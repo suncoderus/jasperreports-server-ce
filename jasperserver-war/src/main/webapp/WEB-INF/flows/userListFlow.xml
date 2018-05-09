@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<flow xmlns="http://www.springframework.org/schema/webflow" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+      ns0:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd"
+      start-state="initEvent">
+
+    <action-state id="initEvent">
+        <evaluate expression="userManagerAction"/>
+        <transition on="success" to="userListView"/>
+    </action-state>
+
+    <!-- Transitions whose 'on' attributes check for externalContext.nativeRequest.method == 'POST' will happen
+    only if the reqest's http method is POST.  This was done to protect sensitive areas against CSRF attacks.
+    Currently, CSRFGuard only protects POST, PUT, DELETE; we want to avoid all server state changing requests via GET, etc.. -->
+    <view-state id="userListView" view="modules/manage/users">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'userListView'"/>
+        </on-entry>
+
+        <transition on="browse" to="next">
+            <evaluate expression="userManagerAction.browse"/>
+        </transition>
+        <transition on="search" to="next">
+            <evaluate expression="userManagerAction.search"/>
+        </transition>
+        <transition on="next" to="next"/>
+
+        <transition on="selectAndGetDetails" to="getDetails">
+            <evaluate expression="userManagerAction.select"/>
+        </transition>
+
+        <transition on="searchAssigned" to="nextAssigned">
+            <evaluate expression="userManagerAction.searchAssigned"/>
+        </transition>
+
+        <transition on="searchAvailable" to="nextAvailable">
+            <evaluate expression="userManagerAction.searchAvailable"/>
+        </transition>
+
+        <transition on="nextAssigned" to="nextAssigned"/>
+        <transition on="nextAvailable" to="nextAvailable"/>
+
+        <transition on="add" to="editUser"/>
+        <transition on="edit" to="editUser"/>
+        <transition on="${currentEvent.id == 'delete' and externalContext.nativeRequest.method == 'POST'}" to="ajaxView">
+            <evaluate expression="userManagerAction.delete"/>
+        </transition>
+        <transition on="${currentEvent.id == 'deleteAll' and externalContext.nativeRequest.method == 'POST'}" to="ajaxView">
+            <evaluate expression="userManagerAction.deleteAll"/>
+        </transition>
+        <transition on="${currentEvent.id == 'enableAll' and externalContext.nativeRequest.method == 'POST'}" to="ajaxView">
+            <evaluate expression="userManagerAction.enableAll"/>
+        </transition>
+        <transition on="${currentEvent.id == 'disableAll' and externalContext.nativeRequest.method == 'POST'}" to="ajaxView">
+            <evaluate expression="userManagerAction.disableAll"/>
+        </transition>
+        <transition on="getAvailableRoles" to="ajaxView">
+            <evaluate expression="userManagerAction.getAvailableRoles"/>
+        </transition>
+        <transition on="${currentEvent.id == 'update' and externalContext.nativeRequest.method == 'POST'}" to="ajaxView">
+            <evaluate expression="userManagerAction.updateUser"/>
+        </transition>
+        <transition on="${currentEvent.id == 'create' and externalContext.nativeRequest.method == 'POST'}" to="ajaxView">
+            <evaluate expression="userManagerAction.create"/>
+        </transition>
+        <transition on="exist" to="ajaxView">
+            <evaluate expression="userManagerAction.exist"/>
+        </transition>
+        <transition on="goToPage" to="goToPage"/>
+    </view-state>
+
+    <action-state id="next">
+        <evaluate expression="userManagerAction"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="getDetails">
+        <evaluate expression="userManagerAction"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="nextAssigned">
+        <evaluate expression="userManagerAction"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="nextAvailable">
+        <evaluate expression="userManagerAction"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <view-state id="ajaxView" view="ajax/ajaxresponse"/>
+
+    <view-state id="ajaxError" view="ajax/ajaxerror"/>
+
+    <!-- exceptions handling -->
+    <decision-state id="backFromError">
+        <if test="not (flowScope.prevForm == null or flowScope.prevForm == '')" then="${flowScope.prevForm}"
+            else="userList"/>
+    </decision-state>
+
+    <view-state id="errorPage" view="modules/system/errorPage">
+        <on-entry>
+            <evaluate expression="errorPageHandlerAction"/>
+        </on-entry>
+    </view-state>
+
+    <global-transitions>
+        <transition on="backFromErrorPage" to="backFromError"/>
+        <transition on-exception="java.lang.Throwable" to="errorPage"/>
+    </global-transitions>
+
+    <!-- end exceptions handling -->
+
+    <bean-import resource="spring-config.xml"/>
+    <bean-import resource="userBeans.xml"/>
+
+</flow>

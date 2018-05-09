@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+   
+	<!-- Backing action for reportDataSourceFlow -->
+   <bean id="reportDataSourceAction" class="com.jaspersoft.jasperserver.war.action.ReportDataSourceAction">
+	   <property name="repository">
+		   <ref bean="${bean.repositoryService}"/>
+	   </property>
+	   <property name="configuration" ref="configurationBean"/>
+
+	   <property name="customDataSourceFactory" ref="customDataSourceServiceFactory"/>
+
+	   <property name="dataSourceMappings">
+		 <bean class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.ResourceFactoryImpl">
+		   <property name="objectFactory" ref="objectFactory"/>
+		   <property name="implementationClassMappings">
+			 <map>
+			   <entry key="JNDI Data Source"
+				   value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.JndiJdbcReportDataSourceImpl"/>
+			   <entry key="JDBC Data Source"
+				   value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.JdbcReportDataSourceImpl"/>
+               <entry key="Virtual Data Source"
+				   value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.VirtualReportDataSourceImpl"/>
+               <entry key="AWS Data Source"
+				   value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.AwsReportDataSourceImpl"/>
+			   <entry key="Bean Data Source"
+				   value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.BeanReportDataSourceImpl"/>
+			   <entry key="Custom Data Source"
+				   value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.CustomReportDataSourceImpl"/>
+               <entry key="Azure Data Source"
+                   value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.AzureSqlReportDataSourceImpl"/>
+			 </map>
+		   </property>
+		 </bean>
+	   </property>
+	   <property name="timezones">
+		   <ref bean="userTimeZonesList"/>
+	   </property>
+	   <property name="validator" ref="dataSourceValidator"/>
+	   <property name="messageSource" ref="messageSource"/>
+	   <property name="engine" ref="engineService"/>
+	   <property name="queryLanguageFlowAttribute" value="queryLanguage"/>
+       <property name="dataSourceTreeDataProvider" ref="dsTreeDataProvider"/>
+	</bean>
+
+    <bean id="dataSourceAction" class="com.jaspersoft.jasperserver.war.action.DataSourceAction">
+	   <property name="repository">
+		   <ref bean="${bean.repositoryService}"/>
+	   </property>
+        <property name="configuration" ref="configurationBean"/>
+        <property name="jdbcConnectionMap" ref="${bean.jdbcConnectionMap}"/>
+        <property name="dynamicUrlPartPattern" ref="dynamicJdbcUrlPartPattern"/>
+        <property name="validationPatternsMap" ref="dataSourcePatterns"/>
+
+        <property name="customDataSourceFactory" ref="customDataSourceServiceFactory"/>
+
+	   <property name="dataSourceMappings">
+		 <bean class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.ResourceFactoryImpl">
+		   <property name="objectFactory" ref="objectFactory"/>
+		   <property name="implementationClassMappings">
+			 <map>
+			   <entry key="JNDI Data Source"
+				   value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.JndiJdbcReportDataSourceImpl"/>
+			   <entry key="JDBC Data Source"
+				   value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.JdbcReportDataSourceImpl"/>
+               <entry key="Virtual Data Source"
+				   value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.VirtualReportDataSourceImpl"/>
+               <entry key="AWS Data Source"
+				   value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.AwsReportDataSourceImpl"/>
+                 <entry key="Azure Data Source"
+                        value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.AzureSqlReportDataSourceImpl"/>
+			   <entry key="Bean Data Source"
+				   value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.BeanReportDataSourceImpl"/>
+               <entry key="Custom Data Source"
+				   value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.CustomReportDataSourceImpl"/>
+			 </map>
+		   </property>
+		 </bean>
+	   </property>
+	   <property name="timezones">
+		   <ref bean="userTimeZonesList"/>
+	   </property>
+       <property name="awsRegions">
+           <ref bean="awsRegions" />
+       </property>
+       <property name="awsDataSourceRecovery" ref="awsDataSourceRecovery"/>
+       <property name="awsEc2MetadataClient" ref="awsEc2MetadataClient"/>
+       <property name="instanceProductTypeResolver" ref="${bean.instanceProductTypeResolver}"/>
+	   <property name="validator" ref="dataSourceValidator"/>
+       <property name="messages" ref="messageSource" />
+	   <property name="engine" ref="engineService"/>
+	   <property name="queryLanguageFlowAttribute" value="queryLanguage"/>
+	   <property name="jdbcDriverService" ref="jdbcDriverService"/>
+	   <property name="awsProperties" ref="awsProperties"/>
+	</bean>
+
+	<bean id="dataSourceValidator" class="com.jaspersoft.jasperserver.war.validation.ReportDataSourceValidator">
+		<property name="repository" ref="${bean.repositoryService}"/>
+		<property name="customDataSourceFactory" ref="customDataSourceServiceFactory"/>
+	</bean>
+
+    <import resource="repositoryExplorerBean.xml"/>
+</beans>

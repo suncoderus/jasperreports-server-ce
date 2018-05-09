@@ -1,0 +1,1 @@
+define(["require","../../export/model/ExportStateModel"],function(e){var t=e("../../export/model/ExportStateModel");return t.extend({url:function(){return"rest_v2/import/"+this.id+"/state"}})});

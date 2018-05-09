@@ -1,0 +1,1 @@
+define(["require","underscore","./ListWithSelection","../trait/nativeMultiSelectionTrait"],function(t){"use strict";var e=t("underscore"),i=t("./ListWithSelection"),r=t("../trait/nativeMultiSelectionTrait"),n=i.extend({});return e.extend(n.prototype,r),n});

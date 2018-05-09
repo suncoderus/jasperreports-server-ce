@@ -1,0 +1,15 @@
+<table class="textDataSourcePreviewTable" unselectable="on" onselectstart="return false">
+    <tbody>
+    {{_.each(data, function(row, y) { }}
+    <tr class="{{- (y === 0 && model.useFirstRowAsHeader) ? 'header' : 'bodyCell' }}">
+        {{_.each(row, function(cell, x) { }}
+        <td class="jrs-grid-cell">
+            <div class="jrs-grid-cell-content">
+                {{- cell }}
+            </div>
+        </td>
+        {{ }); }}
+    </tr>
+    {{ }); }}
+    </tbody>
+</table>

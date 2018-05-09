@@ -1,0 +1,1 @@
+var resourceDataSourceLocate={initialize:function(e){resourceLocator.initialize(e)}};"undefined"==typeof require&&document.observe("dom:loaded",function(){resourceDataSourceLocate.initialize(localContext.initOptions)});

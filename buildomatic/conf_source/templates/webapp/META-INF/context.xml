@@ -1,0 +1,77 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<Context path="/jasperserver" reloadable="false">
+            
+    <!-- maxActive: Maximum number of dB connections in pool. Make sure you
+         configure your mysqld max_connections large enough to handle
+         all of your db connections. Set to 0 for no limit.
+    -->
+    <!-- maxIdle: Maximum number of idle dB connections to retain in pool.
+         Set to -1 for no limit.  See also the DBCP documentation on this
+         and the minEvictableIdleTimeMillis configuration parameter.
+     -->
+    <!-- maxWait: Maximum time to wait for a dB connection to become available
+         in ms, in this example 10 seconds. An Exception is thrown if
+         this timeout is exceeded.  Set to -1 to wait indefinitely.
+    -->
+        
+    <!-- Additional properties to consider. Settings for specifying a      -->
+    <!-- validation query to help with reconnect/timeout errors.           -->
+    <!-- Exact syntax may vary with database type (this tested on mysql.   -->
+    <!--                                                                   -->
+    <!--   validationQuery="select 1"                                      -->
+    <!--   testOnBorrow="true"                                             -->
+    <!--   (and add this to url property): &amp;autoReconnectForPools=true -->
+        
+        
+
+    <Resource name="${js.jndi}" auth="Container" type="javax.sql.DataSource"
+        maxActive="100" maxIdle="30" maxWait="10000"
+        username="${js.dbUsername}" password="${escapeXML:js.dbPassword}"
+        driverClassName="${jdbcDriverClass}"
+        accessToUnderlyingConnectionAllowed = "true"
+        validationQuery="${jdbcTestTableQuery}"
+        testOnBorrow="true"
+        url="${js.jdbcUrl}"
+        factory="${tomcatBasicDatasourceFactory}"
+        ${js.extraParams} />
+
+    <Resource name="${sugarcrm.jndi}" auth="Container" type="javax.sql.DataSource"
+        maxActive="100" maxIdle="30" maxWait="10000"
+        username="${sugarcrm.dbUsername}" password="${escapeXML:sugarcrm.dbPassword}"
+        driverClassName="${jdbcDriverClass}"
+        accessToUnderlyingConnectionAllowed = "true"
+        validationQuery="${jdbcTestTableQuery}"
+        testOnBorrow="true"
+        url="${sugarcrm.jdbcUrl}"
+        factory="${tomcatBasicDatasourceFactory}"/>
+
+    <Resource name="${foodmart.jndi}" auth="Container" type="javax.sql.DataSource"
+        maxActive="100" maxIdle="30" maxWait="10000"
+        username="${foodmart.dbUsername}" password="${escapeXML:foodmart.dbPassword}"
+        driverClassName="${jdbcDriverClass}"
+        accessToUnderlyingConnectionAllowed = "true"
+        validationQuery="${jdbcTestTableQuery}"
+        testOnBorrow="true"
+        url="${foodmart.jdbcUrl}"
+        factory="${tomcatBasicDatasourceFactory}"/>
+
+    <!-- Comment this line to enable session persistence across Tomcat restarts -->
+    <Manager pathname="" />
+</Context>

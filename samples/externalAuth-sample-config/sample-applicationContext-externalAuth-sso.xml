@@ -1,0 +1,214 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <!-- ############ SSO auth ############
+      - Sample configuration of SSO via JasperServer API
+    -->
+
+    <bean id="proxyAuthenticationProcessingFilter" class="com.jaspersoft.jasperserver.api.security.externalAuth.sso.SsoAuthenticationProcessingFilter"
+          parent="authenticationProcessingFilter">
+        <property name="authenticationManager" ref="ssoAuthenticationManager"/>
+        <property name="externalAuthProperties" ref="externalAuthProperties"/>
+        <property name="authenticationSuccessHandler" ref="externalAuthSuccessHandler" />
+    </bean>
+
+    <bean id="externalAuthSuccessHandler"
+          class="com.jaspersoft.jasperserver.api.security.externalAuth.JrsExternalAuthenticationSuccessHandler" parent="successHandler">
+        <property name="externalDataSynchronizer">
+            <ref local="externalDataSynchronizer"/>
+        </property>
+    </bean>
+
+    <bean id="proxyExceptionTranslationFilter" class="com.jaspersoft.jasperserver.api.security.externalAuth.wrappers.spring.JSExceptionTranslationFilter">
+        <property name="authenticationEntryPoint">
+            <bean class="com.jaspersoft.jasperserver.api.security.externalAuth.wrappers.spring.JSLoginUrlAuthenticationEntryPoint">
+                <property name="loginFormUrl">
+                    <value>/externallogin.html</value>
+                </property>
+                <property name="forceHttps">
+                    <value>false</value>
+                </property>
+            </bean>
+        </property>
+        <property name="accessDeniedHandler">
+            <bean class="com.jaspersoft.jasperserver.war.JRSAccessDeniedHandlerImpl">
+                <property name="errorPage" value="/WEB-INF/jsp/modules/system/AccessDeniedPage.jsp"/>
+                <property name="themeResolver" ref="themeResolver"/>
+                <property name="themeSource" ref="themeSource"/>
+                <property name="localeResolver" ref="filterLocaleResolver"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="ssoAuthenticationManager" class="com.jaspersoft.jasperserver.api.security.externalAuth.wrappers.spring.JSProviderManager">
+        <property name="providers">
+            <list>
+                <ref local="ssoAuthenticationProvider"/>
+                <ref bean="${bean.daoAuthenticationProvider}"/>
+                <!-- anonymousAuthenticationProvider only needed if filterInvocationInterceptor.alwaysReauthenticate is set to true
+                    <ref bean="anonymousAuthenticationProvider"/>-->
+            </list>
+        </property>
+    </bean>
+
+    <bean id="ssoSoapAuthenticationManager" class="com.jaspersoft.jasperserver.api.security.externalAuth.wrappers.spring.JSProviderManager">
+        <property name="providers">
+            <list>
+                <ref local="ssoSoapAuthenticationProvider"/>
+                <ref bean="${bean.daoAuthenticationProvider}"/>
+                <!-- anonymousAuthenticationProvider only needed if filterInvocationInterceptor.alwaysReauthenticate is set to true
+                    <ref bean="anonymousAuthenticationProvider"/>-->
+            </list>
+        </property>
+    </bean>
+
+    <bean id="ssoAuthenticationProvider"
+          class="com.jaspersoft.jasperserver.api.security.externalAuth.sso.SsoAuthenticationProvider">
+        <property name="ticketValidator" ref="httpBasedSsoTicketValidator"/>
+        <property name="externalUserDetailsService" ref="externalJDBCUserDetailsService"/>
+    </bean>
+
+    <bean id="ssoSoapAuthenticationProvider"
+          class="com.jaspersoft.jasperserver.api.security.externalAuth.sso.SsoAuthenticationProvider">
+        <property name="ticketValidator" ref="httpBasedSsoWithServiceTicketValidator"/>
+        <property name="externalUserDetailsService" ref="externalJDBCUserDetailsService"/>
+    </bean>
+
+    <bean id="httpBasedSsoTicketValidator"
+          class="com.jaspersoft.jasperserver.api.security.externalAuth.sso.SsoTicketValidatorImpl">
+        <property name="externalAuthProperties" ref="externalAuthProperties"/>
+        <property name="clientHttpRequestFactory">
+            <bean class="com.jaspersoft.jasperserver.api.security.externalAuth.wrappers.spring.JSSimpleClientHttpRequestFactory"/>
+        </property>
+    </bean>
+
+    <bean id="httpBasedSsoWithServiceTicketValidator" class="com.jaspersoft.jasperserver.api.security.externalAuth.sso.SsoTicketValidatorImpl">
+        <property name="externalAuthProperties" ref="externalAuthProperties"/>
+        <property name="service" value="http://localhost:8080/jasperserver/services"/>
+        <property name="clientHttpRequestFactory">
+            <bean class="com.jaspersoft.jasperserver.api.security.externalAuth.wrappers.spring.JSSimpleClientHttpRequestFactory"/>
+        </property>
+    </bean>
+
+    <bean id="externalJDBCUserDetailsService"
+          class="com.jaspersoft.jasperserver.api.security.externalAuth.db.ExternalJDBCUserDetailsService">
+        <property name="dataSource" ref="externalDataSource"/>
+        <property name="authoritiesByUsernameQuery"
+                  value="SELECT u.username, r.rolename FROM jiuser u, jiuserrole ur, jirole r WHERE u.id = ur.userId and ur.roleId=r.id and u.username = ?"/>
+    </bean>
+
+    <!-- ############ SSO auth ############ -->
+
+    <!-- ############ Synchronizer ############ -->
+
+    <bean id="externalDataSynchronizer"
+          class="com.jaspersoft.jasperserver.api.security.externalAuth.ExternalDataSynchronizerImpl">
+        <property name="externalUserDetailsService">
+            <ref local="externalJDBCUserDetailsService"/>
+        </property>
+        <property name="externalUserProcessors">
+            <list>
+                <ref local="externalUserSetupProcessor"/>
+                <!-- Example processor for creating user folder-->
+                <!--<ref local="externalUserFolderProcessor"/>-->
+            </list>
+        </property>
+    </bean>
+
+    <bean id="abstractExternalProcessor"
+          class="com.jaspersoft.jasperserver.api.security.externalAuth.processors.AbstractExternalUserProcessor"
+          abstract="true">
+        <property name="repositoryService" ref="${bean.repositoryService}"/>
+        <property name="userAuthorityService" ref="${bean.userAuthorityService}"/>
+        <property name="tenantService" ref="${bean.tenantService}"/>
+        <property name="profileAttributeService" ref="profileAttributeService"/>
+        <property name="objectPermissionService" ref="objectPermissionService"/>
+    </bean>
+
+    <bean id="externalUserSetupProcessor"
+          class="com.jaspersoft.jasperserver.api.security.externalAuth.processors.ExternalUserSetupProcessor"
+          parent="abstractExternalProcessor">
+        <!--Default permitted role characters; others are removed. Change regular expression to allow other chars.
+                    <property name="permittedExternalRoleNameRegex" value="[A-Za-z0-9_]+"/>-->
+
+        <property name="userAuthorityService">
+            <ref bean="${bean.internalUserAuthorityService}"/>
+        </property>
+        <property name="defaultInternalRoles">
+            <list>
+                <value>ROLE_USER</value>
+            </list>
+        </property>
+
+        <property name="externalAuthProperties" ><ref local="externalAuthProperties"/></property>
+
+        <property name="organizationRoleMap">
+            <map>
+                <!-- Example of mapping customer roles to JRS roles -->
+                <entry>
+                    <key>
+                        <value>ROLE_ADMIN_EXTERNAL_ORGANIZATION</value>
+                    </key>
+                    <!-- JRS role that the <key> external role is mapped to-->
+                    <value>ROLE_ADMINISTRATOR</value>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="externalUserFolderProcessor"
+          class="com.jaspersoft.jasperserver.api.security.externalAuth.processors.ExternalUserFolderProcessor"
+          parent="abstractExternalProcessor">
+        <property name="repositoryService" ref="${bean.unsecureRepositoryService}"/>
+    </bean>
+
+    <!-- ############ Synchronizer ############ -->
+
+    <!-- ############## external dataSource: config in master.properties ############### -->
+    <bean id="externalDataSource" class="com.jaspersoft.jasperserver.api.security.externalAuth.wrappers.spring.jdbc.JSDriverManagerDataSource">
+        <property name="driverClassName" value="${external.jdbc.driverClassName}"/>
+        <property name="url" value="${external.jdbc.url}"/>
+        <property name="username" value="${external.jdbc.username}"/>
+        <property name="password" value="${external.jdbc.password}"/>
+    </bean>
+
+    <bean id="externalAuthProperties"
+          class="com.jaspersoft.jasperserver.api.security.externalAuth.ExternalAuthProperties">
+        <property name="authenticationProcessingUrl" value="/j_spring_security_check"/>
+        <property name="serviceParameterName" value="service"/>
+        <property name="ticketParameterName" value="ticket"/>
+        <property name="externalLoginUrl" value="#ssoServerLocation#/login"/>
+
+        <!-- external logout url. If specified, logout will redirect to that address. -->
+        <property name="logoutUrl" value="#ssoServerLocation#/logout"/>
+
+        <property name="ssoServerTicketValidationUrl" value="#ssoServerLocation#/serviceValidate"/>
+        <property name="ssoServerLocation" value="https://localhost:8443/sso_server_example"/>
+
+        <property name="customPropertyMap">
+            <description>additional custom sso parameters go here</description>
+            <map>
+                <entry key="principalXmlTagName" value="cas:user"/>
+            </map>
+        </property>
+    </bean>
+</beans>

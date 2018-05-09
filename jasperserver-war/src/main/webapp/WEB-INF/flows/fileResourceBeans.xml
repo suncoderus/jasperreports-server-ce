@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+	<!-- Backing action for fileResourceFlow -->
+	<bean id="fileResourceAction" class="com.jaspersoft.jasperserver.war.action.FileResourceAction">
+		<property name="repository">
+			<ref bean="${bean.repositoryService}"/>
+		</property>
+		<property name="configuration">
+			<ref bean="configurationBean"/>
+		</property>
+        <property name="securityContextProvider">
+            <ref bean="${bean.securityContextProvider}" />
+        </property>
+		<property name="validator" ref="fileResourceValidator"/>
+        <property name="messages" ref="messageSource"/>
+        <property name="fileResourceTreeDataProvider" ref="fileResourceTreeDataProvider"/>
+	</bean>
+	<bean id="fileResourceValidator" class="com.jaspersoft.jasperserver.war.validation.FileResourceValidator">
+        <property name="fileNameRegexp" value="^.+$"/>
+        <!-- if null - default validation message key will be used -->
+        <property name="fileNameValidationMessageKey"><null/></property>
+        <!-- max upload file size in bytes. -1 means no limit -->
+        <property name="maxFileSize" value="-1"/>
+		<property name="repository">
+		   <ref bean="${bean.repositoryService}"/>
+		</property>
+		<property name="repositoryServiceSecurityChecker">
+		   <ref bean="${bean.repositoryServiceSecurityChecker}"/>
+		</property>
+	</bean>
+
+    <import resource="repositoryExplorerBean.xml"/>
+</beans>

@@ -1,0 +1,1 @@
+This folder contains JasperServer log files.

@@ -1,0 +1,1 @@
+define(["require","underscore"],function(e){var n=e("underscore");return{processResponse:function(e){return n.map(e,function(e){var r=e[0],t=e[1],o=e[2];return e={data:r,options:n.extend({},o,{total:t})}})}}});

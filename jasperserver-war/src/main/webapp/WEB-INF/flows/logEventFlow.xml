@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<flow xmlns="http://www.springframework.org/schema/webflow" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+      ns0:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd"
+      start-state="eventList">
+
+    <view-state id="eventList" view="modules/messages/messageList">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'eventList'"/>
+        </on-entry>
+        <transition on="viewMessage" to="viewMessage"/>
+        <transition on="delete" to="delete"/>
+        <transition on="markAsRead" to="markAsRead"/>
+        <transition on="markAsUnread" to="markAsUnread"/>
+        <transition on="changeEventsType" to="changeEventsType"/>
+        <transition on="getMessages" to="messages"/>
+        <transition on="error" to="errorPage"/>
+    </view-state>
+
+    <action-state id="messages">
+        <evaluate expression="logEventAction"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <view-state id="ajaxView" view="ajax/ajaxresponse"/>
+    
+    <action-state id="changeEventsType">
+        <evaluate expression="logEventAction"/>
+        <transition on="success" to="messages"/>
+    </action-state>
+
+    <action-state id="delete">
+        <evaluate expression="logEventAction"/>
+        <transition on="success" to="messages"/>
+    </action-state>
+
+    <action-state id="markAsRead">
+        <evaluate expression="logEventAction"/>
+        <transition on="success" to="messages"/>
+    </action-state>
+
+    <action-state id="markAsUnread">
+        <evaluate expression="logEventAction"/>
+        <transition on="success" to="messages"/>
+    </action-state>
+
+    <view-state id="viewMessage" view="modules/messages/messageDetail">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'viewMessage'"/>
+            <evaluate expression="logEventAction.setupMessageDetail"/>
+        </on-entry>
+        <transition on="back" to="eventList"/>
+    </view-state>
+
+    <!-- exceptions handling -->
+    <decision-state id="backFromError">
+        <if test="not (flowScope.prevForm == null or flowScope.prevForm == '')" then="${flowScope.prevForm}"
+            else="eventList"/>
+    </decision-state>
+
+    <view-state id="errorPage" view="modules/system/errorPage">
+        <on-entry>
+            <evaluate expression="errorPageHandlerAction"/>
+        </on-entry>
+    </view-state>
+
+    <global-transitions>
+        <transition on="backFromErrorPage" to="backFromError"/>
+        <transition on-exception="java.lang.Throwable" to="errorPage"/>
+    </global-transitions>
+    <!-- end exceptions handling -->
+
+    <bean-import resource="logEventBeans.xml"/>
+</flow>

@@ -1,0 +1,79 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<project name="ftp-repo-api" default="help-ftp">
+
+    <target name="help-ftp" depends="">
+        <echo message="Available targets :"/>
+        <echo message="  build-ftp                :  build jasperserver-ftp module"/>
+        <echo message="  deploy-ftp-overlay-pro   :  copy jars and xml config files to deployed web application"/>
+        <echo message="Only tomcat is supported for now"/>
+    </target>
+
+    <target name="build-ftp">
+        <runmaven dir="${js-path}/jasperserver-ftp">
+            <arg value="clean"/>
+            <arg value="install"/>
+        </runmaven>
+    </target>
+
+    <target name="deploy-ftp-overlay-pro" depends="set-pro-webapp-name">
+
+        <switch value="${appServerType}">
+            <case value="tomcat5">
+                <var name="warTargetDir" value="${fixedAppServerDir}/webapps/${webAppName}"/>
+                <var name="warTargetDirDel" value="${fixedAppServerDir}/webapps/${webAppNameDel}"/>
+            </case>
+            <case value="tomcat6">
+                <var name="warTargetDir" value="${fixedAppServerDir}/webapps/${webAppName}"/>
+                <var name="warTargetDirDel" value="${fixedAppServerDir}/webapps/${webAppNameDel}"/>
+            </case>
+            <case value="tomcat7">
+                <var name="warTargetDir" value="${fixedAppServerDir}/webapps/${webAppName}"/>
+                <var name="warTargetDirDel" value="${fixedAppServerDir}/webapps/${webAppNameDel}"/>
+            </case>
+
+            <default>
+                <fail>Unknown / not supported value of appServerType ${appServerType}</fail>
+            </default>
+        </switch>
+
+        <var name="overlayJarSourceDir" value="${js-path}/jasperserver-ftp/target"/>
+        <var name="overlayXMLSourceDir" value="${js-path}/jasperserver-ftp/shared-config"/>
+
+        <echo message="deploy-ftp-overlay : appServerType is ${appServerType}"/>
+        <echo message="deploy-ftp-overlay : overlayJarSourceDir is ${overlayJarSourceDir}"/>
+        <echo message="deploy-ftp-overlay : warTargetDir is ${warTargetDir}"/>
+
+        <!-- Copy jars -->
+        <copy toDir="${warTargetDir}/WEB-INF/lib">
+            <fileset dir="${overlayJarSourceDir}">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+
+        <!-- Copy applicationContext -->
+        <copy toDir="${warTargetDir}/WEB-INF">
+            <fileset dir="${overlayXMLSourceDir}">
+                <include name="*.xml"/>
+            </fileset>
+        </copy>
+
+    </target>
+
+</project>

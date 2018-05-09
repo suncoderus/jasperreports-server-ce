@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.jaspersoft.jasperserver.api.metadata.impl</groupId>
+    <artifactId>jasperserver-repository-build-db</artifactId>
+    <packaging>jar</packaging>
+    <name>Jasper Server database generation</name>
+    <url>http://www.jaspersoft.com</url>
+    <parent>
+        <groupId>com.jaspersoft.jasperserver</groupId>
+        <artifactId>server</artifactId>
+        <version>7.1.0</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+    <dependencies>
+        <dependency>
+            <groupId>com.jaspersoft.jasperserver.api.engine.impl</groupId>
+            <artifactId>jasperserver-api-engine-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jaspersoft.jasperserver.api.metadata.impl</groupId>
+            <artifactId>jasperserver-repository-hibernate</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jaspersoft.jasperserver.api.common.impl</groupId>
+            <artifactId>jasperserver-api-common-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jaspersoft.jasperserver.api.metadata.impl</groupId>
+            <artifactId>jasperserver-api-metadata-impl</artifactId>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.jaspersoft.jasperserver.api.metadata.impl</groupId>
+                                    <artifactId>jasperserver-repository-hibernate</artifactId>
+                                    <version>${project.version}</version>
+                                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!--Generate DDL for creating the database after compilation-->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <configuration>
+                            <tasks>
+                                <taskdef name="hibernatetool" classname="org.hibernate.tool.ant.HibernateToolTask">
+                                    <classpath>
+                                        <path refid="maven.test.classpath"/>
+                                        <pathelement location="${maven.build.dest}"/>
+                                    </classpath>
+                                </taskdef>
+                                <mkdir dir="${project.build.directory}/sql"/>
+                                <hibernatetool destdir="${project.build.directory}/sql">
+                                    <classpath>
+                                        <path refid="maven.test.classpath"/>
+                                    </classpath>
+                                    <configuration configurationfile="${platform-path}/hibernate.cfg.xml">
+                                        <fileset dir="${project.build.outputDirectory}">
+                                            <include name="**/*.hbm.xml"/>
+                                            <exclude name="**/util/*.hbm.xml"/>
+                                            <!--Workaround for search, allows to search for Resources AND Folders-->
+                                            <!--Look in RepoResourceItemBase.hbm.xm-->
+                                            <exclude name="**/RepoResourceItemBase.hbm.xml"/>
+                                        </fileset>
+                                    </configuration>
+                                    <hbm2ddl drop="true" create="false" export="${metadata.database.generate}"
+                                             outputfilename="js-drop.ddl" delimiter=";" format="true"/>
+                                    <hbm2ddl drop="false" create="true" export="${metadata.database.generate}"
+                                             outputfilename="js-create.ddl" delimiter=";" format="true"/>
+                                </hibernatetool>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>runquartz</id>
+                        <phase>process-classes</phase>
+                        <configuration>
+                            <tasks unless="suppress.quartz.init">
+                                <property file="${platform-path}/js.jdbc.properties"/>
+                                <sql driver="${metadata.jdbc.driverClassName}" url="${metadata.jdbc.url}"
+                                     userid="${metadata.jdbc.username}" password="${metadata.jdbc.password}"
+                                     src="${js.quartz.script}" onerror="continue"></sql>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-tools</artifactId>
+                        <version>3.1.0.beta4</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.jaspersoft.jasperserver</groupId>
+                        <artifactId>jdbc-dep</artifactId>
+                        <version>1.0</version>
+                        <type>pom</type>
+                    </dependency>
+                    <dependency>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                        <version>1.2.12</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+</project>

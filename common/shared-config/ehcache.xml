@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<ehcache
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="ehcache.xsd"
+        name="jasperserverCache" updateCheck="false">
+
+    <diskStore path="${ehcache.disk.store.dir}/main"/>
+
+
+    <defaultCache
+            maxElementsInMemory="10000"
+            eternal="false"
+            overflowToDisk="true"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"/>
+
+    <cache name="report.job.acl"
+           maxElementsInMemory="1000"
+           eternal="false"
+           overflowToDisk="false"
+           timeToIdleSeconds="7200"
+           timeToLiveSeconds="172800"
+           diskPersistent="false"/>
+
+    <cache name="connection.descriptions"
+           maxElementsInMemory="10000"
+           eternal="false"
+           overflowToDisk="false"
+           timeToIdleSeconds="120"
+           timeToLiveSeconds="1200"
+           diskPersistent="false"/>
+
+    <cache name="hibernate_repository_ehcache"
+           maxElementsInMemory="500"
+           eternal="true"
+           overflowToDisk="true"
+           maxElementsOnDisk="10000"
+           diskPersistent="false"/>
+
+    <!-- cache used by the object permission service -->
+    <cache name="attributeCache"
+           maxElementsInMemory="100000"
+	   statistics="false"
+           eternal="false"
+           overflowToDisk="false"
+           timeToIdleSeconds="360000"
+           timeToLiveSeconds="720000"
+           diskPersistent="false"/>
+
+    <cache name="teiidResultsetEhCache"
+           maxElementsInMemory="10000"
+           eternal="false"
+           overflowToDisk="false"
+           timeToIdleSeconds="360000"
+           timeToLiveSeconds="720000"
+           diskPersistent="false"/>
+
+    <cache name="teiidResultsetReplEhCache"
+           maxElementsInMemory="10000"
+           eternal="false"
+           overflowToDisk="false"
+           timeToIdleSeconds="360000"
+           timeToLiveSeconds="720000"
+           diskPersistent="false"/>
+
+    <cache name="teiidPreparedPlanEhCache"
+           maxElementsInMemory="10000"
+           eternal="false"
+           overflowToDisk="false"
+           timeToIdleSeconds="360000"
+           timeToLiveSeconds="720000"
+           diskPersistent="false"/>
+
+        <!-- Uncomment this section to allow distribution of this cache -->
+        <!--
+        <cacheEventListenerFactory
+            class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
+            properties="replicateAsynchronously=true, replicatePuts=false, replicateUpdates=true,replicateUpdatesViaCopy=false, replicateRemovals=true "/>
+        <bootstrapCacheLoaderFactory
+            class="net.sf.ehcache.distribution.RMIBootstrapCacheLoaderFactory"
+            properties="bootstrapAsynchronously=true, maximumChunkSizeBytes=5000000"/>
+        -->
+
+    <cache name="systemUserStorageCache"
+           maxElementsInMemory="10000"
+           eternal="false"
+           overflowToDisk="false"
+           timeToIdleSeconds="360000"
+           timeToLiveSeconds="720000"
+           diskPersistent="false"/>
+
+    <!-- cache used by the object permission service -->
+    <cache name="aclCache"
+           maxElementsInMemory="100000"
+	   statistics="false"
+           eternal="true"
+           overflowToDisk="true"
+           timeToIdleSeconds="360000"
+           timeToLiveSeconds="720000"
+           diskPersistent="false">
+        <!-- Uncomment this section to allow distribution of this cache -->
+        <!--
+        <cacheEventListenerFactory
+            class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
+            properties="replicateAsynchronously=true, replicatePuts=false, replicateUpdates=true,replicateUpdatesViaCopy=false, replicateRemovals=true "/>
+        <bootstrapCacheLoaderFactory
+            class="net.sf.ehcache.distribution.RMIBootstrapCacheLoaderFactory"
+            properties="bootstrapAsynchronously=true, maximumChunkSizeBytes=5000000"/>
+        -->
+    </cache>
+</ehcache>

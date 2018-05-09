@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <import resource="base-fixtures-config.xml"/>
+
+    <!-- sampleTestCase -->
+
+    <bean id="getValue123" class="java.util.HashMap" parent="baseTestCaseMap">
+        <constructor-arg index="0">
+            <map merge="true">
+                <entry key-ref="QUERY_EXECUTOR" value-ref="queryExecutor"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="queryExecutor" class="java.util.HashMap">
+        <constructor-arg index="0">
+            <map>
+                <entry key="country">
+                    <map>
+                        <entry key="{}"
+                               value-ref="countries_queryResult"/>
+                    </map>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <!-- query results -->
+    <bean id="countries_queryResult" class="com.jaspersoft.jasperserver.war.cascade.utils.OrderedMapMock">
+        <constructor-arg>
+            <map>
+                <entry key="USA">
+                    <list><value>USA</value></list>
+                </entry>
+                <entry key="Ukraine">
+                    <list><value>Ukraine</value></list>
+                </entry>
+                <entry key="Canada">
+                    <list><value>Canada</value></list>
+                </entry>
+                <entry>
+                    <key><null/></key>
+                    <list><null/></list>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="states_queryResult4" class="com.jaspersoft.jasperserver.war.cascade.utils.OrderedMapMock">
+        <constructor-arg>
+            <map/>
+        </constructor-arg>
+    </bean>
+
+</beans>
+
+
+
+

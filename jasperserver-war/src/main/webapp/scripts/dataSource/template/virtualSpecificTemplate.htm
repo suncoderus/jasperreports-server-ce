@@ -1,0 +1,64 @@
+<fieldset class="group">
+    <input type="hidden" name="subDataSources" value=""/>
+    <span class="message warning"></span>
+</fieldset>
+<fieldset class="group">
+    <div style="position:relative" class="content" id="dataSourcesSelector">
+        <div class="body twoColumn_equal pickWells" id="subDsSelectionContainer">
+            <div class="moveButtons" id="moveButtons">
+                <button title="{{- i18n['resource.moveRight'] }}" class="button action square move right up"
+                        disabled="disabled" name="toRight"><span class="wrap">{{- i18n["resource.moveRight"] }}<span
+                        class="icon"></span></span></button>
+                <button title="{{- i18n['resource.moveLeft'] }}" class="button action square move left up"
+                        disabled="disabled" name="toLeft"><span class="wrap">{{- i18n["resource.moveLeft"] }}<span
+                        class="icon"></span></span></button>
+                <button title="{{- i18n['resource.moveAllLeft'] }}" class="button action square move toLeft up"
+                        disabled="disabled" name="allToLeft"><span class="wrap">{{- i18n["resource.moveAllLeft"] }}<span
+                        class="icon"></span></span></button>
+            </div>
+
+            <div class="column secondary" id="availableDataSources">
+                <label for="subDataSourcesTree" class="control">
+                    <span class="wrap">{{- i18n["resource.dataSource.virtual.availableDataSources"] }}</span>
+                    <br>
+
+                    <div class="control groupBox">
+                        <div class="content ">
+                            <div class="header ">
+                                <div class="title"></div>
+                            </div>
+                            <div class="body  ">
+                                <ul class="list collapsible folders" id="subDataSourcesTree"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+
+            <div class="column primary" id="selectedDataSources">
+                <label for="selectedSubDataSourcesList" class="control">
+                    <span class="wrap">{{- i18n["resource.dataSource.virtual.selectedDataSources"] }}</span>
+                    <br>
+
+                    <div class="content">
+                        <ul class="list tabular twoColumn header" id="selectedDataSourcesHeader">
+                            <li>
+                                <div class="wrap">
+                                    <div class="column one">
+                                        <p class="dataSourceName">{{- i18n["resource.dataSource.name"] }}</p>
+                                    </div>
+                                    <div class="column two">
+                                        <p class="dataSourceID">{{- i18n["resource.dataSource.virtual.subDsId"] }}</p>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        <div id="selectedSubDataSourcesListContainer">
+                            <ol class="list tabular twoColumn" id="selectedSubDataSourcesList"></ol>
+                        </div>
+                    </div>
+                </label>
+            </div>
+        </div>
+    </div>
+</fieldset>

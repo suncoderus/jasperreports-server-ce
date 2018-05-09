@@ -1,0 +1,1 @@
+define(["require","underscore","backbone.marionette","text!../templates/emptyCollectionViewTemplate.htm"],function(e){var t=e("underscore"),a=e("backbone.marionette"),m=e("text!../templates/emptyCollectionViewTemplate.htm"),n=a.ItemView.extend({className:"table-row",template:t.template(m)});return n});

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <bean id="webHelp" class="com.jaspersoft.jasperserver.war.webHelp.WebHelpLookup">
+        <property name="showHelp" value="true"/>
+        <property name="hostURL" value="http://help.jaspersoft.com/js-help-v7-en/"/>
+        <property name="pagePrefix" value="Default_CSH.htm#"/> 
+        <!-- context keys (defined by javascript variable webHelpModule.'helpContext' for each page)-->
+        <property name="helpContextMap">
+            <map>
+                <entry key="default" value="100"/>
+                <entry key="bi_overview" value="100"/>
+                <entry key="login" value="150"/>
+                <entry key="legacy_dashboard" value="200"/>
+                <entry key="ad_hoc" value="300"/>
+                <entry key="domain" value="500"/>
+                <entry key="search" value="600"/>
+                <entry key="analysis" value="700"/>
+                <entry key="admin" value="800"/>
+                <entry key="repo" value="900"/>
+                <entry key="dashboard" value="1000"/>
+            </map>
+        </property>
+    </bean>
+
+</beans>

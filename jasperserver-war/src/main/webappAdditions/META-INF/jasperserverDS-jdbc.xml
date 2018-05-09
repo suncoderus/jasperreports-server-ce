@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<jdbc-data-source xmlns="http://www.bea.com/ns/weblogic/90" xmlns:sec="http://www.bea.com/ns/weblogic/90/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wls="http://www.bea.com/ns/weblogic/90/security/wls" xsi:schemaLocation="http://www.bea.com/ns/weblogic/920 http://www.bea.com/ns/weblogic/920.xsd">
+  <name>JasperServerDataBase</name>
+  <jdbc-driver-params>
+    <url>jdbc:mysql://localhost:3306/jasperserver?useUnicode=true&amp;amp;characterEncoding=UTF-8</url>
+    <driver-name>com.mysql.jdbc.Driver</driver-name>
+    <properties>
+      <property>
+        <name>user</name>
+        <value>root</value>
+      </property>
+    </properties>
+    <password-encrypted>password</password-encrypted>
+  </jdbc-driver-params>
+  <jdbc-connection-pool-params>
+    <test-table-name>SQL SELECT 1</test-table-name>
+  </jdbc-connection-pool-params>
+  <jdbc-data-source-params>
+    <jndi-name>JasperServerDataBase</jndi-name>
+    <global-transactions-protocol>OnePhaseCommit</global-transactions-protocol>
+  </jdbc-data-source-params>
+</jdbc-data-source>

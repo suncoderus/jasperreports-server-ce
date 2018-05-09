@@ -1,0 +1,1 @@
+function isProVersion(){return"PRO"==js_edition}var js_edition="OS";

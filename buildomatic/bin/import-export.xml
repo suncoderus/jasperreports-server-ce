@@ -1,0 +1,642 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<project name="export-import">
+    <!-- ======================================================================= -->
+    <!--                                                                         -->
+    <!-- import-export helper macros                                             -->
+    <!--                                                                         -->
+    <!-- ======================================================================= -->
+
+     <macrodef name="check-import-export-file-property"
+            description="check that importFile or exportFile is defined on import targets">
+        <attribute name="type"/> <!-- import or export -->
+        <attribute name="edition"/> <!-- ce or pro -->
+        <attribute name="example"/> <!-- example command used in error message -->
+        <sequential>
+            <var name="propName" value="@{type}File"/>
+            <if>
+                <not>
+                    <isset property="${propName}"/>
+                </not>
+                <then>
+                    <echo>
+The property -D${propName} needs to be specified on the command line
+For instance:     @{example}
+For options try:  js-ant @{type}-help-@{edition}
+                    </echo>
+                    <fail message="Missing file argument for import/export"/>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="run-import-export"
+            description="import or export of repository data">
+        <attribute name="type"/>
+        <attribute name="archive"/>
+        <attribute name="edition"/> <!-- ce or pro -->
+        <attribute name="checkDBMSConnection"/> <!-- true or false -->
+        <attribute name="useConsoleInput" default="false"/> <!-- true or false -->
+        <element name="args" implicit="yes" optional="true"/>
+        <sequential>
+            <!-- set config dir based on edition, then make sure it's there -->
+            <if>
+                <equals arg1="@{edition}" arg2="ce" />
+                <then>
+                    <var name="importExportConfig" value="${importExportConfigCe}"/>
+                </then>
+                <elseif>
+                    <equals arg1="@{edition}" arg2="pro" />
+                    <then>
+                        <var name="importExportConfig" value="${importExportConfigPro}"/>
+                    </then>
+                </elseif>
+                <else>
+                    <fail>Invalid value for edition: @{edition}</fail>
+                </else>
+            </if>
+            <if>
+                <not>
+                    <available file="${importExportConfig}"/>
+                </not>
+                <then>
+                    <echo>
+Error: Directory ${importExportConfig} was not found
+Try running "js-ant assemble-export-files-@{edition}"
+Make sure you have compiled the jasperserver source code.
+                    </echo>
+                    <fail message="Missing import-export config directory"/>
+                </then>
+            </if>
+
+            <!-- determine whether we are using dir or zip -->
+            <if>
+                <matches string="@{archive}" pattern="zip$"/>
+                <then>
+                    <var name="archiveType" value="zip"/>
+                </then>
+                <else>
+                    <var name="archiveType" value="dir"/>
+                </else>
+            </if>
+            <!-- construct parts of command line -->
+            <if>
+                <equals arg1="@{type}" arg2="import" />
+                <then>
+                    <var name="class" value="com.jaspersoft.jasperserver.export.ImportCommand"/>
+                    <var name="archiveArg" value="--input-${archiveType}=@{archive}"/>
+                </then>
+                <else>
+                    <var name="class" value="com.jaspersoft.jasperserver.export.ExportCommand"/>
+                    <var name="archiveArg" value="--output-${archiveType}=@{archive}"/>
+                </else>
+            </if>
+            <echo> </echo>
+            <echo>Property values (in install.xml): </echo>
+            <echo> archiveArg = ${archiveArg}</echo>
+            <echo> dbType = ${dbType}</echo>
+            <echo> jdbcJar = ${jdbcJar}</echo>
+            <echo> currentConf = ${currentConf}</echo>
+            <echo> importExportConfig = ${importExportConfig}</echo>
+            <echo> </echo>
+
+            <!-- todo: fixed bug 15479 - postgresql fails on export on scheduled report       -->
+            <!-- todo: better fix would be to pull in the js.quartz.properties file from the  -->
+            <!--       buildomatic/build_conf dir in the run-import-export macrodef           -->
+            <!-- tweaking conf_source/import_export_config*/js.quartz.properties for quartz delegate if postgresql -->
+            <if>
+                <equals arg1="${dbType}" arg2="postgresql" />
+                <then>
+                    <replace file="${importExportConfig}/js.quartz.properties"
+                             token="StdJDBCDelegate" value="PostgreSQLDelegate"/>
+                </then>
+                <else>
+                    <replace file="${importExportConfig}/js.quartz.properties"
+                             token="PostgreSQLDelegate" value="StdJDBCDelegate"/>
+                </else>
+            </if>
+
+            <set-import-export-lib-dir importExportConfig="${importExportConfig}"/>
+
+            <if>
+               <equals arg1="@{checkDBMSConnection}" arg2="true" />
+               <then>
+                   <validateDB systemName="js" phase="import-export-test" failOnDBNotExists="true"/>
+               </then>
+           </if>
+
+            <if>
+                <equals arg1="@{useConsoleInput}" arg2="true" />
+                <then>
+                    <java classname="${class}" fork="true" failonerror="true">
+                        <arg value="--@{type}"/>
+                        <arg value="${archiveArg}"/>
+                        <args/>
+                        <!-- add arg that tells oracle JDBC driver to use utf-8 types; won't hurt anyone else -->
+                        <jvmarg value="-Doracle.jdbc.defaultNChar=true"/>
+                        <!-- add this to handle properly import catalogs with utf-8 names -->
+                        <jvmarg value="-Dfile.encoding=UTF-8"/>
+                        <!-- disable ehcache -->
+                        <jvmarg value="-Dnet.sf.ehcache.disabled=true"/>
+                        <!-- set this var to avoid certain network exceptions in OS X -->
+                        <jvmarg value="-Djava.net.preferIPv4Stack=true"/>
+                        <jvmarg value="-Xms512m"/>
+                        <jvmarg value="-Xmx2048m"/>
+
+                        <!-- Uncomment to debug remotely     -->
+                        <!--<jvmarg value="-Xdebug"/>
+                        <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=9009"/>-->
+
+                        <classpath>
+            <!--
+                                TODO
+                                we should put currentConf first so it can pick up the files generated based on
+                                db settings, etc., but if you do that, beans don't get recognized because
+                                the Spring context loader uses a pattern of "applicationContext*.xml", which
+                                is sensitive to the order of the classpath.
+                                We should use one of the args such as -configResources to pass a pattern
+                                that is more explicit for Spring, doing something like this:
+                                -configResources=file:blah/import-export/dir/applicationContext*.xml
+                              -->
+                            <pathelement location="${importExportConfig}"/>
+                            <fileset dir="${importExportLibDir}" includes="*.jar"/>
+                            <fileset dir="${currentDbJDBCDir}" includes="${jdbcJar}"/>
+                            <pathelement location="${currentConf}"/>
+                        </classpath>
+                    </java>
+                </then>
+                <else>
+                    <!--
+              JVM forked by Ant tries to read from input stream by default.
+              If one of the <input>s with be executed after this call then
+              user will be prompted for input at least one more time
+              (pending input for forked JVM).
+              inputstring="" is added explicitly to ensure that input will not be captured
+              and <input>s will work as expected.
+
+              TODO This is a known bug https://issues.apache.org/bugzilla/show_bug.cgi?id=49119. Fixed in Ant 1.8.2
+             -->
+
+            <java classname="${class}" fork="true" failonerror="true" inputstring="">
+                <arg value="--@{type}"/>
+                <arg value="${archiveArg}"/>
+                <args/>
+                <!-- add arg that tells oracle JDBC driver to use utf-8 types; won't hurt anyone else -->
+                <jvmarg value="-Doracle.jdbc.defaultNChar=true"/>
+                <!-- add this to handle properly import catalogs with utf-8 names -->
+                <jvmarg value="-Dfile.encoding=UTF-8"/>
+		<!-- disable ehcache -->
+            	<jvmarg value="-Dnet.sf.ehcache.disabled=true"/>
+				<!-- set this var to avoid certain network exceptions in OS X -->
+            	<jvmarg value="-Djava.net.preferIPv4Stack=true"/>
+                <jvmarg value="-Xms512m"/>
+                <jvmarg value="-Xmx2048m"/>
+
+                <!-- Uncomment to debug remotely     -->
+                <!--<jvmarg value="-Xdebug"/>
+                <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=9009"/>-->
+
+                        <classpath>
+                            <!--
+                                TODO
+                                we should put currentConf first so it can pick up the files generated based on
+                                db settings, etc., but if you do that, beans don't get recognized because
+                                the Spring context loader uses a pattern of "applicationContext*.xml", which
+                                is sensitive to the order of the classpath.
+                                We should use one of the args such as -configResources to pass a pattern
+                                that is more explicit for Spring, doing something like this:
+                                -configResources=file:blah/import-export/dir/applicationContext*.xml
+                              -->
+                            <pathelement location="${importExportConfig}"/>
+                            <fileset dir="${importExportLibDir}" includes="*.jar"/>
+                            <fileset dir="${currentDbJDBCDir}" includes="${jdbcJar}"/>
+                            <pathelement location="${currentConf}"/>
+                        </classpath>
+                    </java>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <!-- ======================================================================================= -->
+    <!-- set-import-export-lib-dir                                                               -->
+    <!--   For import-export operation set ${importExportLibDir} in order to find the required   -->
+    <!--   jar files.                                                                            -->
+    <!--   1) if "../scripts/lib" exists then we are in an install context. Default to this      -->
+    <!--      setting. (ie an end user installing from the WAR File Dist zip)                    -->
+    <!--   2) if no scripts/lib then use the jars put in place by buildomatic                    -->
+    <!--      (buildomatia/conf_source/import_export_config_<ce/pro>)                            -->
+    <!-- ======================================================================================= -->
+    <macrodef name="set-import-export-lib-dir">
+        <attribute name="importExportConfig"/>
+        <sequential>
+            <if>
+                <available file="${basedir}/../scripts/lib"/>
+                <then>
+                    <var name="importExportLibDir" value="${basedir}/../scripts/lib"/>
+                </then>
+                <else>
+                    <var name="importExportLibDir" value="@{importExportConfig}/lib"/>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <!-- ======================================================================= -->
+    <!--                                                                         -->
+    <!-- import-export targets                                                   -->
+    <!--                                                                         -->
+    <!-- ======================================================================= -->
+
+    <target name="import"
+            description="do repo import from archive. specify file with -DimportFile">
+
+        <check-import-export-file-property
+            type="import"
+            edition="pro"
+            example="js-ant import -DimportFile=js-catalog.zip"/>
+        <if>
+            <isset property="importArgs"/>
+            <then>
+                <run-import-export type="import" archive="${importFile}"
+                                   edition="pro" checkDBMSConnection="true" useConsoleInput="true">
+                    <arg line="${importArgs}" />
+                </run-import-export>
+            </then>
+            <else>
+                <run-import-export type="import" archive="${importFile}" edition="pro" checkDBMSConnection="true"/>
+            </else>
+        </if>
+    </target>
+
+    <target name="import-ce"
+            description="do repo import from archive. specify file with -DimportFile">
+
+        <check-import-export-file-property
+            type="import"
+            edition="ce"
+            example="js-ant import-ce -DimportFile=js-catalog.zip"/>
+        <if>
+            <isset property="importArgs"/>
+            <then>
+                <run-import-export type="import" archive="${importFile}" edition="ce" checkDBMSConnection="true">
+                    <arg line="${importArgs}" />
+                </run-import-export>
+            </then>
+            <else>
+                <run-import-export type="import" archive="${importFile}" edition="ce" checkDBMSConnection="true"/>
+            </else>
+        </if>
+    </target>
+
+    <!-- for pro there is a minimal file per db -->
+    <target name="import-minimal-pro"
+            description="do import of minimal resources">
+
+        <run-import-export type="import" archive="${exportDir}/js-catalog-${dbType}-minimal-pro.zip" edition="pro" checkDBMSConnection="true"/>
+    </target>
+
+    <target name="import-minimal-ce"
+            description="do import of minimal resources">
+
+        <run-import-export type="import" archive="${exportDir}/js-catalog-${dbType}-minimal-ce.zip" edition="ce" checkDBMSConnection="true"/>
+    </target>
+
+    <target name="import-minimal-for-upgrade-pro"
+            description="do import of minimal resources in upgrade context for Pro">
+        <run-import-export type="import" archive="${exportDir}/js-catalog-${dbType}-minimal-pro.zip" edition="pro" checkDBMSConnection="true">
+            <arg value="--update" />
+            <arg value="--skip-user-update" />
+        </run-import-export>
+    </target>
+
+    <target name="import-minimal-for-upgrade-ce"
+            description="do import of minimal resources in upgrade context for CE">
+        <run-import-export type="import" archive="${exportDir}/js-catalog-${dbType}-minimal-ce.zip" edition="ce" checkDBMSConnection="true">
+            <arg value="--update" />
+            <arg value="--skip-user-update" />
+        </run-import-export>
+    </target>
+
+    <!-- bug 25644: adding "update-core-users" option for ce and pro --> 
+    <target name="import-upgrade"
+            description="do import from older jasperserver version. specify file with -DimportFile=path-and-filename">
+        <check-import-export-file-property
+            type="import"
+            edition="pro"
+            example="js-ant import-upgrade -DimportFile=my-upgrade.zip"/>
+        <if>
+            <isset property="importArgs" />
+            <then>
+                <run-import-export type="import" archive="${importFile}" edition="pro" checkDBMSConnection="true">
+                    <arg line="${importArgs}" />
+                    <arg value="--update-core-users"/>
+                </run-import-export>
+            </then>
+            <else>
+                <run-import-export type="import" archive="${importFile}" edition="pro" checkDBMSConnection="true">
+                    <arg value="--update-core-users"/>
+                </run-import-export>
+            </else>
+        </if>
+    </target>
+
+    <target name="import-upgrade-ce"
+            description="do import from older jasperserver version. specify file with -DimportFile=">
+
+        <check-import-export-file-property
+            type="import"
+            edition="ce"
+            example="js-ant import-upgrade-ce -DimportFile=my-upgrade.zip"/>
+        <if>
+            <isset property="importArgs" />
+            <then>
+                <run-import-export type="import" archive="${importFile}" edition="ce" checkDBMSConnection="true">
+                    <arg line="${importArgs}" />
+                    <arg value="--update-core-users"/>
+                </run-import-export>
+            </then>
+            <else>
+                <run-import-export type="import" archive="${importFile}" edition="ce" checkDBMSConnection="true">
+                    <arg value="--update-core-users"/>
+                </run-import-export>
+            </else>
+        </if>
+
+    </target>
+
+    <target name="import-sample-data-pro"
+            description="import sample data">
+
+        <run-import-export type="import" archive="${exportDir}/js-catalog-${dbType}-pro.zip"  edition="pro" checkDBMSConnection="true">
+            <arg value="--update"/>
+        </run-import-export>
+    </target>
+
+    <target name="import-sample-data-ce"
+            description="import sample data">
+
+        <run-import-export type="import" archive="${exportDir}/js-catalog-${dbType}-ce.zip" edition="ce" checkDBMSConnection="true">
+            <arg value="--update"/>
+        </run-import-export>
+    </target>
+
+    <target name="import-sample-data-upgrade-pro"
+            description="import sample data">
+
+        <run-import-export type="import" archive="${exportDir}/js-catalog-${dbType}-pro.zip"  edition="pro" checkDBMSConnection="true">
+            <arg value="--update"/>
+            <arg value="--skip-user-update"/>
+        </run-import-export>
+    </target>
+
+    <target name="import-sample-data-upgrade-ce"
+            description="import sample data">
+
+        <run-import-export type="import" archive="${exportDir}/js-catalog-${dbType}-ce.zip" edition="ce" checkDBMSConnection="true">
+            <arg value="--update"/>
+            <arg value="--skip-user-update"/>
+        </run-import-export>
+    </target>
+
+    <target name="export"
+            description="do repo export, specify -DexportFile=">
+
+        <check-import-export-file-property
+            type="export"
+            edition="pro"
+            example="js-ant export -DexportFile=js-export.zip"/>
+
+        <if>
+            <isset property="exportArgs"/>
+            <then>
+                <run-import-export type="export"  archive="${exportFile}"  edition="pro" checkDBMSConnection="true">
+                    <arg line="${exportArgs}" />
+                </run-import-export>
+            </then>
+            <else>
+                <run-import-export type="export"  archive="${exportFile}"  edition="pro" checkDBMSConnection="true"/>
+            </else>
+        </if>
+    </target>
+
+    <target name="export-ce"
+            description="do repo export, specify -DexportFile=">
+
+        <check-import-export-file-property
+            type="export"
+            edition="ce"
+            example="js-ant export-ce -DexportFile=js-export.zip"/>
+
+        <if>
+            <isset property="exportArgs"/>
+            <then>
+                <run-import-export type="export"  archive="${exportFile}" edition="ce" checkDBMSConnection="true">
+                    <arg line="${exportArgs}" />
+                </run-import-export>
+            </then>
+            <else>
+                <run-import-export type="export"  archive="${exportFile}" edition="ce" checkDBMSConnection="true"/>
+            </else>
+        </if>
+    </target>
+
+    <target name="export-everything"
+            description="export all resources, specify -DexportFile=">
+
+        <check-import-export-file-property
+            type="export"
+            edition="pro"
+            example="js-ant export-everything -DexportFile=js-export.zip"/>
+
+        <run-import-export type="export"  archive="${exportFile}" edition="pro" checkDBMSConnection="true">
+            <arg value="--everything"/>
+        </run-import-export>
+    </target>
+
+    <target name="export-everything-ce"
+            description="export all resources, specify -DexportFile=">
+
+        <check-import-export-file-property
+            type="export"
+            edition="pro"
+            example="js-ant export-everything-ce -DexportFile=js-export.zip"/>
+
+        <run-import-export type="export"  archive="${exportFile}" edition="ce" checkDBMSConnection="true">
+            <arg value="--everything"/>
+            <arg line="${exportArgs}"/>
+        </run-import-export>
+    </target>
+
+    <target name="validate-database"
+            description="tests if db is available">
+        <validateDB systemName="js" phase="import-export-test" failOnDBNotExists="true"/>
+    </target>
+
+    <target name="import-help"
+            description="Deprecated target">
+        <echo>
+NOTE: try running target "import-help-pro" or "import-help-ce"
+        </echo>
+    </target>
+
+    <target name="export-help"
+            description="Deprecated target">
+        <echo>
+NOTE: try running target "export-help-pro" or "export-help-ce"
+        </echo>
+    </target>
+
+    <target name="import-help-pro"
+            description="print import help Pro">
+
+        <run-import-export type="import"  archive="${exportFile}"  edition="pro" checkDBMSConnection="false">
+            <arg line="--help"/>
+        </run-import-export>
+
+        <echo>
+Buildomatic Import-Export Usage:
+
+To run using buildomatic, options must be specified as Java command line options:
+
+General Example:
+
+  js-ant import -DimportFile=my-reports.zip
+
+Windows Example:
+
+  js-ant import -DimportFile=my-reports-and-users.zip -DimportArgs="--update"
+
+  js-ant import -DimportFile=my-reports-and-users.zip -DimportArgs="--update --skip-user-update"
+
+Linux Example:
+
+  ./js-ant import -DimportFile=my-reports-and-users.zip -DimportArgs="--update"
+
+  ./js-ant import -DimportFile=my-reports-and-users.zip -DimportArgs="--update --skip-user-update"
+</echo>
+    </target>
+
+    <target name="import-help-ce"
+            description="print import help CE">
+
+        <run-import-export type="import"  archive="${exportFile}" edition="ce" checkDBMSConnection="false">
+            <arg line="--help"/>
+        </run-import-export>
+
+        <echo>
+Buildomatic Import-Export Usage:
+
+To run using buildomatic, options must be specified as Java command line options:
+
+General Example:
+
+  js-ant import-ce -DimportFile=my-reports.zip
+
+Windows Example:
+
+  js-ant import-ce -DimportFile=my-reports-and-users.zip -DimportArgs="--update"
+
+  js-ant import-ce -DimportFile=my-reports-and-users.zip -DimportArgs="--update --skip-user-update"
+
+Linux Example:
+
+  ./js-ant import-ce -DimportFile=my-reports-and-users.zip -DimportArgs="--update"
+
+  ./js-ant import-ce -DimportFile=my-reports-and-users.zip -DimportArgs="--update --skip-user-update"
+        </echo>
+    </target>
+
+    <target name="export-help-pro"
+            description="print export help Pro">
+
+        <run-import-export type="export" archive=""  edition="pro" checkDBMSConnection="false">
+            <arg line="--help"/>
+        </run-import-export>
+
+<echo>
+
+Buildomatic Import-Export Usage:
+
+To run using buildomatic, options must be specified as Java command line options:
+
+General Example:
+
+  js-ant export-everything -DexportFile=js-export-all.zip
+
+Windows Example:
+
+  js-ant export -DexportFile=my-reports-and-users.zip
+                -DexportArgs="--uris /organizations/organization_1/reports
+                --users jasperadmin|organization_1,joeuser|organization_1"
+
+  js-ant export -DexportFile=js-organization-1.zip -DexportArgs="--everything
+                --organization organization_1"
+
+Linux Example:
+
+  ./js-ant export -DexportFile=my-reports-and-users.zip
+                  -DexportArgs="--uris /organizations/organization_1/reports
+                  --users 'jasperadmin\|organization_1,joeuser\|organization_1'"
+
+  ./js-ant export -DexportFile=my-reports-and-users.zip
+                  -DexportArgs=\"--uris /organizations/organization_1/reports
+                  --users 'jasperadmin\|organization_1,joeuser\|organization_1'\"
+
+  ./js-ant export -DexportFile=js-organization-1.zip -DexportArgs=\"--everything
+                  --organization organization_1\"
+
+                (linux: note escape backslash on | and " characters and use of ' character)
+</echo>
+
+    </target>
+
+    <target name="export-help-ce"
+            description="print export help CE">
+
+        <run-import-export type="export" archive="" edition="ce" checkDBMSConnection="false">
+            <arg line="--help"/>
+        </run-import-export>
+
+        <echo>
+
+Buildomatic Import-Export Usage:
+
+To run using buildomatic, options must be specified as Java command line options:
+
+General Example:
+
+  js-ant export-everything-ce -DexportFile=js-export-all.zip
+
+Windows Example:
+
+  js-ant export-ce -DexportFile=my-reports-and-users.zip
+                   -DexportArgs="--uris /reports
+                   --users jasperadmin,joeuser"
+
+Linux Example:
+
+  ./js-ant export-ce -DexportFile=my-reports-and-users.zip
+                     -DexportArgs="--uris /reports
+                     --users 'jasperadmin,joeuser'"
+
+                   (linux: note use of the ' character)
+        </echo>
+    </target>
+</project>

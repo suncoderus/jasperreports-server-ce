@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<flow xmlns="http://www.springframework.org/schema/webflow" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+      ns0:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd"
+      start-state="querySourceView">
+
+    <input name="masterFlow"/>
+    <input name="masterFlowStep"/>
+    <input name="parentFlow"/>
+    <input name="queryReference"/>
+    <input name="allowNone"/>
+
+    <view-state id="querySourceView" view="modules/addResource/reportStep5">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'querySourceView'"/>
+            <evaluate expression="queryReferenceAction.prepareQuerySource"/>
+        </on-entry>
+        <transition on="cancel" to="cancel"/>
+        <transition on="next" to="querySourceDecision">
+            <evaluate expression="queryReferenceAction.bindAndValidate"/>
+        </transition>
+        <transition on="finish" to="querySourceDecision">
+            <set name="requestScope.endState" value="'finish'"/>
+            <evaluate expression="queryReferenceAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateQueryExists"/>
+            </evaluate>
+        </transition>
+        <transition on="jump" to="jumpTo">
+            <evaluate expression="queryReferenceAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateQueryExists"/>
+            </evaluate>
+        </transition>
+    </view-state>
+
+    <decision-state id="querySourceDecision">
+        <if test="flowScope.queryReference.source == 'CONTENT_REPOSITORY'" then="finishOrDone"/>
+        <if test="flowScope.queryReference.source == 'NONE'" then="finishOrDone"/>
+        <if test="flowScope.queryReference.source == 'LOCAL'" then="queryLocal"/>
+    </decision-state>
+
+    <action-state id="queryLocal">
+        <evaluate expression="queryReferenceAction"/>
+        <transition on="success" to="querySubflow"/>
+    </action-state>
+
+    <decision-state id="finishOrDone">
+        <if test="requestScope.endState == 'finish'" then="finish" else="done"/>
+    </decision-state>
+
+    <subflow-state id="querySubflow" subflow="queryFlow">
+        <input name="endState" value="requestScope.endState"/>
+        <input name="masterFlow" value="flowScope.masterFlow"/>
+        <input name="masterFlowStep" value="flowScope.masterFlowStep"/>
+        <input name="parentFlow" value="flowScope.parentFlow"/>
+        <input name="query" value="requestScope.queryWrapper"/>
+        <transition on="finish" to="finish"/>
+        <transition on="saved" to="done"/>
+        <transition on="cancel" to="querySourceView"/>
+        <transition on="back" to="querySourceView"/>
+        <transition on="jumpTo" to="jumpTo"/>
+    </subflow-state>
+
+    <end-state id="done">
+        <output name="queryReference"/>
+    </end-state>
+
+    <end-state id="finish">
+        <output name="queryReference"/>
+    </end-state>
+
+    <end-state id="back"/>
+    <end-state id="cancel" view="flowRedirect:searchFlow?lastMode=true"/>
+
+    <end-state id="displayError"/>
+
+    <end-state id="jumpTo">
+        <output name="queryReference"/>
+    </end-state>
+
+    <!-- exceptions handling -->
+    <decision-state id="backFromError">
+        <if test="not (flowScope.prevForm == null or flowScope.prevForm == '')" then="${flowScope.prevForm}"
+            else="done"/>
+    </decision-state>
+
+    <view-state id="errorPage" view="modules/system/errorPage">
+        <on-entry>
+            <evaluate expression="errorPageHandlerAction"/>
+        </on-entry>
+    </view-state>
+
+    <global-transitions>
+        <transition on="backFromErrorPage" to="backFromError"/>
+        <transition on-exception="java.lang.Throwable" to="errorPage"/>
+    </global-transitions>
+
+    <!-- end exceptions handling -->
+
+    <bean-import resource="spring-config.xml"/>
+    <bean-import resource="queryReferenceBeans.xml"/>
+
+</flow>

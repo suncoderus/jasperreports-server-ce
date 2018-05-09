@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"
+       default-lazy-init="true">
+
+
+  <bean id="propertyConfigurer" class="com.jaspersoft.jasperserver.api.common.properties.DecryptingPropertyPlaceholderConfigurer">
+    <property name="locations">
+      <list>
+        <value>js.jdbc.properties</value>
+        <value>js.quartz.properties</value>
+        <value>js.spring.properties</value>
+        <value>js.spring.export.properties</value>
+        <value>js.scheduling.properties</value>
+        <value>mondrian.connect.string.properties</value>
+        <value>js.aws.datasource.properties</value>
+        <value>js.config.properties</value>
+          <value>relativedate.properties</value>
+      </list>
+    </property>
+    <property name="properties">
+      <props>
+        <prop key="resource.root">classpath:</prop>
+        <prop key="bean.olapCacheManager">cacheManager</prop>
+      </props>
+    </property>
+  </bean>
+
+  <bean id="dataSource" class="com.jaspersoft.jasperserver.export.datasource.ConfigurableDataSource" destroy-method="close">
+    <property name="driverClassName" value="${metadata.jdbc.driverClassName}"/>
+    <property name="url" value="${metadata.jdbc.url}"/>
+    <property name="username" value="${metadata.jdbc.username}"/>
+    <property name="password" value="${metadata.jdbc.password}"/>
+    <property name="extraProperties">
+      <map>
+        <entry key="characterEncoding" value="UTF-8" />
+      </map>
+    </property>
+    <property name="initialSize" value="8"/>
+    <property name="maxActive" value="20"/>
+    <property name="maxIdle" value="20"/>
+    <property name="minIdle" value="0"/>
+  </bean>
+
+  <!-- repositoryService bean: moved from applicationContext.xml                     -->
+  <!-- this is because import-export needs a non-authenticated (ie unsecure) version -->
+  <!-- of this bean. Only database login is required.                                -->
+    <alias name="hibernateRepositoryService" alias="repositoryService"/>
+
+
+  <!-- this is not really satisfactory; these two lists need to be defined in six places: ce/pro * webapp/unit-test/export-import -->
+  <bean id="hibernateCompositeDeleteListenerListeners" class="java.util.ArrayList">
+     <constructor-arg index="0" type="java.util.Collection">
+        <list>
+            <ref bean="hibernateReportJobsUserDeleteListener"/>
+            <ref bean="hibernateLoggingServiceUserDeleteListener"/>
+            <ref bean="hibernateAccessEventDeleteListener"/>
+            <ref bean="hibernateRoleDeleteListener"/>
+        </list>
+     </constructor-arg>
+    </bean>
+
+  <bean id="hibernateCompositeSaveOrUpdateListeners" class="java.util.ArrayList">
+     <constructor-arg index="0" type="java.util.Collection">
+        <list>
+            <ref bean="dataSnapshotReportUnitListener" />
+            <ref bean="hibernateRoleSaveOrUpdateListener"/>
+        </list>
+     </constructor-arg>
+  </bean>
+
+  <bean id="hibernateCompositePostUpdateListeners" class="java.util.ArrayList">
+        <constructor-arg index="0" type="java.util.Collection">
+            <list>
+                <!-- don't need listener for import/ export -->
+            </list>
+        </constructor-arg>
+  </bean>
+
+</beans>

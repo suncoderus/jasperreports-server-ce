@@ -1,0 +1,1 @@
+define(["require","backbone","dataSource/model/SubDataSourceModel"],function(e){"use strict";var o=e("backbone"),n=e("dataSource/model/SubDataSourceModel");return o.Collection.extend({model:n,hasNonReadOnlyItems:function(){return this.some(function(e){return!e.get("readOnly")})}})});

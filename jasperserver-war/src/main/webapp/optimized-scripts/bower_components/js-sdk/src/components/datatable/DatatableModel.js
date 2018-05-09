@@ -1,0 +1,1 @@
+define(["require","jquery","backbone","underscore","logger"],function(e){"use strict";var r=(e("jquery"),e("backbone"));e("underscore"),e("logger").register("Datatable");return r.Model.extend({defaults:{showDetails:!0,showTotals:!0,showSummary:!0,columns:[],rows:[],summary:[]}})});

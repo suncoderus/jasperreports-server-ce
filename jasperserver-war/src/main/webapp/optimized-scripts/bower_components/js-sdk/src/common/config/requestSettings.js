@@ -1,0 +1,1 @@
+define(["require"],function(e){return{headers:{"X-Suppress-Basic":"true","Cache-Control":"no-cache, no-store",Pragma:"no-cache"}}});

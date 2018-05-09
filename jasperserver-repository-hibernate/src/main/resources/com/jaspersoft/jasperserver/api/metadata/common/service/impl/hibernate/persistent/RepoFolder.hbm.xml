@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class 
+			table="JIResourceFolder" 
+			name="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoFolder" batch-size="1000">
+		<id name="id" type="long" >
+			<generator class="native"/>
+		</id>
+		<natural-id mutable="true">
+			<property name="URI" not-null="true" length="250" type="string" column="uri"/>
+		</natural-id>
+		<version column="version" unsaved-value="negative" name="version"/>
+		<set inverse="true" cascade="all-delete-orphan" name="children" outer-join="auto">
+			<key column="parent_folder"/>
+			<one-to-many class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoResource"/>
+		</set>
+		<set inverse="true" cascade="all-delete-orphan" name="subFolders" fetch="subselect" outer-join="auto">
+			<key column="parent_folder"/>  
+			<one-to-many class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoFolder"/>
+		</set>
+		<property name="hidden" type="boolean" column="hidden"/>
+		<property name="name" not-null="true" length="200" type="string" column="name"/>
+		<property name="label" not-null="true" length="200" type="string" column="label"/>
+		<property name="description" length="250" type="string" column="description"/>
+		<many-to-one column="parent_folder" name="parent" outer-join="auto"/>
+		<property name="creationDate" not-null="true" type="timestamp" column="creation_date"/>
+		<property name="updateDate" not-null="true" type="timestamp" column="update_date"/>
+	</class>
+
+<!-- create index JIResourceFolder_parent_folder_index on JIResourceFolder (parent_folder); -->
+<!-- replacing JIResourceFolder_parent_folder_index with idx35_parent_folder_idx -->
+<database-object>
+	<create>create index idx35_parent_folder_idx on JIResourceFolder (parent_folder)</create>
+	<drop>DROP INDEX idx35_parent_folder_idx ON JIResourceFolder</drop>
+</database-object>
+
+<!-- create index JIResourceFolder_version_index on JIResourceFolder (version); -->
+<database-object>
+	<create>create index JIResourceFolder_version_index on JIResourceFolder (version)</create>
+	<drop>DROP INDEX JIResourceFolder_version_index ON JIResourceFolder</drop>
+</database-object>
+
+<!-- create index JIResourceFolder_hidden_index on JIResourceFolder (hidden); -->
+<database-object>
+        <create>create index JIResourceFolder_hidden_index on JIResourceFolder (hidden)</create>
+        <drop>DROP INDEX JIResourceFolder_hidden_index ON JIResourceFolder</drop>
+</database-object>
+
+</hibernate-mapping>

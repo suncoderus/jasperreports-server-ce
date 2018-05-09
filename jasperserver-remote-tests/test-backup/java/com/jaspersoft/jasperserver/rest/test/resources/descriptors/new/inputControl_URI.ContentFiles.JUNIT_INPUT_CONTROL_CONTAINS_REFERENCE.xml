@@ -1,0 +1,57 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<resourceDescriptor name="JUNIT_INPUT_CONTROL_CONTAINS_REFERENCE"
+	wsType="inputControl" uriString="/ContentFiles/JUNIT_INPUT_CONTROL_CONTAINS_REFERENCE" isNew="true">
+	<label>JUNIT_INPUT_CONTROL_CONTAINS_REFERENCE</label>
+	<description>INPUT CONTROL CONTAINS ANOTHER LOCAL RESOURCE </description>
+	<creationDate>1310759308000</creationDate>
+	<resourceProperty name="PROP_RESOURCE_TYPE">
+		<value>com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_PARENT_FOLDER">
+		<value>/ContentFiles</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_VERSION">
+		<value>0</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_HAS_DATA">
+		<value>false</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_IS_REFERENCE">
+		<value>false</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_INPUTCONTROL_IS_MANDATORY">
+		<value>true</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_INPUTCONTROL_IS_READONLY">
+		<value>false</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_INPUTCONTROL_IS_VISIBLE">
+		<value>true</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_INPUTCONTROL_TYPE">
+		<value>2</value>
+	</resourceProperty>
+	<resourceDescriptor name="" wsType="reference" uriString="" isNew="false">
+		<label>null</label>
+		<resourceProperty name="PROP_REFERENCE_URI">
+			<value>/datatypes/date</value>
+		</resourceProperty>
+	</resourceDescriptor>
+</resourceDescriptor>

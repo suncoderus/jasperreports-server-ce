@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+	<!-- JR data snapshots -->
+    
+    <bean id="engineServiceDataCacheProvider" 
+    	class="com.jaspersoft.jasperserver.api.engine.jasperreports.service.impl.StandardDataCacheProvider">
+    	<property name="ReportLoadingService" ref="${bean.reportLoadingService}"/>
+		<property name="dataSnapshotService" ref="dataSnapshotService"/>
+    </bean>
+	
+	<bean id="dataSnapshotService" class="com.jaspersoft.jasperserver.api.engine.jasperreports.service.impl.StandardDataSnapshotService">
+		<property name="snapshotRecordingEnabled" value="true"/>
+		<property name="snapshotPersistenceEnabled" value="false"/><!-- data snapshot persistence is off by default -->
+		<property name="persistenceService" ref="dataSnapshotPersistenceService"/>
+		<property name="cachingService" ref="dataSnapshotCachingService"/>
+		<property name="dataCacheProvider" ref="engineServiceDataCacheProvider"/>
+		<property name="repository" ref="${bean.repositoryService}"/>
+		<property name="unsecureRepository" ref="${bean.unsecureRepositoryService}"/>
+	</bean>
+	
+	<bean id="dataSnapshotPersistenceService" 
+		class="com.jaspersoft.jasperserver.api.metadata.data.snapshot.hibernate.HibernateDataSnapshotService">
+		<property name="sessionFactory" ref="sessionFactory"/>
+		<property name="contentsPersistenceService" ref="dataSnapshotContentsPersistenceService"/>
+	</bean>
+	
+	<bean id="dataSnapshotContentsPersistenceService"
+		class="com.jaspersoft.jasperserver.api.metadata.data.snapshot.hibernate.HibernateDataSnapshotContentsService">
+		<property name="sessionFactory" ref="sessionFactory"/>
+		<property name="snapshotSerializer" ref="dataSnapshotSerializer"/>
+	</bean>
+	
+	<bean id="dataSnapshotSerializer" class="com.jaspersoft.jasperserver.api.metadata.data.cache.JavaDataSnapshotSerializer"/>
+
+	<bean id="dataSnapshotEhCacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" depends-on="sysProperties">
+		<property name="configLocation" value="${resource.root}/ehcache-data-snapshots.xml"/>
+	</bean>
+					
+	<bean id="dataSnapshotCachingService" 
+		class="com.jaspersoft.jasperserver.api.engine.jasperreports.service.impl.DataSnapshotEhcacheService">
+		<property name="metadataCache">
+			<bean class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+				<property name="cacheManager" ref="dataSnapshotEhCacheManager"/>
+				<property name="cacheName" value="snapshotMetadata" />
+			</bean>
+		</property>
+		<property name="contentsCache">
+			<bean class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+				<property name="cacheManager" ref="dataSnapshotEhCacheManager"/>
+				<property name="cacheName" value="snapshotContents" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="dataSnapshotReportUnitListener" class="com.jaspersoft.jasperserver.api.metadata.data.snapshot.hibernate.DataSnapshotReportUnitListener">
+		<property name="dataSnapshotServiceBean">
+			<idref local="dataSnapshotPersistenceService"/>
+		</property>
+	</bean>
+
+	<bean id="dataSnapshotReportUnitCopyListener" class="com.jaspersoft.jasperserver.api.engine.jasperreports.service.impl.DataSnapshotReportUnitCopyListener">
+		<property name="dataSnapshotServiceBean">
+			<idref local="dataSnapshotService"/>
+		</property>
+	</bean>
+
+</beans>

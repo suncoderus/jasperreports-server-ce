@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<joined-subclass 
+			name="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.impl.RepoReportUnit"
+			extends="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoResource"
+			table="JIReportUnit">
+		<key column="id"/>
+		<many-to-one column="reportDataSource" name="dataSource" class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoResource"/>
+		<many-to-one column="query" name="query"/>
+		<list table="JIReportUnitInputControl" name="inputControls" fetch="subselect">
+			<key column="report_unit_id"/>
+			<list-index column="control_index"/>
+			<many-to-many column="input_control_id" class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoInputControl"/>
+		</list>
+		<list table="JIReportUnitResource" name="resources" fetch="subselect">
+			<key column="report_unit_id"/>
+			<list-index column="resource_index"/>
+			<many-to-many column="resource_id" class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoFileResource"/>
+		</list>
+		<many-to-one column="mainReport" name="mainReport"/>
+		<property name="inputControlRenderingView" length="100" type="string" column="controlrenderer"/>
+		<property name="reportRenderingView" length="100" type="string" column="reportrenderer"/>
+		<property name="alwaysPromptControls" column="promptcontrols"/>
+		<property name="controlsLayout" column="controlslayout"/>
+		<property name="dataSnapshotId" column="data_snapshot_id" type="long"/>
+	</joined-subclass>
+
+<!-- create index JIReportUnit_mainReport_index on JIReportUnit (mainReport); -->
+<database-object>
+	<create>create index JIReportUnit_mainReport_index on JIReportUnit (mainReport)</create>
+	<drop>DROP INDEX JIReportUnit_mainReport_index ON JIReportUnit</drop>
+</database-object>
+
+<!-- create index JIReportUnit_query_index on JIReportUnit (query); -->
+<database-object>
+	<create>create index JIReportUnit_query_index on JIReportUnit (query)</create>
+	<drop>DROP INDEX JIReportUnit_query_index ON JIReportUnit</drop>
+</database-object>
+
+<!-- create index JIReportUnit_reportDataSource_index on JIReportUnit (reportDataSource); -->
+<!-- replacing JIReportUnit_reportDataSource_index with idx29_reportDataSource_idx -->
+<database-object>
+	<create>create index idx29_reportDataSource_idx on JIReportUnit (reportDataSource)</create>
+	<drop>DROP INDEX idx29_reportDataSource_idx ON JIReportUnit</drop>
+</database-object>
+
+<!-- create index JIReportUnitInputControl_input_control_id_index on JIReportUnitInputControl (input_control_id); -->
+<!-- replacing JIReportUnitInputControl_input_control_id_index with idx30_input_ctrl_id_idx -->
+<database-object>
+	<create>create index idx30_input_ctrl_id_idx on JIReportUnitInputControl (input_control_id)</create>
+	<drop>DROP INDEX idx30_input_ctrl_id_idx ON JIReportUnitInputControl</drop>
+</database-object>
+
+<!-- create index JIReportUnitInputControl_report_unit_id_index on JIReportUnitInputControl (report_unit_id); -->
+<!-- replacing JIReportUnitInputControl_report_unit_id_index with idx31_report_unit_id_idx -->
+<database-object>
+	<create>create index idx31_report_unit_id_idx on JIReportUnitInputControl (report_unit_id)</create>
+	<drop>DROP INDEX idx31_report_unit_id_idx ON JIReportUnitInputControl</drop>
+</database-object>
+
+<!-- create index JIReportUnitResource_report_unit_id_index on JIReportUnitResource (report_unit_id); -->
+<!-- replacing JIReportUnitResource_report_unit_id_index with idx32_report_unit_id_idx -->
+<database-object>
+	<create>create index idx32_report_unit_id_idx on JIReportUnitResource (report_unit_id)</create>
+	<drop>DROP INDEX idx32_report_unit_id_idx ON JIReportUnitResource</drop>
+</database-object>
+
+<!-- create index JIReportUnitResource_resource_id_index on JIReportUnitResource (resource_id); -->
+<!-- replacing JIReportUnitResource_resource_id_index with idx33_resource_id_idx -->
+<database-object>
+	<create>create index idx33_resource_id_idx on JIReportUnitResource (resource_id)</create>
+	<drop>DROP INDEX idx33_resource_id_idx ON JIReportUnitResource</drop>
+</database-object>
+
+</hibernate-mapping>

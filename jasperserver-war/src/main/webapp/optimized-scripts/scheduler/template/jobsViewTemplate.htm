@@ -1,0 +1,75 @@
+<div class="page column decorated primary listOfJobs singleReportView">
+	<div class="content">
+
+		<div class="header ">
+			<div class="title">
+				{{- i18n["report.scheduling.list.header"] }}: <span class="path">{{- reportUri }}</span>
+			</div>
+
+			<div class="toolbar">
+				<ul class="list buttonSet">
+					<li class="node open">
+						<ul class="list buttonSet">
+							<li class="leaf">
+								<button name="backButton" class="button capsule text up">
+									<span class="wrap">{{- i18n["report.scheduling.list.button.back"] }}</span>
+									<span class="icon"></span>
+								</button>
+							</li>
+							<li class="leaf">
+								<button name="scheduleJob" class="button capsule text first up">
+									<span class="wrap">{{- i18n["report.scheduling.list.button.new"] }}</span>
+									<span class="icon"></span>
+								</button>
+							</li>
+							<li class="leaf">
+								<button name="runJob" class="button capsule text last up">
+									<span class="wrap">{{- i18n["report.scheduling.list.button.now"] }}</span>
+									<span class="icon"></span>
+								</button>
+							</li>
+							<li class="leaf">
+								<button name="refreshList" class="button capsule text up">
+									<span class="wrap">{{- i18n["report.scheduling.list.button.refresh"] }}</span>
+									<span class="icon"></span>
+								</button>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="subheader">
+			<ul id="resultsListHeader" class="list collapsible tabular jobs header">
+				<li id="" class="jobs first leaf">
+					<div class="wrap">
+						<div class="column one">
+							<p class="jobID">{{- i18n["report.scheduling.list.header.id"] }}</p>
+						</div>
+						<div class="column two">
+							<p class="jobName">{{- i18n["report.scheduling.list.header.label"] }}</p>
+							<p class="jobOwner">{{- i18n["report.scheduling.list.header.owner"] }}</p>
+						</div>
+						<div class="column three">
+							<p class="jobState">{{- i18n["report.scheduling.list.header.state"] }}</p>
+						</div>
+						<div class="column four">
+							<p class="lastRanDate">{{- i18n["report.scheduling.list.header.prevFireTime"] }}</p>
+							<p class="nextRunDate">{{- i18n["report.scheduling.list.header.nextFireTime"] }}</p>
+						</div>
+						<div class="column five">
+							<p class="jobEnabled">{{- i18n["report.scheduling.list.label.enabled"] }}</p>
+						</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+
+		<div class="body">
+			<div id="jobsSummaryContainer">
+				<div name="jobsContainer" class="body"></div>
+			</div>
+		</div>
+	</div>
+</div>

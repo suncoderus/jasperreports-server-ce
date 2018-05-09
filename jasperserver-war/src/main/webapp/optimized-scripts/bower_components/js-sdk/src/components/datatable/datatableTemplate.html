@@ -1,0 +1,67 @@
+<div class="jr-mDatatableContainer jr" style="position: absolute">
+    <table class="jr-mDatatable jr" style="width: inherit">
+
+        <thead class="jr-mDatatable-header jr">
+        <tr class="jr-mDatatable-row jr">
+            {{ _.each(columns, function (column) { }}
+            <th scope="row" class="jr-mDatatable-cell jr">
+                <div class="jr-mDatatable-cell-wrapper jr" style="width: {{- column.width + 'px'}}">
+                    <div class="jr-mDatatable-cell-text jr">{{- column.label }}</div>
+                </div>
+            </th>
+            {{ }) }}
+        </tr>
+        </thead>
+
+        <tbody class="jr-mDatatable-body jr">
+
+        {{ _.each(rows, function (row, rowIdx) { }}
+        {{ if (row.type === "detail" && showDetails) { }}
+        <tr class="jr-mDatatable-row {{- rowIdx % 2 ? 'jr-mDatatable-rowOdd' : 'jr-mDatatable-rowEven'}} jr">
+            {{ _.each(row.data, function (value, idx) { }}
+            <td scope="row" class="jr-mDatatable-cell jr">
+                <div class="jr-mDatatable-cell-wrapper jr" style="width: {{- columns[idx].width + 'px'}}">
+                    <div class="jr-mDatatable-cell-text jr">{{- value }}</div>
+                </div>
+            </td>
+            {{ }) }}
+        </tr>
+        {{ } else if (row.type === "group") { }}
+        <tr class="jr-mDatatable-row jr-mDatatable-rowGroup jr">
+            <td colspan="{{- columns.length }}" class="jr-mDatatable-cell jr">
+                <div class="jr-mDatatable-cell-wrapper jr">
+                    <div class="jr-mDatatable-cell-text jr">{{- row.data[0] }}</div>
+                </div>
+            </td>
+        </tr>
+        {{ } else if (row.type === "group total" && showTotals) { }}
+        <tr class="jr-mDatatable-row jr-mDatatable-rowGrouptotal jr">
+            {{ _.each(row.data, function (value, idx) { }}
+            <td class="jr-mDatatable-cell jr">
+                <div class="jr-mDatatable-cell-wrapper jr" style="width: {{- columns[idx].width + 'px'}}">
+                    <div class="jr-mDatatable-cell-text jr">{{- value }}</div>
+                </div>
+            </td>
+            {{ }) }}
+        </tr>
+        {{ } }}
+        {{ }) }}
+        </tbody>
+
+        <tfoot>
+        {{ if (showSummary) { }}
+        {{ _.each(summary, function (row) { }}
+        <tr class="jr-mDatatable-row jr-mDatatable-rowTotal jr">
+            {{ _.each(row.data, function (value, idx) { }}
+            <td class="jr-mDatatable-cell jr">
+                <div class="jr-mDatatable-cell-wrapper jr" style="width: {{- columns[idx].width + 'px'}}">
+                    <div class="jr-mDatatable-cell-text jr">{{- value }}</div>
+                </div>
+            </td>
+            {{ }) }}
+        </tr>
+        {{ }) }}
+        {{ } }}
+        </tfoot>
+    </table>
+</div>

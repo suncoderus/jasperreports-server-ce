@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <import resource="base-fixtures-config.xml"/>
+    <import resource="../applicationContext-cascade-test.xml"/>
+    <bean id="multySelectListOfValuesInputControl"
+          class="com.jaspersoft.jasperserver.war.cascade.utils.InputControlMock" scope="prototype">
+        <property name="inputControlType" ref="TYPE_MULTI_SELECT_QUERY"/>
+    </bean>
+
+    <bean id="singleSelectListOfValuesInputControl" class="com.jaspersoft.jasperserver.war.cascade.utils.InputControlMock" scope="prototype">
+        <property name="inputControlType" ref="TYPE_SINGLE_SELECT_LIST_OF_VALUES"/>
+    </bean>
+
+    <bean id="shipreg" parent="multySelectListOfValuesInputControl">
+        <property name="name" value="shipreg"/>
+        <property name="label" value="shipreg"/>
+    </bean>
+
+    <bean id="shipregSingleSelect" parent="shipreg">
+        <property name="inputControlType" ref="TYPE_SINGLE_SELECT_LIST_OF_VALUES"/>
+    </bean>
+
+    <bean id="stringCollection_controlInfo" class="com.jaspersoft.jasperserver.war.cascade.utils.ReportInputControlInformationMock">
+        <property name="valueType" value="java.util.Collection"/>
+        <property name="nestedType" value="java.lang.String"/>
+    </bean>
+
+    <bean id="shipreg_controlInfo" parent="stringCollection_controlInfo">
+        <property name="parameterName" value="shipreg"/>
+        <property name="promptLabel" value="shipreg"/>
+        <property name="defaultValue">
+            <list value-type="java.lang.String">
+                <value>NM</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="parameterTypes" class="java.util.HashMap">
+        <constructor-arg>
+            <map>
+                <entry key="shipreg"><value type="java.lang.Class">java.util.Collection</value></entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="listOvValuesLoader" class="com.jaspersoft.jasperserver.war.cascade.utils.ListOfValuesLoaderMock">
+        <property name="values">
+            <list>
+                <bean class="com.jaspersoft.jasperserver.api.metadata.common.domain.client.ListOfValuesItemImpl">
+                    <property name="label" value="RJ"/>
+                    <property name="value" value="RJ"/>
+                </bean>
+                <bean class="com.jaspersoft.jasperserver.api.metadata.common.domain.client.ListOfValuesItemImpl">
+                    <property name="label" value="NM"/>
+                    <property name="value" value="NM"/>
+                </bean>
+                <bean class="com.jaspersoft.jasperserver.api.metadata.common.domain.client.ListOfValuesItemImpl">
+                    <property name="label" value="[Null]"/>
+                    <property name="value" value="~NULL~"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+</beans>

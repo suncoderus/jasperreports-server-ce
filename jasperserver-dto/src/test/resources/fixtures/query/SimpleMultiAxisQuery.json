@@ -1,0 +1,123 @@
+{
+  "select": {
+    "aggregations": [
+      {
+        "fieldRef": "open_date",
+        "expression": {
+          "string": "CountAll(open_date)"
+        }
+      },
+      {
+        "fieldRef": "city",
+        "expression": {
+          "string": "CountDistinct(city)"
+        }
+      },
+      {
+        "fieldRef": "sales",
+        "expression": {
+          "string": "Sum(sales)"
+        }
+      }
+    ]
+  },
+  "from": {
+    "olapCube" : ""
+  },
+  "groupBy": {
+    "columns": {
+      "items": [
+        {
+        "allLevel": {
+          "field": "(All)",
+          "dimension": "Category"
+        }
+        },{
+          "level": {
+            "id": "open_date1",
+            "field": "open_date",
+            "dimension": "open_date",
+            "categorizer": "year",
+            "includeAll": true
+          }
+        }, {
+          "level": {
+            "id": "open_date2",
+            "field": "open_date",
+            "categorizer": "quarter"
+          }
+        },
+        {
+          "allLevel": {
+            "dimension": "Product",
+            "field": "All"
+          }
+        }
+      ],
+      "expansions": [
+        {
+          "level": {
+            "aggregation": false,
+            "fieldRef": "open_date1",
+            "expanded": true
+          }
+        },
+        {
+          "member": {
+            "path": ["2005"],
+            "expanded": false
+          }
+        },
+        {
+          "level": {
+            "aggregation": true,
+            "expanded": true
+          }
+        }
+      ]
+    },
+    "rows": {
+      "items": [
+        { "level": { "field": "state" }},
+        { "aggregations": {} }
+    ],
+      "expansions": [
+        {
+          "member": {
+            "path": [
+              "USA",
+              "CA"
+            ],
+            "expanded": true
+          }
+        }
+      ]
+    }
+  },
+  "orderBy": [{
+    "member": {
+      "ascending": false,
+      "path": ["2004"]
+    }}, {
+    "member": {
+      "ascending": true,
+      "path": ["Q3"]
+    }}, {
+    "level": {
+      "fieldRef": "open_date1",
+      "ascending": false
+    }},{
+    "topN": {
+      "limit": 5,
+      "limitAllLevels": true,
+      "createOtherBucket": false,
+      "path": ["store_sales", "USA"]
+    }}, {
+    "bottomN": {
+      "limit": 5,
+      "limitAllLevels": true,
+      "createOtherBucket": false,
+      "path": ["store_sales", "CA"]
+    }}
+  ]
+}

@@ -1,0 +1,55 @@
+<fieldset class="group shortFields">
+    <legend class="offLeft"><span>{{- i18n['resource.dataSource.accessProp']}}</span></legend>
+
+    <label title="{{- i18n['resource.dataSource.jdbc.selectDriverTitle']}}" class="control select">
+        <span class="wrap">{{- i18n['resource.dataSource.jdbc.driver']}}:</span>
+        <select name="selectedDriverClass">
+            {{ _.each(drivers, function(driver) { }}
+                <option value="{{- driver.jdbcDriverClass }}"
+                {{ if (modelAttributes.selectedDriverClass === driver.jdbcDriverClass) { }}
+                    selected="selected"
+                {{ } }}>
+                    {{ if (!driver.available && driver.jdbcDriverClass !== otherDriverValue) { }}
+                        {{- i18n["resource.dataSource.jdbc.driverMissing"] }}
+                    {{ } }}
+                    {{- driver.label }}
+                    {{ if (driver.jdbcDriverClass !== otherDriverValue && typeof (driver.label) !== "undefined" && driver.label !== "") { }}
+                        ({{- driver.jdbcDriverClass }})
+                    {{ } else if (driver.jdbcDriverClass !== otherDriverValue && (typeof driver.label === "undefined" || driver.label === "")) { }}
+                        {{- driver.jdbcDriverClass }}
+                    {{ } }}
+                </option>
+            {{ }); }}
+        </select>
+
+        {{ if (driverUploadEnabled) { }}
+		<button class="button action up" id="driverUploadButton">
+			<span class="wrap">{{- i18n['resource.dataSource.jdbc.upload.editDriverButton']}}</span>
+		</button>
+        {{ } }}
+    </label>
+
+    <div name="jdbcSpecificFieldsContainer"></div>
+
+    <label title="{{- i18n['resource.analysisConnection.url']}}" class="control input text">
+        <span class="wrap">{{- i18n['resource.dataSource.jdbc.url']}} ({{- i18n['required.field']}}):</span>
+        <input type="text" value="{{- modelAttributes.connectionUrl }}" name="connectionUrl">
+        <span class="message warning"></span>
+        <span class="message hint">{{- i18n['resource.dataSource.jdbc.hint2']}}</span>
+    </label>
+
+    <label title="{{- i18n['resource.dataSource.jdbc.username']}}" class="control input text ">
+        <span class="wrap">{{- i18n['resource.dataSource.jdbc.username']}}:</span>
+        <input type="text" value="{{- modelAttributes.username }}" name="username">
+        <span class="message warning"></span>
+        <span class="message hint"></span>
+    </label>
+
+    <label title="{{- i18n['resource.dataSource.jdbc.password']}}" class="control input password ">
+        <span class="wrap">{{- i18n['resource.dataSource.jdbc.password']}}:</span>
+        <input type="password" value="{{- modelAttributes.password }}" name="password">
+        <span class="message warning"></span>
+        <span class="message hint"></span>
+    </label>
+
+</fieldset>

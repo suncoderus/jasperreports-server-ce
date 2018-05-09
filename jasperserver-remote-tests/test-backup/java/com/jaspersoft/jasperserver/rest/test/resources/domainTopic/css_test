@@ -1,0 +1,1998 @@
+/*
+containers.css
+
+
+pods skin
+tim sheiner & christie rixford
+
+Containers are columns, rows, menus, panels and dialogs.  All these elements shared a basic structure, and all exist to divide the UI into interactive zones.
+
+*/
+
+/*
+______________________________________________________________
+
+ SHARED CONTAINER STYLES
+______________________________________________________________
+
+*/
+
+.corner,
+.edge {
+	position: absolute;
+	text-indent: -5000px;
+}
+
+.corner.top.left {
+	background-position: top left;
+}
+
+.corner.bottom.left {
+	background-position: bottom left;
+}
+
+.corner.top.right {
+	background-position: top right;
+}
+
+.corner.bottom.right {
+	background-position: bottom right;
+}
+
+.row {
+	position: relative;
+	clear:both;
+}
+
+.row.actionButtons {
+	margin-top:20px;
+}
+
+.primary>.sizer {
+	/* primary container in a group NEVER has sizer child */
+	display: none;
+}
+
+.cosmetic {
+	position:relative;
+	background-repeat: no-repeat;
+	background-image: inherit;
+}
+
+.header {
+	overflow: hidden;
+}
+
+.widget .header {
+	overflow: hidden;
+	min-height: 27px;
+}
+
+.header>.cosmetic {
+	background-position: left top;
+	display:block;
+	float:none;
+	position:absolute;
+	z-index: 0;
+	top:0;
+}
+
+.content {
+	background-repeat: no-repeat;
+}
+
+.body {
+	position: absolute;
+	left:0;
+	right:0;
+	bottom:0;
+	top:0;
+}
+
+.header>.title {
+	margin: 0 0 0 20px;
+	display: inline-block;
+	z-index: 2;
+	position: relative;
+}
+
+.header>.title h1,
+.header>.title h2,
+.header>.title h3,
+.header>.title h4,
+.header>.title h5 {
+	font-size: inherit;
+	line-height: inherit;
+}
+
+.header>.title>.tabSet.text {
+	display:inline-block;
+	line-height:13px;
+	top:2px;
+	margin-bottom: 0;
+}
+
+.column .header>.title {
+	line-height: 35px;
+	height: 35px;
+}
+
+
+.header {
+	border-bottom:1px solid #D4D5D5;
+}
+
+.header .icon {
+	width:25px;
+	position:absolute;
+}
+
+.sub.header {
+	height:28px;
+	position: relative;
+	top:-1px;
+	z-index: 10;
+	border-bottom:medium none;
+	border-top:1px solid #d4d6d6;
+	min-height: 0;
+}
+
+.header .label {
+	top:-4px;
+	display: inline;
+}
+
+
+.sub.header .title {
+	font-weight: normal;
+	margin:0 20px;
+	line-height: 28px;
+}
+
+.header>.button.mutton {
+	background-image: url(images/disclosure_indicators_sprite.png);
+	background-repeat: no-repeat;
+	background-position: 0 -151px;
+	height:16px;
+	width:16px;
+	position:absolute;
+	right:5px;
+	top:11px;
+
+}
+
+.header>.button.mutton.over {
+	background-position: 0 -180px;
+}
+
+.toolbar {
+	background-image: url(images/toolbar_bkgd.png);
+	background-color: #D3D3D3;
+	background-repeat: repeat-x;
+	border-bottom: 1px solid #9E9E9E;
+	border-top:1px solid #D4D5D5;
+	height:32px;
+	padding-left:1.5em;
+	overflow: hidden;
+}
+
+/* iPads (portrait and landscape) */
+@media only screen
+and (min-device-width : 768px)
+and (max-device-width : 1024px) {
+
+	.toolbar {
+		padding-left:.75em;
+	}
+}
+
+.toolbar>input {
+	top:10px;
+}
+
+.toolbar>.buttonSet {
+	top:-1px;
+}
+
+
+.footer {
+	background-repeat: no-repeat;
+	overflow: hidden;
+	position:absolute;
+	bottom:0;
+	left:0;
+	right:0;
+	height: 18px;
+}
+
+.footer>span {
+
+}
+
+.sizer {
+	position: absolute;
+}
+
+.sizer.horizontal {
+	cursor:col-resize;
+}
+
+.sizer.vertical {
+	cursor:row-resize;
+}
+
+.sizer.diagonal {
+	cursor:se-resize;
+}
+
+.header>.launcher {
+	display: inline;
+}
+
+.header .button.options {
+	position:absolute;
+	right:40px;
+	top:8px;
+}
+
+.sub.header .button.options {
+	top:4px;
+}
+
+.sub.header>.control {
+	margin:6px 1em 0;
+}
+
+
+
+/* END shared container attributes */
+
+/*
+______________________________________________________________
+
+ COLUMNS
+______________________________________________________________
+
+Columns are the basis for all page layouts.  The fundamental characteristic of a column is that it is as tall as as its parent.
+
+*/
+
+/* Column layout
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*/
+
+.column {
+	position:absolute;
+	margin:0;
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+	overflow: visible;
+}
+
+.column>.content {
+	position: relative;
+	height: 100%;
+}
+
+.column>.content>.body {
+	top:36px;
+}
+
+.column.simple {
+	overflow: visible;
+}
+
+.column.simple>.content,
+.column.decorated>.content {
+	position: absolute;
+	height: auto;
+}
+
+
+.column.simple>.content>.body,
+.column.decorated>.content>.body {
+	overflow: auto;
+}
+
+.column.accordian>.content>.body,
+.column.split>.content>.body {
+	overflow: hidden;
+}
+
+
+/* sizers
+   note: default positioning assumes left to right reading UI
+*/
+
+.column>.sizer {
+	position:absolute;
+	top:0px;
+	bottom:0;
+	width:15px;
+	cursor:col-resize;
+	background: none;
+	background: url(images/panel_sizer_sprite.png) -14px center no-repeat;
+}
+
+.secondary.column>.sizer {
+	right:0;
+	margin-right:-18px;
+}
+
+.tertiary.column>.sizer {
+	left:0;
+	margin-left:-20px;
+}
+
+.column.noHeader>.content>.header,
+.column.noHeader>.minimize {
+	display: none;
+}
+
+.column.noHeader>.content>.body {
+	top: 0;
+}
+
+.column.decorated.noHeader>.content>.body {
+	margin-top: 10px;
+}
+
+.column > .content > .body.showingSubHeader,
+.column.showingSubHeader > .content > .body {
+	margin-top:29px;
+}
+
+.column.showingToolBar > .content > .body {
+	margin-top:33px;
+}
+
+.column.showingToolBar.showingSubHeader > .content > .body {
+	margin-top:63px;
+}
+
+.column.showingToolBar.showingDisplayManager > .content > .body {
+	margin-top:105px;
+}
+
+
+.sub.header .horizontal {
+    margin: 6px 1em 0 1em;
+}
+
+
+
+/* DECORATED COLUMN
+--------------------------------------------------------------
+   a decorated column has a visual presence in the UI with borders, headers, shadows, etc.
+*/
+
+.column.decorated {
+	margin:21px 21px 25px; /* default margin setting overridden as req'd in layout.css */
+	bottom:0;
+	top:0;
+	overflow: visible;
+	background-color: #fff;
+	border:1px solid #d3d2d2;
+	min-width: 150px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+	-moz-box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+	-webkit-box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+#frame.column.decorated {
+	border:none;
+	min-width:1024px;
+}
+
+/* styles used to produce shadow background */
+
+.column.decorated>.corner,
+.column.decorated>.edge {
+	display:none;
+}
+
+.column.decorated>.corner {
+	display:none;
+}
+
+.column.decorated>.corner.top {
+	display:none;
+}
+
+.column.decorated>.corner.bottom {
+	display:none;
+}
+
+.column.decorated>.corner.left {
+	display:none;
+}
+
+.column.decorated>.corner.right {
+	display:none;
+}
+
+.column.decorated>.corner.top.left {
+	display:none;
+}
+
+.column.decorated>.corner.bottom.left {
+	display:none;
+}
+
+.column.decorated>.corner.top.right {
+	display:none;
+}
+
+.column.decorated>.corner.bottom.right {
+	display:none;
+}
+
+.column.decorated>.edge.rl {
+	top:5px;
+	bottom: 5px;
+	width: 10px;
+	background-image: url(images/column_bkgd_edges_rl.png);
+	background-repeat: repeat-y;
+}
+
+.column.decorated>.edge.tb {
+	left:5px;
+	right: 5px;
+	height: 10px;
+	background-image: url(images/column_bkgd_edges_tb.png);
+	background-repeat: repeat-x;
+}
+
+.column.decorated>.edge.rl.left {
+	left:-5px;
+	right: auto;
+	background-position: top left;
+}
+
+.column.decorated>.edge.rl.right {
+	right:-5px;
+	left: auto;
+	background-position: top right;
+}
+
+.column.decorated>.edge.tb.top {
+	top:-5px;
+	bottom: auto;
+	background-position: top left;
+}
+
+.column.decorated>.edge.tb.bottom {
+	bottom:-5px;
+	top: auto;
+	background-position: bottom left;
+}
+
+/* END shadow styles */
+
+.column.decorated>.content {
+/* set coordinates to visual (0,0,0,0) of .column.decorated background,
+   as this object used as reference for positioning
+   child objects */
+	bottom:0;
+	left:0;
+	right:0;
+	top:0;
+}
+
+.column.decorated>.content>.header {
+	min-height:35px;
+	position: relative;
+	white-space: nowrap;
+}
+
+.column.decorated>.content>.body {
+	position: absolute;
+	top:36px;
+	bottom:45px;
+	left:0;
+}
+
+.column.decorated.secondary>.content>.body,
+.column.decorated.tertiary>.content>.body {
+	background-color: #f8f8f8;
+}
+
+.inputs .column.decorated.secondary>.content>.body,
+.inputs .column.decorated.tertiary>.content>.body {
+	background-color: transparent;
+}
+
+.column.decorated>.content>.footer {
+	border-top: 1px solid #D4D5D5;
+	height:40px;
+	padding:5px 20px 0;
+	z-index: 100;
+}
+
+.column.decorated.minimized {
+	height:155px;
+	width:18px !important;
+	min-width: 0;
+}
+
+.column.decorated.minimized .sizer,
+.column.decorated.minimized .body,
+.column.decorated.minimized .header,
+.column.decorated.minimized .footer,
+.column.decorated.minimized.secondary .corner.left,
+.column.decorated.minimized.secondary .edge.left,
+.column.decorated.minimized.tertiary .corner.right,
+.column.decorated.minimized.tertiary .edge.right   {
+	display:none;
+}
+
+.column.decorated.minimized .footer {
+	padding:0;
+}
+
+.column.decorated.minimized.secondary .edge.tb {
+	left:0;
+}
+
+.column.decorated.minimized.secondary {
+	margin-left:0;
+	-moz-border-radius: 0px 10px 10px 0px;
+	-webkit-border-radius: 0px 10px 10px 0px;
+	border-radius: 0px 10px 10px 0px;
+}
+
+
+.column.decorated.minimized.tertiary .edge.tb {
+	right:0;
+}
+
+.column.decorated.minimized.tertiary {
+	margin-right:0;
+	right: 1px !important;
+	-moz-border-radius: 10px 0px 0px 10px;
+	-webkit-border-radius: 10px 0px 0px 10px;
+	border-radius: 10px 0px 0px 10px;
+}
+
+/*
+______________________________________________________________
+
+ PANELS
+______________________________________________________________
+
+*/
+
+/* Panel Layouts
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*/
+
+.panel {
+	position: absolute;
+}
+
+.panel.sizeable {
+	min-height: 150px;
+	min-width: 150px;
+}
+
+.panel>.sizer {
+	position:absolute;
+	width:9px;
+	height:9px;
+	background-image: url(images/panel_sizer_sprite.png);
+	background-repeat: none;
+	cursor: pointer;
+	z-index: 3;
+}
+
+.panel>.sizer.vertical {
+	background-position: left 0;
+}
+
+
+.panel>.sizer.diagonal {
+	background-position: left -48px;
+}
+
+.panel.inlay .column.primary,
+.panel.inlay .column.secondary,
+.panel.inlay .column.tertiary {
+	position:relative;
+	top:auto;
+	left:auto;
+	bottom:auto;
+	right:auto;
+	margin:0;
+}
+
+.panel .row.actions {
+	position:absolute;
+	bottom:5px;
+}
+
+.panel .row.inputs {
+	position:absolute;
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+	margin:15px 20px 50px;
+}
+
+.panel .footer {
+	border-top: 1px solid #D4D5D5;
+}
+
+.panel.noHeader>.content>.header {
+	display: none;
+}
+
+.panel.showingSubHeader>.content>.body {
+	margin-top:29px;
+}
+
+
+.panel.filter.inlay>.content {
+	min-height: 0;
+}
+
+.panel.filter .select {
+	margin: auto 10px;
+}
+
+
+
+/* Display Panels
+--------------------------------------------------------------
+Display panels are used to communicate information only; they do not
+contain forms or elements intended to collect user input
+
+There are 3 types:
+- .panel.tooltip
+- .panel.info
+- .panel.info.system
+
+*/
+
+/* .panel.tooltip */
+
+.panel.tooltip {
+	border:1px solid #fa631b;
+	background-color: #FEFFBB;
+	-moz-border-radius:4px;
+	-webkit-border-radius:4px;
+	border-radius:4px;
+	margin: 0;
+	float: left;
+    z-index: 1000;
+}
+
+.panel.tooltip>.content {
+	position: relative;
+}
+
+.panel.tooltip>.content>.body {
+	line-height:2em;
+	padding: 10px 10px 0;
+}
+
+
+.panel.tooltip .message.label {
+	color:#8F9537;
+	margin-bottom: 0;
+}
+
+.panel.tooltip .corner,
+.panel.tooltip .edge {
+	display: none;
+}
+
+
+/* .panel.info */
+
+.info {
+	float: left;
+	position: relative;
+	margin:2px 5px 20px 2px; /* moves visual top and left to actual */
+	clear:both;
+	border:1px solid #d3d2d2;
+	-moz-border-radius: 10px;
+	-webkit-radius: 10px;
+	border-radius: 10px;
+	-moz-box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.25);
+	-webkit-box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.25);
+	box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.25);
+}
+
+.info>.corner {
+	display:none;
+}
+
+.info>.edge.rl {
+	display:none;
+}
+
+.info>.edge.tb {
+	display:none;
+}
+
+.info>.corner.top {
+	display:none;
+}
+
+.info>.corner.bottom {
+	display:none;
+}
+
+.info>.corner.left {
+	display:none;
+}
+
+.info>.corner.right {
+	display:none;
+}
+
+.info>.edge.rl.left {
+	display:none;
+}
+
+.info>.edge.rl.right {
+	display:none;
+}
+
+.info>.edge.tb.top {
+	display:none;
+}
+
+.info>.edge.tb.bottom {
+	display:none;
+}
+
+.info>.content {
+/* set coordinates to visual (0,0,0,0) of .column.decorated background,
+   as this object used as reference for positioning
+   child objects */
+	left:-1px;
+	margin-bottom:-5px;
+	margin-right:-4px;
+	position:relative;
+	top:-3px;
+}
+
+.info>.content>.header,
+.info>.content>.footer {
+	display: none;
+}
+
+.info .body {
+	position: relative;
+	padding:10px;
+	overflow: hidden;
+}
+
+.info .column {
+	position: relative;
+	height:100%;
+}
+
+.info .body.twoColumn_equal .column {
+	width: 48%;
+	float:left;
+	left:0;
+}
+
+.info.fillParent {
+	float:none;
+}
+
+.info.fillParent .footer {
+	bottom:-10px;
+}
+
+/* .panel.info.system */
+
+.info.system {
+	height:25px;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	min-height: 0;
+	min-width: 0;
+	margin: 3px;
+	background-color: #FEEF97;
+}
+
+.info.system>.corner {
+	height: 10px;
+	width: 10px;
+	background-image: url(images/panel_info_system_bkgd_corners.png);
+	background-repeat: no-repeat;
+}
+
+.info.system>.edge.rl {
+	top:3px;
+	bottom: 3px;
+	width: 10px;
+	background-image: url(images/panel_info_system_bkgd_edges_rl.png);
+	background-repeat: repeat-y;
+}
+
+.info.system>.edge.tb {
+	left:3px;
+	right: 3px;
+	height: 10px;
+	background-image: url(images/panel_info_system_bkgd_edges_tb.png);
+	background-repeat: repeat-x;
+}
+
+.info.system>.corner.top {
+	top:-3px;
+}
+
+.info.system>.corner.bottom {
+	bottom:-3px;
+}
+
+.info.system>.corner.left {
+	left:-3px;
+}
+
+.info.system>.corner.right {
+	right:-3px;
+}
+
+.info.system>.edge.rl.left {
+	left:-3px;
+	right: auto;
+	background-position: top left;
+}
+
+.info.system>.edge.rl.right {
+	right:-3px;
+	left: auto;
+	background-position: top right;
+}
+
+.info.system>.edge.tb.top {
+	top:-3px;
+	bottom: auto;
+	background-position: top left;
+}
+
+.info.system>.edge.tb.bottom {
+	bottom:-3px;
+	top: auto;
+	background-position: bottom left;
+}
+
+.info.system>.content {
+/* set coordinates to visual (0,0,0,0) of .column.decorated background,
+   as this object used as reference for positioning
+   child objects */
+	left:-3px;
+	margin-bottom:-1px;
+	margin-right:-5px;
+	position:relative;
+	top:-3px;
+	text-align: center;
+}
+
+.info.system .body {
+	padding:0;
+}
+
+.info.system .message {
+	line-height: 32px;
+	margin:auto 10px;
+	overflow:hidden;
+	white-space:nowrap;
+}
+
+/* Dialog Panels
+--------------------------------------------------------------
+
+Dialog panels are contain forms or elements intended to collect user input.
+
+There are 3 main types:
+
+- .dialog.inlay
+- .dialog.overlay
+- .dialog.overlay.widget (a more petite version of .dialog.overlay)
+
+For the .dialog.overlay types, there are 2 special cases:
+
+- .sizeable
+- .tabbed
+
+These special cases may require particular overrides to the size or
+positioning metrics for the container components.
+
+In particular, .sizeable requires that .dialog>.content be position:absolute.
+
+
+*/
+
+.dialog .group {
+	margin: 0;
+}
+
+.dialog>.content>.body {
+	padding:20px;
+	position: relative;
+	overflow: auto;
+}
+
+.panel.dialog>.content>.header>.title {
+	white-space: nowrap;
+}
+
+/* .panel.dialog.inlay
+   a panel for fixed, non-resizable applications
+*/
+
+.dialog.inlay {
+	margin:4px 6px 9px 2px; /* moves visual top and left to actual */
+	float:left;
+	border-top:1px solid #d3d5d6;
+	border-right:1px solid #d3d5d6;
+	border-bottom:1px solid #d3d5d6;
+	border-left:1px solid #d3d5d6;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+	-moz-box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+	-webkit-box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+	box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.dialog.inlay>.corner {
+	display:none;
+}
+
+.dialog.inlay>.edge.rl {
+	display:none;
+}
+
+.dialog.inlay>.edge.tb {
+	display:none;
+}
+
+.dialog.inlay>.corner.top {
+	display:none;
+}
+
+.dialog.inlay>.corner.bottom {
+	display:none;
+}
+
+.dialog.inlay>.corner.left {
+	display:none;
+}
+
+.dialog.inlay>.corner.right {
+	display:none;
+}
+
+.dialog.inlay>.edge.rl.left {
+	display:none;
+}
+
+.dialog.inlay>.edge.rl.right {
+	display:none;
+}
+
+.dialog.inlay>.edge.tb.top {
+	display:none;
+}
+
+.dialog.inlay>.edge.tb.bottom {
+	display:none;
+}
+
+.dialog.inlay>.content {
+/* set coordinates to visual (0,0,0,0) of .column.decorated background,
+   as this object used as reference for positioning
+   child objects */
+	left:0px;
+	margin-bottom:0px;
+	margin-right:0px;
+	position:relative;
+	top:0px;
+}
+
+.dialog.inlay .header {
+	height:28px;
+	border-bottom:1px solid #E0E0E0;
+	padding-right:15px;
+	position: relative;
+}
+
+.dialog.inlay .header span {
+	display: none;
+}
+
+.dialog.inlay .header * {
+	line-height: 28px;
+}
+
+.dialog.inlay .header .icon {
+	height:28px;
+}
+
+.dialog.inlay>.content>.body {
+	z-index: 2;
+	margin-bottom: 0;
+	overflow: hidden;
+}
+
+
+.dialog.inlay .sizer {
+	display: none;
+}
+
+.dialog.inlay .footer {
+	background-repeat: no-repeat;
+	position: relative;
+	border-width:0;
+	height:34px;
+	padding:5px 20px;
+	overflow: visible;
+}
+
+.dialog.inlay .footer>.cosmetic {
+	position:absolute;
+	bottom:0;
+	height:76px;
+}
+
+.dialog.inlay .footer>.cosmetic.left {
+	left:0;
+	right:15px;
+}
+
+.dialog.inlay .footer>.cosmetic.right {
+	right:0;
+	width:15px;
+}
+
+
+.dialog.inlay.fillParent {
+	float:none;
+	position: relative;
+}
+
+.dialog.inlay.fillParent .footer {
+	bottom:-5px;
+}
+
+/* .dialog.inlay.overlay */
+
+.dialog.inlay.filter {
+    margin: 10px;
+    position: relative;
+    line-height: normal;
+}
+
+.dialog.inlay.filter>.content>.body {
+    white-space: nowrap;
+    padding: 10px 20px;
+}
+
+.dialog.inlay.filter>.content>.body>.column {
+    height: auto;
+    margin: 0;
+    line-height: normal;
+    position: relative;
+    float: left;
+    min-width: 185px;
+    overflow:visible;
+}
+
+.dialog.inlay.filter>.content>.body>.column.two.pickWells {
+    height:150px;
+}
+
+
+.dialog.inlay.filter .select {
+    margin-left: 0;
+}
+
+/*
+.dialog.inlay.filter>.content>.body>.column.two .wrap {
+    position: absolute;
+    left: -5000px;
+}
+*/
+
+.dialog.inlay.filter>.content>.body>.column.two>.control>.wrap {
+    position: absolute;
+    left: -5000px;
+}
+
+
+
+.dialog.inlay.filter>.content>.body>.column.two.pickWells .wrap {
+    position: relative;
+    left: auto;
+}
+
+
+.dialog.inlay.filter>.content>.body>.column.two input {
+    margin-top:0;
+}
+
+
+.dialog.inlay.filter .footer>.lock {
+	position:absolute;
+	right:20px;
+	top:5px;
+	z-index: 1;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+/* Safari and Google Chrome only */
+	.dialog.inlay.filter .footer>.lock>.wrap {
+		float:right;
+	}
+
+	.dialog.inlay.filter>.content>.body>.column.two .searchLockup input {
+    	margin-top:2px;
+	}
+}
+
+
+
+/* .panel.dialog.overlay */
+
+.dialog.overlay>.corner {
+	display:none;
+}
+
+.dialog.overlay>.edge.rl {
+	display:none;
+}
+
+.dialog.overlay>.edge.tb {
+	display:none;
+}
+
+.dialog.overlay>.corner.top {
+	display:none;
+}
+
+.dialog.overlay>.corner.bottom {
+	display:none;
+}
+
+.dialog.overlay>.corner.left {
+	display:none;
+}
+
+.dialog.overlay>.corner.right {
+	display:none;
+}
+
+.dialog.overlay>.edge.rl.left {
+	display:none;
+}
+
+.dialog.overlay>.edge.rl.right {
+	display:none;
+}
+
+.dialog.overlay>.edge.tb.top {
+	display:none;
+}
+
+.dialog.overlay>.edge.tb.bottom {
+	display:none;
+}
+
+
+.dialog.overlay {
+	border-top:1px solid #d3d5d6;
+	border-right:1px solid #d3d5d6;
+	border-bottom:1px solid #d3d5d6;
+	border-left:1px solid #d3d5d6;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+	-moz-box-shadow: 0 0 6px 4px rgba(0, 0, 0, 0.25); /* the 0.25 in the rgba values adds opacity for fading into dark AND light colors gracefully */
+	-webkit-box-shadow: 0 0 6px 4px rgba(0, 0, 0, 0.25);
+	box-shadow: 0 0 6px 4px rgba(0, 0, 0, 0.25);
+	background-color: #fff;
+	float: left;
+	margin:3px;
+}
+
+.dialog.overlay>.content {
+/* set coordinates to visual (0,0,0,0) of .column.decorated background,
+   as this object used as reference for positioning
+   child objects */
+	margin-bottom:0;
+	left:-1px;
+	margin-right:-1px;
+	top:-1px;
+	position: relative;
+}
+
+.dialog.overlay>.content>.header {
+	background: -webkit-gradient(linear, left top, left bottom, from(#edeeef), to(#d4d5d5));
+	background: -moz-linear-gradient(top,#edeeef,#d4d5d5);
+	-moz-border-radius: 10px 10px 0px 0px;
+	-webkit-border-radius: 10px 10px 0px 0px;
+	border-radius: 10px 10px 0px 0px;
+}
+
+.dialog.overlay .header>.cosmetic {
+	display:none;
+}
+
+.dialog.overlay .header.mover>.cosmetic {
+	background: -webkit-gradient(linear, left top, left bottom, from(#e7e7e7), to(#c1c1c1));
+	background: -moz-linear-gradient(top,#e7e7e7,#c1c1c1);
+	-moz-border-radius: 10px 10px 0px 0px;
+	-webkit-border-radius: 10px 10px 0px 0px;
+	border-radius: 10px 10px 0px 0px;
+	height:35px;
+	left:0;
+	right:0;
+}
+
+
+.dialog.overlay.showingSubHeader>.content>.header {
+	background: -webkit-gradient(linear, left top, left bottom, from(#edeeef), to(#bec0c0));
+	background: -moz-linear-gradient(top,#edeeef,#bec0c0);
+	border-bottom:1px solid #fff;
+}
+
+.dialog.overlay.showingSubHeader>.content>.header>.sub.header {
+	background-color:#fff;
+	border-bottom:none;
+}
+
+.dialog.overlay>.content>.header>.title {
+	line-height: 35px;
+}
+
+.dialog.overlay .header .icon {
+	height:35px;
+}
+
+.dialog.overlay>.sizer {
+	display: none;
+}
+
+.dialog.overlay>.content>.footer {
+	height:34px;
+	padding:5px 20px;
+    border-width: 0;
+    position: relative;
+}
+
+
+/*.dialog.overlay.sizeable */
+
+.dialog.overlay.sizeable {
+	float: none;
+}
+
+.dialog.overlay.sizeable>.content {
+/* set coordinates to visual (0,0,0,0) of .column.decorated background,
+   as this object used as reference for positioning
+   child objects */
+	bottom:0;
+	left:0;
+	right:0;
+	top:0;
+	float: none;
+	margin-left: 0;
+	position:absolute;
+	margin:0;
+}
+
+.dialog.overlay.sizeable>.content>.body {
+	top:35px;
+	bottom:44px;
+	margin-bottom: 0;
+	position: absolute;
+}
+
+.dialog.overlay.sizeable>.content>.footer {
+	height:34px;
+	padding:5px 5px 5px 20px;
+    border-width: 1px;
+    position: absolute;
+}
+
+.dialog.overlay.sizeable>.content>.footer,
+.dialog.overlay.sizeable>.sizer {
+	display: block;
+}
+
+.dialog.overlay.sizeable>.sizer {
+	display: block;
+	bottom:5px;
+	right:5px;
+}
+
+.dialog.overlay.sizeable>.content>.footer {
+	height:34px;
+	padding:5px 5px 5px 20px;
+}
+
+.dialog .groupBox {
+	float:none;
+}
+
+.dialog.sizeable .groupBox {
+	bottom:25px;
+	left:20px;
+	position:absolute;
+	right:20px;
+	top:18px;
+}
+
+.dialog.sizeable .groupBox>.content {
+	bottom:0;
+	left:0;
+	position:absolute;
+	right:0;
+}
+
+.dialog.sizeable .groupBox>.content>.body {
+	bottom:10px;
+	padding:0 10px;
+	position:absolute;
+	top:10px;
+	border-top:1px solid #f0f0f0;
+	border-bottom:1px solid #f0f0f0;
+}
+
+/*.dialog.tabbed */
+
+.dialog.tabbed .tabSet {
+	margin-bottom: 0;
+}
+
+.dialog.tabbed .groupBox {
+	margin-top:14px;
+	padding-top: 20px;
+}
+
+/* .dialog.tabbed.sizeable */
+
+.dialog.tabbed.sizeable>.content>.body>.groupBox>.content>.body {
+	top:20px;
+}
+
+
+/* .dialog.overlay.widget */
+
+.dialog.overlay.widget>.content {
+/* set coordinates to visual (0,0,0,0) of .column.decorated background,
+   as this object used as reference for positioning
+   child objects */
+	left:-2px;
+	margin-bottom:-4px;
+	margin-right:-3px;
+	position:relative;
+	top:-2px;
+}
+
+
+.dialog.overlay.widget>.content>.header {
+	height:27px;
+	background-image: url(images/panel_widget_header_sprite.png);
+	background-position: right -72px;
+	padding-right:15px;
+}
+
+.dialog.overlay.widget .header span {
+	height:28px;
+	left:-1px;
+	right:18px;
+}
+
+.dialog.overlay.widget .header * {
+	line-height: 28px;
+}
+
+.dialog.overlay.widget .header .icon {
+	height:28px;
+}
+
+/* .dialog.overlay.widget.sizeable */
+
+.dialog.overlay.widget.sizeable>.content {
+/* set coordinates to visual (0,0,0,0) of .panel.widget background,
+   as this object used as reference for positioning
+   child objects */
+	bottom:-1px;
+	left:-1px;
+	right:-1px;
+	top:-1px;
+	float: none;
+	margin-left: 0;
+	position:absolute;
+	margin:0;
+}
+
+.dialog.overlay.widget.sizeable .body {
+	top:28px;
+	bottom: 30px;
+}
+
+.dialog.overlay.widget.sizeable>.sizer {
+	bottom:5px;
+	right:5px;
+}
+
+.dialog.overlay.widget.sizeable .footer {
+	height:20px;
+}
+
+/* Panes
+--------------------------------------------------------------
+Panes are dialogs that visually share their left and right
+borders with their enclosing column
+
+.Pane also has the special case of .pane.sizeable, that requires that .pane>.content be position:absolute.
+
+*/
+
+.pane {
+	position:relative;
+	margin:0;
+	left:0;
+	right:0;
+	background-image: none;
+	border-bottom: 1px solid #e0e0e0;
+	background-color: #fff;
+}
+
+.pane>.content {
+	position:relative;
+	/* float: left; */
+	width:100%;
+}
+
+.pane.minimized,
+.pane.sizeable.minimized {
+	height:auto !important;
+	min-height:0;
+	border-bottom: none;
+}
+
+.pane.minimized>.content,
+.pane.sizeable.minimized>.content {
+	position:relative;
+}
+
+
+.pane.sizeable.minimized .sizer,
+.pane.minimized .body,
+.pane.minimized .footer {
+	display:none;
+}
+
+.pane .body {
+	position:relative;
+}
+
+.pane .footer {
+	border-top:none;
+}
+
+.pane .sizer {
+	bottom:0;
+	width:100%;
+}
+
+.pane .sizer.vertical {
+	background-position:53% -10px;
+	background-repeat:no-repeat;
+	/* border-top:1px solid #E0E0E0; */
+}
+
+.pane.upper .sizer {
+	bottom:-20px;
+	right:3px;
+	top:auto;
+	background-color: none;
+}
+
+.pane.lower .sizer {
+	top:10px;
+	right:3px;
+	background-color: none;
+}
+
+.pane.closed .body,
+.pane.closed .footer,
+.pane.closed .sizer {
+	display: none;
+}
+
+
+.pane .header {
+	height:28px;
+	border-top: 1px solid #FFF;
+	border-bottom:1px solid #E0E0E0;
+	background-color: #F0F0F0;
+}
+
+.pane .header .title {
+	height: 28px;
+	line-height:28px;
+	margin-right:22px;
+	white-space:normal;
+}
+
+.pane .header .disclosure {
+	position:absolute;
+	top:6px;
+	left:2px;
+}
+
+.pane .header .icon {
+	height:28px;
+}
+
+/* .pane.sizeable */
+
+.pane.sizeable>.content {
+	height:100%;
+	position: absolute;
+	float: none;
+	left:0;
+	top:0;
+	right: 0;
+	bottom: 0;
+	margin: 0
+}
+
+.pane.sizeable .body {
+	position: absolute;
+	top:30px;
+	bottom: 5px;
+	overflow: auto;
+}
+
+.pane.sizeable .footer {
+	height:5px;
+	border-top:1px solid #E0E0E0;
+}
+
+.pane .control.searchLockup {
+	margin-top: 8px;
+}
+
+.pane .control.searchLockup input {
+	width: 70%;
+}
+
+
+/*
+______________________________________________________________
+
+ MENUS
+______________________________________________________________
+
+Display panels are used to communicate information only; they do not
+contain forms or elements intended to collect user input
+
+There are 2 types:
+- .menu.vertical
+- .menu.horizontal
+
+.Menu.vertical has two cases:
+- .context
+- .dropDown
+
+*/
+
+/* Menu Layout
+-------------------------------------------------------------- */
+
+.menu {
+	position:absolute;
+	float:left;
+	cursor: pointer;
+	list-style: none;
+	margin:0;
+}
+
+.menu>.content {
+	position:relative;
+	padding:7px 0;
+}
+
+.menu .node {
+	position: relative;
+}
+
+.menu .leaf {
+	margin:0;
+}
+
+.menu .wrap {
+	margin-bottom:0;
+}
+
+.menu .node>.wrap>.icon {
+	background-image:url("images/disclosure_indicators_sprite.png");
+	background-repeat:no-repeat;
+	left:auto;
+	position:absolute;
+}
+
+.menu.vertical .node .sub.menu {
+	left:100%;
+	top:-5px;
+	margin: 0;
+}
+
+
+
+/* Vertical Menus
+-------------------------------------------------------------- */
+
+.menu.vertical {
+	min-width: 150px;
+	background-color:#ffffff;
+	border:1px solid #d3d5d6;
+	-moz-border-radius: 0px 0px 10px 10px;
+	-webkit-border-radius: 0px 0px 10px 10px;
+	border-radius: 0px 0px 10px 10px;
+	-moz-box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+	-webkit-box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+	box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.menu.vertical .wrap {
+	line-height: 2em;
+	padding:0 2em;
+	white-space: nowrap;
+	background-repeat: no-repeat;
+	margin-bottom:0;
+}
+
+.menu.vertical .leaf.separator,
+.menu.vertical .leaf.buttonItem {
+	border-top: 1px solid #bdbdbd;
+}
+
+.menu.vertical .leaf.separator {
+	background: none;
+	height:1px;
+	margin:2px 0;
+}
+
+.menu.vertical .leaf>.wrap.toggle.down {
+	background-image: url(images/lists_sprite.png);
+	background-position:7px -299px;
+}
+
+
+.menu.vertical .leaf>.wrap.toggle.down.over,
+.menu.vertical .leaf>.wrap.toggle.down.pressed
+ {
+	background-position:7px -324px;
+}
+
+
+.menu.vertical .node>.wrap>.icon {
+	background-position:left top;
+	height:13px;
+	right:5px;
+	top:6px;
+	width:11px;
+}
+
+
+.menu.vertical .node>.wrap.over>.icon,
+.menu.vertical .node>.wrap.pressed>.icon {
+	background-position: left -19px;
+}
+
+.menu.vertical .node.closed>.menu {
+	display: none;
+}
+
+.menu.vertical .node.open>.menu {
+	display: block;
+}
+
+
+	/* CONTEXT MENU */
+
+.menu.context {
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+}
+
+.menu.context>.corner {}
+
+.menu>.corner {
+	display:none;
+}
+
+.menu.context>.edge.rl {
+	display:none;
+}
+
+.menu.context>.edge.tb {
+	display:none;
+}
+
+.menu.context>.corner.top {
+	display:none;
+}
+
+.menu.context>.corner.bottom {
+	display:none;
+}
+
+.menu.context>.corner.left {
+	display:none;
+}
+
+.menu.context>.corner.right {
+	display:none;
+}
+
+.menu.context>.edge.rl.left {
+	display:none;
+}
+
+.menu.context>.edge.rl.right {
+	display:none;
+}
+
+.menu.context>.edge.tb.top {
+	display:none;
+}
+
+.menu.context>.edge.tb.bottom {
+	display:none;
+}
+
+.menu.context>.content {
+/* set coordinates to visual (0,0,0,0) of .menu.context.context background,
+   as this object used as reference for positioning
+   child objects */
+	left:0;
+	margin-bottom:-6px;
+	margin-right:0;
+	position:relative;
+	top:-2px;
+}
+
+
+	/* DROPDOWN MENU */
+
+.menu.dropDown>.content {
+/* set coordinates to visual (0,0,0,0) of .menu.dropDown.context background,
+   as this object used as reference for positioning
+   child objects */
+	left:0px;
+	margin-bottom:-6px;
+	margin-right:0px;
+	position:relative;
+	top:-2px;
+}
+
+.menu.dropDown>.corner {
+	display:none;
+}
+
+.menu.dropDown>.edge.rl {
+	display:none;
+}
+
+.menu.dropDown>.edge.tb {
+	display:none;
+}
+
+.menu.dropDown>.corner.top {
+	display:none;
+}
+
+.menu.dropDown>.corner.bottom {
+	display:none;
+}
+
+.menu.dropDown>.corner.left {
+	display:none;
+}
+
+.menu.dropDown>.corner.right {
+	display:none;
+}
+
+.menu.dropDown>.edge.rl.left {
+	display:none;
+}
+
+.menu.dropDown>.edge.rl.right {
+	display:none;
+}
+
+.menu.dropDown>.edge.tb.top {
+	display:none;
+}
+
+.menu.dropDown>.edge.tb.bottom {
+	display:none;
+}
+
+
+
+
+/* Horizontal Menus
+-------------------------------------------------------------- */
+.menu.primaryNav li {
+	border:none;
+	padding-right:0;
+}
+
+/* .menu.primaryNav */
+
+.menu.primaryNav {
+	margin-left:10px;
+}
+
+.menu.primaryNav .wrap {
+	padding:0 2em;
+	line-height:35px;
+	border:none;
+	background-repeat: repeat-x;
+}
+
+.menu.primaryNav .wrap.over,
+.menu.primaryNav .wrap.pressed {
+	background: -webkit-gradient(linear, left top, left bottom, from(#ffab0b), to(#ff7a0b));
+	background: -moz-linear-gradient(top,#ffab0b,#ff7a0b);
+	height:37px;
+}
+
+.menu.primaryNav #main_home .wrap.pressed {
+	background-image: url(images/menu_primaryNav_sprite.png);
+	background-position: center -56px;
+}
+
+.menu.primaryNav .node>.wrap>.icon {
+	background-position: 0px -75px;
+	height: 35px;
+	right:10px;
+	width:11px;
+}
+
+.menu.primaryNav #main_home .wrap {
+	text-indent: -5000px;
+}
+
+.menu.primaryNav #main_home .wrap>.icon {
+	left:50%;
+	margin-left:-9px;
+	width:18px;
+}
+
+.menu.primaryNav #main_home .wrap>.icon {
+	background-image: url(images/menu_primaryNav_sprite.png);
+	background-repeat: no-repeat;
+	background-position: left -163px;
+}
+
+.menu.primaryNav #main_home .wrap.over>.icon,
+.menu.primaryNav #main_home .wrap.pressed>.icon {
+	background-position: left -163px;
+}
+
+
+/* iPads (portrait and landscape) */
+@media only screen 
+and (min-device-width : 768px) 
+and (max-device-width : 1024px) {
+
+	.column>.sizer {
+		position:absolute;
+		top:0px;
+		bottom:0;
+		width:10px;
+		cursor:col-resize;
+		background-image: none;
+		z-index:99;
+	}
+	
+	.secondary.column>.sizer {
+		right:0;
+		margin-right:-11px;
+	}
+	
+	.tertiary.column>.sizer {
+		left:0;
+		margin-left:-11px;
+	}
+	
+	.column.decorated {
+		-webkit-border-radius: 0;
+		border-radius: 0;
+		box-shadow: 0 0 0;
+		-webkit-box-shadow: 0 0 0;
+		margin: 0;
+		border-top: none;
+	}
+	
+	#stepDisplay .column.decorated {
+		bottom:0;
+		top:0;
+		overflow: visible;
+		background-color: #fff;
+		border:1px solid #d3d2d2;
+		min-width: 150px;
+		-moz-border-radius: 10px;
+		-webkit-border-radius: 10px;
+		border-radius: 10px;
+		-moz-box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+		-webkit-box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+		box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+	}
+	
+	#display {
+		position: absolute;
+		top:0;
+		bottom:20px;
+		left:0;
+	}
+	
+	.column.decorated.minimized {
+		height:100%;
+		width:8px;
+		min-width: 0;
+		top:0;
+		bottom:0;
+		z-index:199;
+	}
+	.column.decorated.minimized.secondary {
+		margin-left:0;
+		-webkit-border-radius: 0;
+	}
+	.column.decorated.minimized.tertiary {
+		margin-right:0;
+		right: 1px;
+		-webkit-border-radius: 0;
+	}
+	
+	.menu.primaryNav li {
+		border-right:1px solid #187fb0;
+		margin:0px;
+	}
+	
+}
+
+/*
+______________________________________________________________
+
+ FIREFOX STYLES
+______________________________________________________________
+
+*/
+
+/* the styles below target ONLY firefox. implemented in v4.2 due to FF 3.5 lack of gradient support */
+@-moz-document url-prefix() {
+.menu.primaryNav .wrap.over,
+.menu.primaryNav .wrap.pressed {
+		background-image: url(images/menu_primaryNav_sprite.png);
+		background-position: center top;
+	}
+}

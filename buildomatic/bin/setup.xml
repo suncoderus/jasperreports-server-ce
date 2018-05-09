@@ -1,0 +1,1060 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<project name="setup">
+    <property environment="env"/>
+
+    <componentdef classname="com.jaspersoft.buildomatic.JSPropertyEvaluator"
+                  name="jsPropertyEvaluator">
+        <classpath>
+            <pathelement location="${basedir}/target/buildomatic.jar" />
+            <pathelement location="${basedir}/target/commons-lang3-3.0.jar" />
+            <pathelement location="${basedir}/target/js-crypto-1.0.6.jar" />
+            <pathelement location="${basedir}/target/log4j-1.2.16.jar" />
+            <pathelement location="${basedir}/target/commons-codec-1.5.jar" />
+        </classpath>
+    </componentdef>
+    <propertyhelper>
+        <jsPropertyEvaluator/>
+    </propertyhelper>
+
+    <!-- load ant-contrib -->
+    <taskdef resource="net/sf/antcontrib/antlib.xml"/>
+
+    <!-- define custom java tasks -->
+    <taskdef resource="tasks.properties" onerror="report">
+        <classpath>
+            <pathelement location="${basedir}/target/buildomatic.jar" />
+            <pathelement location="${basedir}/target/js-crypto-1.0.6.jar" />
+            <pathelement location="${basedir}/target/commons-codec-1.5.jar" />
+            <pathelement location="${basedir}/target/commons-configuration-1.9.jar" />
+            <pathelement location="${basedir}/target/commons-lang-2.5.jar" />
+            <pathelement location="${basedir}/target/commons-collections-3.2.jar" />
+            <pathelement location="${basedir}/target/commons-logging-api-1.1.jar" />
+            <pathelement location="${basedir}/target/log4j-1.2.16.jar" />
+        </classpath>
+    </taskdef>
+
+    <!-- ======================================================================= -->
+    <!-- This file:                                                              -->
+    <!--                                                                         -->
+    <!--   - sets properties                                                     -->
+    <!--   - reads and sets up config files                                      -->
+    <!--   - checks the app server                                               -->
+    <!-- ======================================================================= -->
+
+
+    <!-- ======================================================================= -->
+    <!--                                                                         -->
+    <!-- Macro definitions                                                       -->
+    <!--                                                                         -->
+    <!-- ======================================================================= -->
+    
+    <!-- copy and filter a fileset -->
+    <macrodef name="filterCopy">
+        <attribute name="toDir"/>
+        <element name="filesetarg" implicit="yes"/>
+        <sequential>
+            <copy toDir="@{toDir}" overwrite="true">
+                <filesetarg/>
+                <filterchain>
+                    <expandproperties/>
+                </filterchain>
+            </copy>
+        </sequential>
+    </macrodef>
+
+    <!-- copy and filter a file -->
+    <macrodef name="filterCopyFile">
+        <attribute name="file"/>
+        <attribute name="toFile"/>
+        <sequential>
+            <copy file="@{file}" toFile="@{toFile}" overwrite="true">
+                <filterchain>
+                    <expandproperties/>
+                </filterchain>
+            </copy>
+        </sequential>
+    </macrodef>
+
+    <!-- copy a template file to your conf dir and load the props -->
+    <macrodef name="filterCopyLoad">
+        <attribute name="file"/>
+        <attribute name="toFile"/>
+        <sequential>
+            <copy file="@{file}" toFile="@{toFile}" overwrite="true">
+                <filterchain>
+                    <expandproperties/>
+                </filterchain>
+            </copy>
+            <property file="@{toFile}"/>
+        </sequential>
+    </macrodef>
+
+
+    <!-- check user defined path values for spaces at end of line -->
+    <!-- a space at the end of a line will cause problems         -->
+    <macrodef name="chkForSpace">
+        <attribute name="propName"/>
+        <attribute name="propValue"/>
+        <sequential>
+            <if>
+               <matches pattern=" $" string="@{propValue}"/>
+               <then>
+                   <fail>Error: property @{propName}: "@{propValue}" has a space at the end!</fail>
+               </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <!-- check for linux package-management installed instance of tomcat (ie using yum or apt-get -->
+    <!-- user specifies this by setting properties CATALINA_HOME, CATALINA_BASE                   -->
+    <macrodef name="chkIfPackageManagedTomcat">
+        <sequential>
+
+            <!-- set that both vars are set -->
+
+            <echo>chkIfPackageManagedTomcat: check if package managed tomcat</echo> 
+            <if>
+                <or> 
+                    <isset property="CATALINA_HOME"/> 
+                    <isset property="CATALINA_BASE"/> 
+                </or> 
+               <then>
+                   <if>
+                       <and>
+                           <isset property="CATALINA_HOME"/> 
+                           <isset property="CATALINA_BASE"/> 
+                       </and>
+                       <then>
+                           <echo>chkIfPackageManagedTomcat: CATALINA_HOME and CATALINA_BASE are BOTH set </echo> 
+
+                           <!-- now check if the folders exist --> 
+                           <if>
+                             <available type="dir" file="${CATALINA_HOME}"/>
+                             <then>
+                               <echo>chkIfPackageManagedTomcat: CATALINA_HOME folder location exists</echo> 
+                             </then>
+                             <else>
+                               <fail>Error: CATALINA_HOME folder location does not exit</fail>
+                             </else>
+                           </if>
+
+                           <if>
+                             <available type="dir" file="${CATALINA_BASE}"/>
+                             <then>
+                               <echo>chkIfPackageManagedTomcat: CATALINA_BASE folder location exists</echo> 
+                             </then>
+                             <else>
+                               <fail>Error: CATALINA_BASE folder location does not exit</fail>
+                             </else>
+                           </if>
+
+                           <!-- all is good. set the tomcatPackageManaged property to true --> 
+                           <property name="tomcatPackageManaged" value="true"/>
+
+                       </then>
+                       <else>
+                           <fail>Error: CATALINA_HOME and CATALINA_BASE are NOT both set</fail>
+                       </else>
+                   </if>
+               </then>
+               <else> 
+                   <!-- CATALINA prop values are not set. do nothing -->
+               </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <!-- check to see if the linux locale environment setting should be overridden -->
+    <!--   - this applies to postgresql under linux only                           --> 
+    <!--   - fix for bug 33435 (you have to read the bug 'cause its complicated)   --> 
+    <!--   - if db platform is postgresql                                          --> 
+    <!--   - and if both db.set.lc_collate and db.set.lc_ctype are set             --> 
+    <!--     (these are optional settings specified in default_master.properties)  --> 
+    <!--   - then use the alternate postgresql scripts-with-locale.properties      --> 
+    <!--     file to setup the database create command for jasperserver            --> 
+    <!--                                                                           --> 
+    <!--   - for postgresql use one of the following scripts for db creation:      --> 
+    <!--                                                                           --> 
+    <!--       conf_source/db/postgresql/scripts.properties                        --> 
+    <!--       conf_source/db/postgresql/scripts-with-locale.properties            --> 
+    <!--                                                                           --> 
+    <!--   - for all other databases use:                                          --> 
+    <!--                                                                           --> 
+    <!--       conf_source/db/<dbType>/scripts.properties                          --> 
+    <!--                                                                           --> 
+    <macrodef name="chkAndSetLocaleDbSettings">
+        <sequential>
+        <if>
+            <equals arg1="${dbType}" arg2="postgresql" />
+            <then>
+                <echo>chkAndSetLocaleDbSettings: dbType is postgresql</echo>
+                <if> 
+                    <and>
+                        <isset property="db.set.lc_collate"/>
+                        <isset property="db.set.lc_ctype"/>
+                    </and>
+                    <then>
+                        <echo>chkAndSetLocaleDbSettings: db.set.lc_collate and db.set.lc_ctype are BOTH set</echo>
+                        <echo>chkAndSetLocaleDbSettings: parse: scripts-with-locale.properties for db commands</echo>
+                        <property file="${currentDbDir}/scripts-with-locale.properties"/>
+                    </then>
+                    <else>
+                        <echo>chkAndSetLocaleDbSettings: db.set.lc_collate and db.set.lc_ctype are NOT both set</echo>
+                        <echo>chkAndSetLocaleDbSettings: parse: scripts.properties for db commands</echo>
+                        <property file="${currentDbDir}/scripts.properties"/>
+                    </else>
+                </if> 
+            </then>
+            <else>
+                <echo>chkAndSetLocaleDbSettings: parse: scripts.properties for db commands</echo>
+                <property file="${currentDbDir}/scripts.properties"/>
+            </else>
+        </if>
+        </sequential>
+    </macrodef>
+
+    <!-- ======================================================================= -->
+    <!--                                                                         -->
+    <!-- Start setting properties, etc.                                          -->
+    <!--                                                                         -->
+    <!-- ======================================================================= -->
+
+    <!-- load pre-initialized properties (do with a prop value so you can override) -->
+    <property name="initProps" value="${basedir}/init.properties"/>
+    <property file="${initProps}"/>
+
+
+    <!-- set base for everything...convert to / because mixed paths cause trouble -->
+    <pathconvert dirsep="/" property="buildBase">
+        <file file="${basedir}"/>
+    </pathconvert>
+
+    <property name="buildBin" value="${buildBase}/bin" />
+
+    <!-- load build and svn paths                          -->
+    <!-- these are used when in "dev" context -->
+    <!-- NOTE: now, all these values come from default_master.properties   -->
+    <!-- NOTE: js-build.properties is being deprecated                     -->
+    <!-- NOTE: This code is being kept for now for backwards compatibility -->
+    <if>
+        <available file="js-build.properties"/>
+        <then>
+            <property file="js-build.properties"/>
+        </then>
+    </if>
+
+
+    <!-- common props -->
+
+    <!-- 
+      These paths point to files or root directories, and can change
+      depending on file layouts.
+      -->
+    <!-- 
+        confName: used to derive the master properties file name and the conf directory
+                  can be set by developer on cmd line: js-ant -DconfName=postgresql <targetName>
+      -->
+    <property name="confName" value="default"/>
+
+    <property name="runSqlDefaultOnError" value="continue" />
+    <!--
+        Master props file;
+        drives generation of config files 
+      -->
+    <property name="masterPropsSource" value="${buildBase}/${confName}_master.properties"/>
+
+    <property name="enablePropsFilter" value="true" />
+
+    <if>
+        <isset property="env.ks"/>
+        <then>
+            <property name="ks" value="${env.ks}" />
+        </then>
+        <else>
+            <property name="ks" value="${user.home}" />
+        </else>
+    </if>
+    <if>
+        <isset property="env.ksp"/>
+        <then>
+            <property name="ksp" value="${env.ksp}" />
+        </then>
+        <else>
+            <property name="ksp" value="${user.home}" />
+        </else>
+    </if>
+    <sequential>
+      <if>
+        <equals arg1="${enablePropsFilter}" arg2="true" />
+        <then>
+          <echo message="Filtering properties (cleaning out blank spaces)" />
+          <replaceregexp file="${masterPropsSource}" match="\s+$" replace="" byline="true" />
+        </then>
+        <else>
+          <echo message="Filtering properties is disabled. Skipping" />
+        </else>
+      </if>
+
+        <create-ks ks="${ks}" ksp="${ksp}" propsFile="${masterPropsSource}"/>
+        <encrypt-props
+                propsFile="${masterPropsSource}"
+                ksp="${ksp}"/>
+
+    </sequential>
+
+
+    <!-- ======================================================================= -->
+    <!-- load master.properties file                                             -->
+    <!-- ======================================================================= -->
+
+    <!-- read and load <name>_master.properties (normally named default_master.properties) -->
+    <!-- <name>_master.properties is loaded first so these values take precedence          -->
+    <property file="${masterPropsSource}"/>
+
+    <!-- mapping  appServerType property values to currently supported ones-->
+    <switch value="${appServerType}">
+      <case value="tomcat7">
+          <var name="appServerType" value="tomcat"/>
+      </case>
+      <case value="tomcat8">
+          <var name="appServerType" value="tomcat"/>
+      </case>
+      <case value="tomcat">
+          <var name="appServerType" value="tomcat"/>
+      </case>
+      <case value="jboss-as-7">
+          <var name="appServerType" value="wildfly"/>
+      </case>
+      <case value="jboss-eap-6">
+          <var name="appServerType" value="jboss-eap-6"/>
+      </case>
+      <case value="jboss-eap-7">
+          <var name="appServerType" value="jboss-eap-7"/>
+      </case>
+      <case value="wildfly">
+          <var name="appServerType" value="wildfly"/>
+      </case>
+      <case value="glassfish3">
+          <var name="appServerType" value="glassfish"/>
+      </case>
+      <case value="glassfish">
+          <var name="appServerType" value="glassfish"/>
+      </case>
+      <case value="skipAppServerCheck">
+          <var name="appServerType" value="skipAppServerCheck"/>
+      </case>
+      <default>
+        <fail message="found unsupported appServerType found ${appServerType}" />
+      </default>
+    </switch>
+
+    <!-- 
+        Current config directory
+        This contains all files used and produced by build-o-matic.
+        Subsequent build steps can use files in this directory.
+      -->
+    <property name="currentConf" value="${buildBase}/build_conf/${confName}"/>
+    
+    <!-- 
+        Home for all conf source 
+        This consists of prop files or templates which are used in 
+        the read-config process or other build steps.
+      -->
+    <property name="confSourceDir" value="${buildBase}/conf_source"/>
+
+    <!-- 
+        Home for various resources which may be created either by hand
+        or with a build step and used during installation.
+        This includes:
+          SQL scripts
+          Repository exports
+          WAR files
+      -->
+    <property name="installResourceDir" value="${buildBase}/install_resources"/>
+
+    <!-- 
+        Home for updates such as patches
+      -->
+    <property name="updateDir" value="${buildBase}/updates"/>
+
+    <!-- 
+      The rest of these should not usually change;
+      they point to files under currentConf and confSourceDir
+      -->
+
+    <!-- currentConf -->
+
+    <!-- master props copy destination -->
+    <property name="masterProps" value="${currentConf}/master.properties"/>
+    
+    <!-- db props -->
+    <property name="dbProps" value="${currentConf}/db.properties"/>
+
+
+
+    <!-- app server props -->
+    <property name="appSrvProps" value="${currentConf}/app.srv.properties"/>
+
+    <!-- default props -->
+    <property name="defaultProps" value="${currentConf}/default.properties"/>
+
+    <!-- db template-type props -->
+    <property name="dbTemplateProps" value="${currentConf}/db.template.properties"/>
+
+    <!-- confSourceDir -->
+
+    <!-- default props source -->
+    <property name="defaultPropsSource" value="${confSourceDir}/default.properties"/>
+
+    <!-- generic templates dir -->
+    <property name="templateDir" value="${confSourceDir}/templates"/>
+
+    <!-- db files dir -->
+    <property name="dbDir" value="${confSourceDir}/db"/>
+
+    <!-- import/export ce config dir -->
+    <property name="importExportConfigCe" value="${confSourceDir}/ieCe"/>
+
+    <!-- import/export pro config dir -->
+    <property name="importExportConfigPro" value="${confSourceDir}/iePro"/>
+
+    <!-- maven runner -->
+    <property name="mvnRunner" value="${buildBase}/js-mvn"/>
+
+    <!-- set import/export lib dir (used by FoodMart loader, context.xml updater, etc.) -->
+    <if>
+        <available file="${importExportConfigCe}/lib"/>
+        <then>
+            <property name="ieLib" value="${importExportConfigCe}/lib"/>
+        </then>
+        <elseif>
+            <available file="${importExportConfigPro}/lib"/>
+            <then>
+                <property name="ieLib" value="${importExportConfigPro}/lib"/>
+            </then>
+        </elseif>
+        <else>
+            <echo message="WARNING: no directory found for loading dependent jars for import/export"/>
+        </else>
+    </if>
+    <if>
+        <isset property="ieLib" />
+        <then>
+            <property name="foodJarsDir" value="${ieLib}"/>
+        </then>
+    </if>
+
+    <!-- installResourceDir -->
+
+    <!-- sql scripts (in subdirectories by db type) -->
+    <property name="sqlDir" value="${installResourceDir}/sql"/>
+    
+    <!-- FoodMart data (used by Mondrian foodmart loader) 
+         This is in a specific MySQL format that the loader expects, but is not db-specific
+      -->
+    <property name="foodMartData" value="${sqlDir}/FoodMartCreateData.zip"/>
+    
+    <!-- war files/dirs -->
+    <property name="warDir" value="${installResourceDir}/war"/>
+    
+    <!-- exports -->
+    <property name="exportDir" value="${installResourceDir}/export"/>
+
+    <property name="nameOfFile" value="_test_.sql" />
+
+    <if>
+        <not>
+            <available file="${masterPropsSource}"/>
+        </not>
+        <then>
+            <fail>Error: Master properties file ${masterPropsSource} not found!</fail>
+        </then>
+    </if>
+
+    <!--<chkForSpace propName="appServerDir" propValue="${appServerDir}"/>
+
+    <chkForSpace propName="appServerType" propValue="${appServerType}"/>-->
+
+    <!-- We need to fix appServerDir before using filteredCopyLoad                 -->
+    <!-- and use ${fixedAppServerDir} in property files instead of ${appServerDir} -->
+    <pathconvert dirsep="/" property="fixedAppServerDir">
+        <file file="${appServerDir}"/>
+    </pathconvert>
+
+    <!-- ======================================================================= -->
+    <!--  Checking database type.                                                -->
+    <!-- ======================================================================= -->
+    <if>
+        <not>
+            <or>
+                <equals arg1="${dbType}" arg2="db2" />
+                <equals arg1="${dbType}" arg2="ingres" />
+                <equals arg1="${dbType}" arg2="mysql" />
+                <equals arg1="${dbType}" arg2="oracle" />
+                <equals arg1="${dbType}" arg2="postgresql" />
+                <equals arg1="${dbType}" arg2="sqlserver" />
+            </or>
+        </not>
+        <then>
+            <fail>Buildomatic doesn't support ${dbType} database type!</fail>
+        </then>
+    </if>
+
+    <!-- ======================================================================= -->
+    <!-- filter and load properties from the template files:                     -->
+    <!--                                                                         -->
+    <!--   masterPropsSource (default_master.properties) (normally)              -->
+    <!--   dbProps           (db.properties)                                     -->
+    <!--   appSrvProps       (app.srv.properties)                                -->
+    <!--   defaultProps      (default.properties)                                -->
+    <!--   dbTemplateProps   (db.template.properties)                            -->
+    <!--                                                                         -->
+    <!--   ${currentDbDir}/scripts.properties (depends on db used)               -->
+    <!--                                                                         -->
+    <!-- ======================================================================= -->
+
+
+    <!-- setJdbcJarProperty: -->
+    <!--   Need to set the jdbcJar property. It has one of two values.            -->
+    <!--   If maven.jdbc.artifactId and maven.jdbc.version exit then we use these -->
+    <!--   to specify an existing jar file.                                       -->
+    <!--   If they do not exist, they we expect that the user will supply         -->
+    <!--   a JDBC jar file. We do not know the name of the jar file so we will    -->
+    <!--   use the syntax "*.jar" in order to be sure that we are getting the jar -->
+    <!--                                                                          -->
+    <macrodef name="setJdbcJarProperty">
+      <sequential>
+        <if>
+          <and>
+            <isset property="maven.jdbc.artifactId" />
+            <isset property="maven.jdbc.version" />
+          </and>
+          <then>
+              <if>
+                  <equals arg1="${maven.jdbc.groupId}" arg2="tibcosoftwareinc.jdbc" />
+                  <then>
+                      <if>
+                          <available type="dir" file="${importExportConfigPro}/lib"/>
+                          <then>
+                              <copy toDir="${currentDbJDBCDir}/"  overwrite="true">
+                                  <fileset dir="${importExportConfigPro}/lib" includes="jasperreports-pro-*.jar"/>
+                              </copy>
+                          </then>
+                          <else>
+                              <copy file="${currentConf}/../../install_resources/extra-jars/jswlstc-1.0.jar"
+                                    tofile="${currentDbJDBCDir}/jasperreports-pro-tc-1.0.jar"
+                                    overwrite="true"/>
+
+                          </else>
+                      </if>
+                      <property name="jdbcJar" value="*.jar"/>
+                  </then>
+                  <else>
+                      <property name="jdbcJar" value="${maven.jdbc.artifactId}-${maven.jdbc.version}.jar"/>
+                  </else>
+              </if>
+          </then>
+          <else>
+            <property name="jdbcJar" value="*.jar"/>
+          </else>
+        </if>          
+      </sequential>
+    </macrodef>
+
+    <macrodef name="setCurrentDbDir">
+        <sequential>
+            <local name="dir" />
+            <property name="dir" value="${dbDir}/${dbType}" />
+
+            <if>
+                <available file="${dir}" />
+                <then>
+                    <property name="currentDbDir" value="${dir}" />
+                </then>
+                <else>
+                    <fail>Database configuration directory '${dir}' is not found (dbType=${dbType}). Most probably you are using an unsupported database type or there is a configuration error in default_master.properties</fail>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="setCurrentDbJDBCDir">
+        <sequential>
+            <if>
+                <available file="${currentDbDir}/${jdbcDriverMaker}.jdbc" />
+                <then>
+                    <property name="currentDbJDBCDir" value="${currentDbDir}/${jdbcDriverMaker}.jdbc" />
+                </then>
+                <else>
+                    <property name="currentDbJDBCDir" value="${currentDbDir}/jdbc" />
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+
+    <macrodef name="gen-config-if-required">
+        <sequential>
+            <if>
+                <contains string="${appServerType}" substring="tomcat" />
+                <then>
+                    <setup-tomcat-basic-datasource-factory/>
+                </then>
+            </if>
+
+            <if>
+                <!-- test if masterPropsSource or any of the template files have changed -->
+                <uptodate targetfile="${masterProps}">
+                    <srcresources>
+                        <file file="${masterPropsSource}"/>
+                        <fileset dir="${templateDir}"/>
+                    </srcresources>
+                </uptodate>
+                <then>
+                    <!-- load base props -->
+                    <property file="${masterProps}"/>
+
+                    <!-- look up props for your db -->
+                    <setCurrentDbDir />
+
+                    <!-- look up props for your db jdbc driver location -->
+                    <setCurrentDbJDBCDir />
+
+                    <!-- set sql script dir -->
+                    <property name="currentSqlDir" value="${sqlDir}/${dbType}"/>
+
+                    <!-- load db props -->
+                    <property file="${dbProps}"/>
+
+                    <!-- load app server props -->
+                    <property file="${appSrvProps}"/>
+
+                    <!-- load default props -->
+                    <property file="${defaultProps}"/>
+
+                    <!-- load db template-type props -->
+                    <property file="${dbTemplateProps}"/>
+
+                    <!-- load db script props by calling macro (will chk for Locale props too) -->
+                    <chkAndSetLocaleDbSettings />
+                </then>
+                <else>
+                    <echo>creating ${currentConf}</echo>
+                    <!-- recreate build conf -->
+                    <delete dir="${currentConf}"/>
+                    <mkdir dir="${currentConf}"/>
+
+                    <!-- copy and load base props -->
+                    <filterCopyLoad file="${masterPropsSource}" toFile="${masterProps}"/>
+
+                    <!-- look up props for your db -->
+                    <setCurrentDbDir />
+
+                    <!-- look up props for your db jdbc driver location -->
+                    <setCurrentDbJDBCDir />
+
+                    <!-- set sql script dir -->
+                    <property name="currentSqlDir" value="${sqlDir}/${dbType}"/>
+
+                    <!-- copy and load db props -->
+                    <if>
+                        <available file="${currentDbDir}/${jdbcDriverMaker}.db.properties"/>
+                        <then>
+                            <filterCopyLoad file="${currentDbDir}/${jdbcDriverMaker}.db.properties" toFile="${dbProps}"/>
+                        </then>
+                        <else>
+                            <filterCopyLoad file="${currentDbDir}/db.properties" toFile="${dbProps}"/>
+                        </else>
+                    </if>
+
+                    <!-- copy and load app server props -->
+                    <filterCopyLoad file="${templateDir}/app.srv.properties" toFile="${appSrvProps}"/>
+
+                    <!-- copy and load default props -->
+                    <filterCopyLoad file="${defaultPropsSource}" toFile="${defaultProps}"/>
+
+                    <!-- copy and load db template-type props
+                         TODO db-specific code doesn't belong here;
+                         we should be able to handle this in the templates,
+                         or in some special db-specific target
+                      -->
+                    <if>
+                        <equals arg1="${dbType}" arg2="sqlserver" />
+                        <then>
+                            <if>
+                                <isset property="dbInstance"/>
+                                <then>
+                                    <var name="dbHostOrInstance" value="${dbHost};instanceName=${dbInstance}"/>
+                                    <echo>dbHostOrInstance = ${dbHostOrInstance}</echo>
+                                </then>
+                                <else>
+                                    <if>
+                                        <isset property="dbPort"/>
+                                        <then>
+                                            <var name="dbHostOrInstance" value="${dbHost}:${dbPort}"/>
+                                            <echo>dbHostOrInstance = ${dbHostOrInstance}</echo>
+                                        </then>
+                                        <else>
+                                        <!-- don't need to do anything to the dbHost property -->
+                                        <!-- user didn't set port or instance -->
+                                            <echo>dbHostOrInstance = ${dbHostOrInstance} </echo>
+                                        </else>
+                                    </if>
+                                </else>
+                            </if>
+                        </then>
+                    </if>
+
+                    <if>
+                        <equals arg1="${dbType}" arg2="oracle" />
+                        <then>
+                            <if>
+                                <isset property="serviceName"/>
+                                <then>
+                                    <var name="dbSidOrServiceName" value="/${serviceName}"/>
+                                    <echo>dbSidOrServiceName = ${dbSidOrServiceName}</echo>
+                                    <var name="dbSidOrServiceNameProp" value="ServiceName=${serviceName}"/>
+                                    <echo>dbSidOrServiceNameProp = ${dbSidOrServiceNameProp}</echo>
+                                	<!--
+                                	Bug 40326
+                                	sidOrSnParam and sidOrSnValue are used in /buildomatic/conf_source/templates/js-glassfish-oracle-ds.xml
+                                	-->
+                                	<var name="sidOrSnParam" value="serviceName"/>                                                                                                                                                            
+                                	<var name="sidOrSnValue" value="${serviceName}"/>
+                                </then>
+                                <else>
+                                    <if>
+                                        <isset property="sid"/>
+                                        <then>
+                                            <var name="dbSidOrServiceName" value=":${sid}"/>
+                                            <echo>dbSidOrServiceName = ${dbSidOrServiceName}</echo>
+                                            <var name="dbSidOrServiceNameProp" value="SID=${sid}"/>
+                                            <echo>dbSidOrServiceNameProp = ${dbSidOrServiceNameProp}</echo>
+                                        	<!--
+                                        	Bug 40326
+                                        	sidOrSnParam and sidOrSnValue are used in /buildomatic/conf_source/templates/js-glassfish-oracle-ds.xml
+                                        	-->
+                                            <var name="sidOrSnParam" value="sid"/>
+      	                                    <var name="sidOrSnValue" value="${sid}"/>
+                                        </then>
+                                    </if>
+                                </else>
+                            </if>
+                        </then>
+                    </if>
+
+                    <if>
+                        <available file="${currentDbDir}/${jdbcDriverMaker}.db.template.properties"/>
+                        <then>
+                            <filterCopyLoad file="${currentDbDir}/${jdbcDriverMaker}.db.template.properties" toFile="${dbTemplateProps}"/>
+                        </then>
+                        <else>
+                            <filterCopyLoad file="${currentDbDir}/db.template.properties" toFile="${dbTemplateProps}"/>
+                        </else>
+                    </if>
+
+                    <!-- load db script props by calling macro (will chk for Locale props too) -->
+                    <chkAndSetLocaleDbSettings />
+
+                    <!-- now use common props to generate other (non-property) files -->
+                    <filterCopy toDir="${currentConf}">
+                        <fileset dir="${templateDir}"/>
+                    </filterCopy>
+
+                    <!-- copy and load maven runner -->
+                    <filterCopyFile file="${templateDir}/js-mvn" toFile="${mvnRunner}"/>
+
+                    <if>
+                        <equals arg1="${dbType}" arg2="oracle" />
+                        <then>
+                            <filterCopyFile file="${sqlDir}/${dbType}/killSession.sql" toFile="${currentConf}/killSession.sql"/>
+                        </then>
+                    </if>
+
+                    <!-- copy the quartz property file to webapp dir (it gets used in both webapp and standalones) -->
+                    <copy toDir="${currentConf}/webapp/WEB-INF">
+                        <fileset dir="${currentConf}" includes="js.quartz.properties"/>
+                    </copy>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="setup-tomcat-basic-datasource-factory"
+              description="This macro sets up tomcatBasicDatasourceFactory var throughout the application">
+        <sequential>
+            <!-- tomcat -->
+            <if>
+                <contains string="${appServerType}" substring="tomcat" />
+                <then>
+                    <chkIfPackageManagedTomcat />
+
+                    <if>
+                        <isset property="tomcatPackageManaged"/>
+                        <then>
+                            <property name="appServerJdbcDir" value="${CATALINA_HOME}/lib"/>
+                        </then>
+                        <else>
+                            <property name="appServerJdbcDir" value="${fixedAppServerDir}/lib"/>
+                        </else>
+                    </if>
+                </then>
+            </if>
+
+            <!-- [35068] Tomcat DBCP Factory dependency setup.  Deals with some Tomcat installations missing tomcat-dbcp. -->
+            <!-- If tomcat-dbcp jar is present, the factory is set to  -->
+            <!-- com.jaspersoft.jasperserver.tomcat.jndi.JSBasicDataSourceFactory. -->
+            <!-- Otherwise, it's com.jaspersoft.jasperserver.tomcat.jndi.JSCommonsBasicDataSourceFactory -->
+            <!-- JSCommonsBasicDataSourceFactory extends BasicDataSourceFactory class from commons-dbcp jar -->
+            <!-- shipped with JRS. -->
+            <var name="tomcatBasicDatasourceFactory" value="com.jaspersoft.jasperserver.tomcat.jndi.JSBasicDataSourceFactory" />
+            <path id="tomcatDBCPPath">
+                <fileset dir="${appServerJdbcDir}">
+                    <filename name="*.jar"/>
+                </fileset>
+            </path>
+            <if>
+                <not>
+                    <available classname="org.apache.tomcat.dbcp.dbcp.BasicDataSourceFactory"
+                               classpathref="tomcatDBCPPath"/>
+                </not>
+                <then>
+                    <var name="tomcatBasicDatasourceFactory" value="com.jaspersoft.jasperserver.tomcat.jndi.JSCommonsBasicDataSourceFactory" />
+                </then>
+            </if>
+            <echo message="Tomcat DBCP Factory: ${tomcatBasicDatasourceFactory}"/>
+        </sequential>
+    </macrodef>
+
+    <gen-config-if-required />
+
+    <setJdbcJarProperty />
+
+    <!-- Set App Server properties                                -->
+    <!--                                                          -->
+    <!-- valid values for appServerType:                          -->
+    <!--   tomcat                                                 -->
+    <!--   jboss-eap                                            -->
+    <!--   wildfly                                                -->
+    <!--   glassfish                                              -->
+    <!--   skipAppServerCheck   (skip app server checking logic)  -->
+
+    <if>
+        <not>
+            <isset property="appServerType"/>
+        </not>
+        <then>
+            <fail>Error: property appServerType does not seem to be set. Check your default_master.properties file</fail>
+        </then>
+    </if>
+
+    <!-- skipAppServerCheck (ie skip app server checking logic) -->
+    <if>
+        <equals arg1="${appServerType}" arg2="skipAppServerCheck"/>
+        <then>
+            <property name="appServerDir" value="skipAppServerCheck"/>
+            <property name="appServerJdbcDir" value="skipAppServerCheck"/>
+            <property name="appServerWorkDir" value="skipAppServerCheck"/>
+        </then>
+    </if>
+    <!-- tomcat -->
+    <if>
+        <equals arg1="${appServerType}" arg2="tomcat"/>
+        <then>
+            <!-- check for linux package-management installed instance of tomcat -->
+            <chkIfPackageManagedTomcat />
+
+            <if>
+              <isset property="tomcatPackageManaged"/>
+              <then>
+                <echo>tomcatPackageManaged IS SET</echo>
+                <!-- need to set appServerJdbcDir, appServerWorkDir, tomcatDatasourceExtraDir,     -->
+                <!-- and *reset* fixedAppServerDir from the CATALINA_HOME and CATALINA_BASE values -->
+                <property name="appServerJdbcDir" value="${CATALINA_HOME}/lib"/>
+                <property name="appServerWorkDir" value="${CATALINA_BASE}/work/Catalina/localhost"/>
+                <!-- tomcat usually copies the jasperserver/META-INF/context.xml to the folder below -->
+                <property name="tomcatDatasourceExtraDir" value="${CATALINA_BASE}/conf/Catalina/localhost"/>
+                <!-- NOTE: override of fixedAppServerDir value with value from CATALINA_BASE -->
+                <echo>Overriding fixedAppServerDir with value from CATALINA_BASE </echo>
+                <var name="fixedAppServerDir" value="${CATALINA_BASE}"/>
+              </then>
+              <else>
+                <!-- tomcatPackageManaged is not set -->
+                <property name="appServerJdbcDir" value="${fixedAppServerDir}/lib"/>
+                <property name="appServerWorkDir" value="${fixedAppServerDir}/work/Catalina/localhost"/>
+                <!-- some tomcat6 versions copy the jasperserver/META-INF/context.xml to the folder below -->
+                <property name="tomcatDatasourceExtraDir" value="${fixedAppServerDir}/conf/Catalina/localhost"/>
+              </else>
+            </if>
+        </then>
+    </if>
+    <!-- jboss, wildfly -->
+    <if>
+        <or>
+            <equals arg1="${appServerType}" arg2="wildfly"/>
+            <equals arg1="${appServerType}" arg2="jboss-eap-6"/>
+            <equals arg1="${appServerType}" arg2="jboss-eap-7"/>
+        </or>
+        <then>
+            <!-- set the profile/configuration to use from the jboss.profile property -->
+            <property name="appServerJdbcDir" value="${fixedAppServerDir}/${jboss7.profile}/deployments"/>
+            <!-- destination for the war distributive -->
+            <property name="jbossDeployDir" value="${fixedAppServerDir}/${jboss7.profile}/deployments"/>
+        </then>
+    </if>
+
+    <!--  Glassfish -->
+    <if>
+        <equals arg1="${appServerType}" arg2="glassfish"/>
+        <then>
+            <property name="appServerJdbcDir" value="${fixedAppServerDir}/glassfish/domains/${glassfishDomain}/lib/ext"/>
+            <property name="appServerWorkDir" value="${fixedAppServerDir}/glassfish/domains/${glassfishDomain}/applications/j2ee-modules"/>
+        </then>
+    </if>
+
+    <!-- check that one of the above blocks set the property value successfully -->
+    <if>
+        <not>
+            <isset property="appServerJdbcDir"/>
+        </not>
+        <then>
+            <echo> </echo>
+            <echo>Error: appServerType property does not seem to be valid, appServerType=${appServerType}</echo>
+            <echo>Error: Check that appServerType is properly set in your default_master.properties file</echo>
+            <fail>Error: Check that appServerType is properly set in your default_master.properties file</fail>
+        </then>
+    </if>
+
+    <!-- check that the appServerDir is a valid directory (unless skipAppServerCheck is set) -->
+    
+    <if>
+        <not>
+            <equals arg1="${appServerType}" arg2="skipAppServerCheck"/>
+        </not>
+        <then>
+            <if>
+                <not>
+                    <available file="${fixedAppServerDir}" type="dir"/>
+                </not>
+                <then>
+                    <echo> </echo>
+                    <echo>Error: The appServerDir does not seem to be a valid directory: </echo>
+                    <echo>Error: appServerDir=${appServerDir}, fixedAppServerDir=${fixedAppServerDir}</echo>
+                    <echo>Error: Check that appServerDir is properly set in your default_master.properties file</echo>
+                    <fail>Error: Check that appServerDir is properly set in your default_master.properties file</fail>
+                </then>
+            </if>
+        </then>
+    </if>
+
+    <!-- debug: echo some of the values for info -->
+    <!--
+    <echo> </echo>
+    <echo>Property values (in setup.xml: at bottom of file): </echo>
+    <echo> appServerType=${appServerType} </echo>
+    <echo> appServerDir=${appServerDir} </echo>
+    <echo> fixedAppServerDir=${fixedAppServerDir} </echo>
+    <echo> </echo>
+    -->
+
+    <!-- ======================================================================= -->
+    <!--                                                                         -->
+    <!-- Config clean and re-generate targets                                    -->
+    <!--                                                                         -->
+    <!-- ======================================================================= -->
+
+    <target name="clean-config"
+        description="clean out current config dir files. Will re-gen on next target.">
+
+        <echo>About to clean the currentConf dir, currentConf= ${currentConf}</echo>
+
+        <!-- delete the appropriate config dir in the build_conf dir -->
+
+        <delete dir="${currentConf}"/>
+    
+    </target>
+
+    <target name="gen-config"
+        description="Gen config files if they have already been cleaned">
+
+        <echo>Regen config files if they have already been cleaned:</echo>
+        <echo>currentConf= ${currentConf}</echo>
+
+        <!-- If the config files have been cleaned via running the clean-config target,  -->
+        <!-- then when gen-config is executed, the config files get recreated before     -->
+        <!-- attempting to execute this target. The config files get regenerated before  -->
+        <!-- *any* target is executed. But it is still handy to have a gen-config target -->
+    
+        <gen-config-if-required />
+    </target>
+    
+    <target name="refresh-config" depends="clean-config, gen-config"
+        description="force regeneration of config files"/>
+
+    <target name="list-modules" description="list modules known to config collector and the paths used by each">
+        <ant antfile="${js-pro-path}/build-config.xml" inheritall="true" inheritrefs="true" target="list-modules"/>
+    </target>
+    <target name="list-module-files" description="list files used for a specific module">
+        <ant antfile="${js-pro-path}/build-config.xml" inheritall="true" inheritrefs="true" target="list-config"/>
+    </target>
+    <target name="list-files" description="list all files">
+        <ant antfile="${js-pro-path}/build-config.xml" inheritall="true" inheritrefs="true" target="list-files"/>
+    </target>
+    
+    <target name="test-ce-all-props" description="Tests that all JasperServer CE properties are initialized">
+      <var name="listOfPropsCE" value="dbType,dbHost,dbUsername,dbPassword,dbPort,js.dbName,sugarcrm.dbName,foodmart.dbName,
+      webAppNameCE" />
+      
+      <if>
+        <not>
+          <isset property="CATALINA_HOME"/>
+        </not>
+        <then>
+          <var name="listOfPropsCE" value="${listOfPropsCE},appServerType,appServerDir" />
+        </then>
+      </if>
+
+      <validatePropsNotBlank properties="${listOfPropsCE}" />
+    </target>
+
+    <target name="test-pro-all-props" description="Tests that all JasperServer Pro properties are initialized">
+      <var name="listOfPropsPro" value="dbType,dbHost,dbUsername,dbPassword,dbPort,js.dbName,sugarcrm.dbName,foodmart.dbName,
+      webAppNamePro" />
+
+      <if>
+        <not>
+          <isset property="CATALINA_HOME"/>
+        </not>
+        <then>
+          <var name="listOfPropsPro" value="${listOfPropsPro},appServerType,appServerDir" />
+        </then>
+      </if>
+
+      <if>
+        <equals arg1="${dbType}" arg2="oracle" />
+        <then>
+          <var name="listOfPropsPro" value="${listOfPropsPro},sysUsername,sysPassword,sid" />
+        </then>
+      </if>
+
+      <validatePropsNotBlank properties="${listOfPropsPro}" />
+    </target>    
+  
+</project>

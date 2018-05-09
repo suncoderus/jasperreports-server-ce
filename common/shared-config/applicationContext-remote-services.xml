@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+    <context:component-scan base-package="com.jaspersoft.jasperserver.remote">
+        <context:exclude-filter type="regex" expression=".*SqlExecutionStrategy"/>
+        <context:exclude-filter type="regex" expression=".*JdbcDataSourceMetadataBuilder"/>
+    </context:component-scan>
+    <alias name="${bean.auditContext}" alias="concreteAuditContext"/>
+    <alias name="${bean.repositoryService}" alias="concreteRepository"/>
+    <alias name="${bean.userAuthorityService}" alias="concreteUserAuthorityService"/>
+    <alias name="${bean.permissionsService}" alias="concretePermissionsService"/>
+    <alias name="${bean.remoteResourceHandlerRegistry}" alias="remoteResourceHandlerRegistry"/>
+    <alias name="${bean.reportSchedulingService}" alias="concreteReportSchedulingService"/>
+    <alias name="${bean.securityContextProvider}" alias="concreteSecurityContextProvider"/>
+    <alias name="${bean.serverInfoService}" alias="concreteServerInfoService"/>
+    <alias name="${bean.reportExecutor}" alias="reportExecutor"/>
+    <alias name="${bean.filterResolver}" alias="filterResolver"/>
+    <alias name="fullHtmlExportStrategy" alias="defaultHtmlExportStrategy"/>
+    <bean id="beanValidator"
+          class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+
+    <util:list id="defaultRoles">
+        <bean class="com.jaspersoft.jasperserver.api.metadata.user.domain.client.RoleImpl">
+            <property name="roleName" value="ROLE_USER"/>
+        </bean>
+    </util:list>
+
+    <bean id="dbTypesToStrategyMappingCe" class="java.util.HashMap">
+        <constructor-arg index="0" type="java.util.Map">
+            <map merge="true">
+                <entry key="Teiid Embedded">
+                    <bean class="com.jaspersoft.jasperserver.remote.connection.jdbc.VdsSqlEscapingStrategy" />
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <util:map id="connectionDescriptionProviders">
+        <entry key="job">
+            <bean class="com.jaspersoft.jasperserver.remote.connection.ReportJobFtpConnectionDescriptionProviderImpl" />
+        </entry>
+    </util:map>
+
+    <bean id="connectionsCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+        <property name="cacheManager" ref="cacheManager"/>
+        <property name="cacheName">
+            <value>connection.descriptions</value>
+        </property>
+    </bean>
+
+    <bean id="remoteResourceHandlerRegistryCE" class="com.jaspersoft.jasperserver.remote.MapResourceHandlerRegistry">
+        <property name="handlers">
+            <map>
+                <entry key="folder" value-ref="folderHandler"/>
+                <entry key="img" value-ref="fileHandler"/>
+                <entry key="xml" value-ref="fileHandler"/>
+                <entry key="font" value-ref="fileHandler"/>
+                <entry key="jrxml" value-ref="fileHandler"/>
+                <entry key="jar" value-ref="fileHandler"/>
+                <entry key="prop" value-ref="fileHandler"/>
+                <entry key="jrtx" value-ref="fileHandler"/>
+                <entry key="reference" value-ref="fileHandler"/>
+                <entry key="olapMondrianSchema" value-ref="fileHandler"/>
+                <entry key="reportUnit" value-ref="reportUnitHandler"/>
+                <entry key="olapUnit" value-ref="olapUnitHandler"/>
+                <entry key="datasource" value-ref="dataSourceHandler"/>
+                <entry key="jdbc" value-ref="jdbcDataSourceHandler"/>
+                <entry key="aws" value-ref="awsDataSourceHandler"/>
+                <entry key="azuresql" value-ref="azureSqlDataSourceHandler"/>
+                <entry key="jndi" value-ref="jndiJdbcDataSourceHandler"/>
+                <entry key="bean" value-ref="beanDataSourceHandler"/>
+                <entry key="virtual" value-ref="remoteVirtualDataSourceHandler"/>
+                <entry key="custom" value-ref="customDataSourceHandler"/>
+                <entry key="inputControl" value-ref="inputControlHandler"/>
+                <entry key="dataType" value-ref="dataTypeHandler"/>
+                <entry key="olapXmlaCon" value-ref="xmlaConnectionHandler"/>
+                <entry key="xmlaConnection" value-ref="xmlaConnectionHandler"/>
+                <entry key="unknow" value-ref="unknownResourceHandler"/>
+                <entry key="lov" value-ref="listOfValuesHandler"/>
+                <entry key="query" value-ref="queryHandler"/>
+                <entry key="contentResource" value-ref="contentResourceHandler"/>
+            </map>
+        </property>
+    </bean>
+    <util:list id="htmlReportHeaderIncludes">
+        <!-- If JRHtmlExporterParameter.HTML_HEADER export parameter is specified in HTML exporter,
+        then JR replaces not content of <header> element, but also <html><head></head><body><table> etc.
+        Putting these elements (htmlHeaderPrefix and htmlHeaderSuffix) here to fix corrupted HTML -->
+        <ref bean="htmlHeaderPrefix"/>
+        <ref bean="htmlHeaderBody"/>
+        <ref bean="htmlHeaderSuffix"/>
+    </util:list>
+
+    <bean id="htmlHeaderPrefix" class="java.lang.String">
+        <constructor-arg index="0" type="java.lang.String">
+            <value>
+                <![CDATA[
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <style type="text/css">a {text-decoration: none}</style>
+                ]]>
+            </value>
+        </constructor-arg>
+    </bean>
+
+
+    <bean id="htmlHeaderBody" class="java.lang.String">
+        <constructor-arg index="0" type="java.lang.String">
+            <!--{contextPath} placeholder (multiple usage is supported) is replaced by real contextPath in runtime.-->
+            <!--See com.jaspersoft.jasperserver.remote.exporters.HtmlExporter-->
+            <value>
+                <![CDATA[
+        <style type="text/css">.jrPage{margin-left: auto;margin-right: auto;}</style>
+                ]]>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="htmlHeaderSuffix" class="java.lang.String">
+        <constructor-arg index="0" type="java.lang.String">
+            <value>
+                <![CDATA[
+    </head>
+        <body text="#000000" link="#000000" alink="#000000" vlink="#000000">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td width="50%">&nbsp;</td>
+                    <td align="center">
+                ]]>
+            </value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="jasperReportsRemoteContext" class="net.sf.jasperreports.engine.SimpleJasperReportsContext">
+        <property name="parent" ref="${bean.jasperReportsContext}"/>
+        <property name="propertiesMap">
+            <props>
+                <prop key="com.jaspersoft.jasperreports.highcharts.generate.image">false</prop>
+                <!--<prop key="com.jaspersoft.jasperreports.highcharts.html.export.type">standalone</prop>-->
+            </props>
+        </property>
+    </bean>
+
+    <bean id="tempFolder" class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="/temp"/>
+    </bean>
+
+    <bean id="roleToAccessTempFolder" class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="ROLE_ADMINISTRATOR"/>
+    </bean>
+
+    <bean id="localizedErrorDescriptorBuilder" class="com.jaspersoft.jasperserver.remote.exception.builders.LocalizedErrorDescriptorBuilder">
+        <constructor-arg ref="messageSource" />
+    </bean>
+
+    <util:list id="queryLanguagesCe">
+        <value>sql</value>
+        <value>hql</value>
+        <value>domain</value>
+        <value>HiveQL</value>
+        <value>MongoDbQuery</value>
+        <value>cql</value>
+    </util:list>
+
+    <alias name="${bean.permissionsRecipientIdentityResolver}" alias="concretePermissionsRecipientIdentityResolver"/>
+    <alias name="${bean.attributesRecipientIdentityResolver}" alias="concreteAttributesRecipientIdentityResolver"/>
+
+    <util:set id="cdsPropertiesToIgnore">
+        <value>password</value>
+        <value>_cds_name</value>
+    </util:set>
+
+    <alias name="${bean.queryLanguages}" alias="queryLanguages"/>
+
+    <util:map id="remoteExportersMap" key-type="java.lang.String" value-type="com.jaspersoft.jasperserver.remote.ReportExporter">
+        <entry key="pdf" value-ref="remotePdfExporter"/>
+        <entry key="html" value-ref="remoteHtmlExporter"/>
+        <entry key="xlsx" value-ref="remoteXlsxExporter"/>
+        <entry key="xls" value-ref="remoteXlsExporter"/>
+        <entry key="rtf" value-ref="remoteRtfExporter"/>
+        <entry key="csv" value-ref="remoteCsvExporter"/>
+        <entry key="xml" value-ref="remoteXmlExporter"/>
+        <entry key="odt" value-ref="remoteOdtExporter"/>
+        <entry key="ods" value-ref="remoteOdsExporter"/>
+        <entry key="docx" value-ref="remoteDocxExporter"/>
+        <entry key="pptx" value-ref="remotePptxExporter"/>
+        <entry key="json" value-ref="remoteJsonMetadataExporter"/>
+    </util:map>
+
+    <util:map id="htmlExportStrategies">
+        <entry key="full" value-ref="fullHtmlExportStrategy"/>
+        <entry key="embeddable" value-ref="embeddableHtmlExportStrategy"/>
+    </util:map>
+
+    <!--The set of file types, which must be created as FileResource.
+    All other type, not specified here will be created as ContentResource-->
+    <util:set id="fileResourceTypes">
+        <value>font</value>
+        <value>jrxml</value>
+        <value>jar</value>
+        <value>prop</value>
+        <value>jrtx</value>
+        <value>xml</value>
+        <value>json</value>
+        <value>css</value>
+        <value>accessGrantSchema</value>
+        <value>olapMondrianSchema</value>
+        <value>dashboardComponent</value>
+        <value>img</value>
+    </util:set>
+
+    <util:set id="customDataSourcesToHide">
+        <value>remoteXmlDataSource2</value> <!-- Full domain support remote XML custom data source -->
+        <value>remoteXmlDataSource</value>  <!-- Simple single table remote XML custom data source -->
+        <value>mongoDBQueryDataSource2</value> <!-- Full domain support mongodb query custom data source -->
+        <value>mongoDBQueryDataSource</value>  <!-- Simple single table remote XML custom data source -->
+        <value>jsonDataSource2</value> <!-- Full domain support JSON custom data source -->
+        <value>jsonDataSource</value>  <!-- Simple single table remote XML custom data source -->
+		<value>jsonQLDataSource</value>  <!-- Full domain support JSON QL custom data source -->
+        <value>jdbcQueryDataSource2</value> <!-- Full domain support jdbc query custom data source -->
+        <value>jdbcQueryDataSource</value>  <!-- Simple single table remote XML custom data source -->
+        <value>xlsDataSource</value> <!-- Full domain support XLS custom data source -->
+        <value>xlsxDataSource</value> <!-- Full domain support XLSX custom data source -->
+        <value>textDataSource</value> <!-- Full domain support TEXT/ CSV custom data source -->
+        <value>JsonSeriesDataSource</value> <!-- Simple single table remote XML custom data source -->
+        <value>xmlaQueryDataSource</value> <!-- Simple single table XMLA Query custom data source -->
+        <value>cassandraQueryDataSource</value> <!-- Deprecated.  Please use cassandra SIMBA JDBC driver to run native CQL.  Append "QueryMode=1" in URL in order to run CQL  -->
+        <value>HiveDataSource</value> <!-- Deprecated.  Please use Hive/ Impala JDBC drivers instead -->
+    </util:set>
+
+    <bean name="waitForFinalJasperPrintMs" class="java.lang.Integer">
+        <constructor-arg type="java.lang.String" value="100"/>
+    </bean>
+
+    <bean id="importExportTaskRemoverJob" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.JSMethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="importExportTaskRemover"/>
+        <property name="targetMethod" value="call"/>
+        <property name="scheduler" ref="quartzScheduler"/>
+    </bean>
+
+
+    <bean id="importExportTaskRemoverTrigger" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.JSSimpleTriggerBean">
+        <property name="jobDetail" ref="importExportTaskRemoverJob"/>
+        <!-- run on startup just after 10 sec -->
+        <property name="startDelay" value="10000"/>
+        <property name="repeatInterval" value="86400000"/>
+        <!-- once a week -->
+        <!--<property name="repeatInterval" value="604800000"/>-->
+        <!-- once a day --><!--
+        <property name="repeatInterval" value="86400000"/> -->
+        <!-- once every hour --><!--
+        <property name="repeatInterval" value="3600000"/> -->
+        <!-- once a minute --><!--
+        <property name="repeatInterval" value="60000"/> -->
+        <!-- once a second --><!--
+        <property name="repeatInterval" value="1000"/> -->
+    </bean>
+
+    <bean id="importExportTaskRemover" class="com.jaspersoft.jasperserver.remote.services.async.ImportExportTaskRemover">
+        <property name="expirationInterval" value="86400000"/>
+    </bean>
+
+
+    <alias name="${bean.copyMoveStrategies}" alias="copyMoveStrategies"/>
+
+    <util:map id="copyMoveStrategiesCe">
+    </util:map>
+
+    <bean id="attributesConfig" class="com.jaspersoft.jasperserver.remote.helpers.AttributesConfig">
+        <property name="maxLengthAttrName" value="255"/>
+        <property name="maxLengthAttrValue" value="2000"/>
+    </bean>
+
+
+
+    <util:map id="protocolMapping">
+        <entry key="user">
+            <value type="java.lang.Class">com.jaspersoft.jasperserver.api.metadata.user.domain.User</value>
+        </entry>
+        <entry key="role">
+            <value type="java.lang.Class">com.jaspersoft.jasperserver.api.metadata.user.domain.Role</value>
+        </entry>
+        <entry key="tenant">
+            <value type="java.lang.Class">com.jaspersoft.jasperserver.api.metadata.user.domain.Tenant</value>
+        </entry>
+    </util:map>
+
+    <bean id="permissionsRecipientIdentityResolver" class="com.jaspersoft.jasperserver.remote.helpers.RecipientIdentityResolver">
+        <property name="map" ref="protocolMapping"/>
+        <property name="identifierLabel" value="recipientUri"/>
+        <property name="requiredProtocols">
+            <set>
+                <value>user</value>
+                <value>role</value>
+            </set>
+        </property>
+    </bean>
+
+    <bean id="attributesRecipientIdentityResolver" class="com.jaspersoft.jasperserver.remote.helpers.RecipientIdentityResolver">
+        <property name="map" ref="protocolMapping"/>
+        <property name="identifierLabel" value="holder"/>
+        <property name="requiredProtocols">
+            <set>
+                <value>user</value>
+                <value>tenant</value>
+            </set>
+        </property>
+    </bean>
+
+
+    <alias name="${bean.foldersOnly}" alias="foldersOnly"/>
+    <alias name="${bean.modifyProtected}" alias="modifyProtected"/>
+
+    <bean id="modifyProtectedCe" class="java.util.HashSet">
+        <!-- this set contains URI or regular expressions of delete protected resources.
+        Currently there are technical JRS specific folders -->
+        <constructor-arg index="0" type="java.util.Collection">
+            <set>
+                <value>/</value>
+                <value>/temp</value>
+                <value>/themes</value>
+                <value>/themes/default</value>
+                <value>/themes/default/.+</value>
+            </set>
+        </constructor-arg>
+    </bean>
+
+    <bean id="foldersOnlyCe" class="java.util.HashSet">
+        <!-- this set contains URI or regular expressions of delete protected resources.
+        Currently there are technical JRS specific folders -->
+        <constructor-arg index="0" type="java.util.Collection">
+            <set>
+                <value>/</value>
+            </set>
+        </constructor-arg>
+    </bean>
+    <!-- Repository search configurations. -->
+    <bean id="defaultRestSearchConfiguration" class="com.jaspersoft.jasperserver.search.common.RepositorySearchConfiguration">
+        <property name="customSorters" ref="customSorters"/>
+        <property name="customFilters" ref="customFilters"/>
+        <property name="itemsPerPage" value="100"/>
+        <property name="maxItemsPerQuery" value="1000"/>
+        <property name="searchSecurityResolver" ref="${bean.searchSecurityResolver}"/>
+        <property name="systemFilters" ref="systemFilters"/>
+        <property name="resourceLabelMaxLength" value="100"/>
+        <property name="resourceNameMaxLength" value="100"/>
+        <property name="resourceDescriptionMaxLength" value="250"/>
+        <property name="customFiltersMap" ref="defaultCustomFiltersMap"/>
+    </bean>
+
+    <!-- NOTE: create a separate bean instead of alias if mode specific configuration is required. -->
+    <alias name="defaultRestSearchConfiguration" alias="restSearchModeRepositorySearchConfiguration"/>
+    <alias name="defaultRestSearchConfiguration" alias="restBrowseModeRepositorySearchConfiguration"/>
+
+    <!-- Search mode settings. -->
+    <bean id="restSearchSearchModeSettings" class="com.jaspersoft.jasperserver.search.mode.SearchModeSettings">
+        <property name="initialStateResolver" ref="searchInitialStateResolver"/>
+        <property name="jsonConverter" ref="searchModeJsonConverter"/>
+        <property name="repositorySearchConfiguration" ref="restSearchModeRepositorySearchConfiguration"/>
+    </bean>
+
+    <bean id="restBrowseSearchModeSettings" class="com.jaspersoft.jasperserver.search.mode.SearchModeSettings">
+        <property name="initialStateResolver" ref="browseInitialStateResolver"/>
+        <property name="jsonConverter" ref="browseModeJsonConverter"/>
+        <property name="repositorySearchConfiguration" ref="restBrowseModeRepositorySearchConfiguration"/>
+    </bean>
+
+    <bean id="restSearchModeSettingsResolver" class="com.jaspersoft.jasperserver.search.mode.impl.SearchModeSettingsResolverImpl">
+        <property name="settingsMap">
+            <map>
+                <entry key="SEARCH" value-ref="restSearchSearchModeSettings"/>
+                <entry key="BROWSE" value-ref="restBrowseSearchModeSettings"/>
+            </map>
+        </property>
+    </bean>
+
+    <util:list id="disabledResourceTypes" value-type="java.lang.Class">
+        <!--add client DTO class names to disable. E.g.:
+        <value>com.jaspersoft.jasperserver.dto.resources.domain.ClientDomainSchema</value>
+        -->
+        <value>com.jaspersoft.jasperserver.dto.resources.domain.ClientDomain</value>
+        <value>com.jaspersoft.jasperserver.dto.resources.domain.ClientDomainSchema</value>
+    </util:list>
+
+
+    <bean id="importExportPrivilegeRolesCe" class="java.util.ArrayList">
+        <constructor-arg  index="0" type="java.util.Collection">
+            <list merge="true" value-type="java.lang.String">
+                <ref bean="roleAdministrator"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <alias name="${bean.importExportPrivilegeRoles}" alias="importExportPrivilegeRoles"/>
+
+    <bean id="exportPrivilegeOptionsCe" class="java.util.HashSet">
+        <constructor-arg index="0" type="java.util.Collection">
+            <set merge="true">
+                <value>include-access-events</value>
+            </set>
+        </constructor-arg>
+    </bean>
+
+    <alias name="${bean.exportPrivilegeOptions}" alias="exportPrivilegeOptions"/>
+
+
+</beans>

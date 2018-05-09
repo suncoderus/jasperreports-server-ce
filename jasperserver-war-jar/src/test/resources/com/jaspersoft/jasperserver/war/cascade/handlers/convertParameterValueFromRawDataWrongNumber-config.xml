@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <import resource="base-fixtures-config.xml"/>
+
+    <bean id="convertParameterValueFromRawDataWrongNumber" class="java.util.HashMap" parent="baseTestCaseMap">
+        <constructor-arg index="0">
+            <map merge="true">
+                <entry key-ref="CONTROLS" value-ref="controls"/>
+                <entry key-ref="RAW_PARAMS_ARRAY" value=",123,123a"/>
+                <entry key-ref="EXPECTED_RESULT" value-ref="expectedResultTypedValue"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="expectedResultTypedValue" class="java.util.ArrayList">
+        <constructor-arg index="0" type="java.util.Collection">
+            <list value-type="java.lang.Integer">
+                <null/>
+                <value>123</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="controls" class="java.util.HashMap">
+        <constructor-arg index="0">
+            <map>
+                <entry key="order"> <!-- Control name -->
+                    <bean parent="orderControlDefinition"/>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="orderControlDefinition" class="java.util.HashMap">
+        <constructor-arg index="0">
+            <map>
+                <entry key-ref="INPUT_CONTROL">
+                    <bean parent="orderInputControl"/>
+                </entry>
+                <entry key-ref="CONTROL_INFO">
+                    <bean parent="orderControlInfo"/>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="query" class="com.jaspersoft.jasperserver.api.metadata.common.domain.client.QueryImpl"/>
+
+    <bean id="queryOrder" parent="query">
+        <property name="sql" value=""/>
+    </bean>
+    <bean id="queryRefOrder" class="com.jaspersoft.jasperserver.api.metadata.common.domain.ResourceReference">
+        <constructor-arg ref="queryOrder"/>
+    </bean>
+
+    <bean id="integerCollectionInputControlInfo" class="com.jaspersoft.jasperserver.war.cascade.utils.ReportInputControlInformationMock">
+        <property name="valueType" value="java.util.Collection"/>
+        <property name="nestedType" value="java.lang.Integer"/>
+    </bean>
+
+    <bean id="orderControlInfo" parent="integerCollectionInputControlInfo">
+        <property name="parameterName" value="order"/>
+        <property name="promptLabel" value="Order"/>
+        <property name="defaultValue">
+            <list value-type="java.lang.Integer">
+                <value>1</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="multiSelectQueryNumberInputControl" class="com.jaspersoft.jasperserver.war.cascade.utils.InputControlMock">
+        <property name="inputControlType" ref="TYPE_MULTI_SELECT_QUERY"/>
+    </bean>
+
+    <bean id="orderInputControl" parent="multiSelectQueryNumberInputControl">
+        <property name="name" value="order"/>
+        <property name="label" value="order"/>
+        <property name="query" ref="queryRefOrder"/>
+        <property name="queryValueColumn" value="order"/>
+        <property name="queryVisibleColumnsList"><list><value>order</value></list></property>
+    </bean>
+
+
+
+</beans>

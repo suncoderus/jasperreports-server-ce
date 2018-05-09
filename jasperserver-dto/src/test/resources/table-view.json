@@ -1,0 +1,183 @@
+{
+    "uri": "/public/Samples/Ad_Hoc_Views/4_Product_Results_by_Store_Type",
+    "label": "",
+    "description": "",
+    "permissionMask": "",
+    "creationDate": "",
+    "updateDate": "",
+    "version": "",
+    "view": {
+        "title": "Product Results by Store Type",
+        "type": "table",
+        "isOLAP": false,
+        "measures": [
+            {
+                "id": "_artificial",
+                "label": "",
+                "isMeasure": false,
+                "defaultFunction": null
+            },
+            {
+                "id": "sales_fact_ALL.sales__product.sales__product__product_name",
+                "label": "Product Name",
+                "isMeasure": false,
+                "defaultFunction": "Count"
+            },
+            {
+                "id": "sales_fact_ALL.sales__product.sales__product__recyclable_package",
+                "label": "Recyclable Packaging",
+                "isMeasure": false,
+                "defaultFunction": "Count"
+            },
+            {
+                "id": "sales_fact_ALL.sales_fact_ALL__store_sales_2013",
+                "label": "Store Sales 2013",
+                "isMeasure": true
+            },
+            {
+                "id": "sales_fact_ALL.sales_fact_ALL__store_cost_2013",
+                "label": "Store Cost 2013",
+                "isMeasure": true
+            },
+            {
+                "id": "sales_fact_ALL.sales_fact_ALL__unit_sales_2013",
+                "label": "Unit Sales 2013",
+                "isMeasure": true
+            }
+        ],
+        "groups": [
+            {
+                "id": "sales_fact_ALL.sales__store.sales__store__store_type",
+                "label": "Store Type"
+            }
+        ],
+        "inputControls": [
+            {
+                "id": "filter_1",
+                "fieldName": "sales_fact_ALL.sales__store.sales__store__region.sales__store__region__sales_country",
+                "operatorName": "in",
+                "totalCount": 4,
+                "options": [
+                    {
+                        "value": "Canada",
+                        "selected": true
+                    }
+                ],
+                "label": "sales_fact_ALL.sales__store.sales__store__region.sales__store__region__sales_country",
+                "filterDataType": "String",
+                "editable": true
+            },
+            {
+                "id": "filter_3",
+                "fieldName": "sales_fact_ALL.sales__product.sales__product__product_name",
+                "operatorName": "in",
+                "totalCount": 1560,
+                "options": [
+                    {
+                        "value": "ADJ Rosy Sunglasses",
+                        "selected": false
+                    },
+                    {
+                        "value": "Akron City Map",
+                        "selected": false
+                    },
+                    {
+                        "value": "Akron Eyeglass Screwdriver",
+                        "selected": false
+                    }
+                ],
+                "label": "sales_fact_ALL.sales__product.sales__product__product_name",
+                "filterDataType": "String",
+                "editable": true
+            }
+        ]
+    },
+    "query": {
+        "type": "Tabular",
+        "select": {
+            "rows": [
+                {
+                    "id": "sales_fact_ALL.sales__store.sales__store__store_type",
+                    "expanded": false
+                }
+            ],
+            "columns": [
+                {
+                    "id": "_artificial"
+                },
+                {
+                    "id": "sales_fact_ALL.sales__product.sales__product__product_name"
+                },
+                {
+                    "id": "sales_fact_ALL.sales__product.sales__product__recyclable_package"
+                },
+                {
+                    "id": "sales_fact_ALL.sales_fact_ALL__store_sales_2013"
+                },
+                {
+                    "id": "sales_fact_ALL.sales_fact_ALL__store_cost_2013"
+                },
+                {
+                    "id": "sales_fact_ALL.sales_fact_ALL__unit_sales_2013"
+                }
+            ]
+        },
+        "from": "/uri",
+        "where": {
+            "fields": [
+                {
+                    "id": "filter_1",
+                    "fieldId": "sales_fact_ALL.sales__store.sales__store__region.sales__store__region__sales_country",
+                    "complexExpressionId": "A",
+                    "operatorName": "in",
+                    "optionsCount": 5,
+                    "options": [
+                        {
+                            "value": "Canada",
+                            "selected": true
+                        }
+                    ]
+                },
+                {
+                    "id": "filter_3",
+                    "fieldId": "sales_fact_ALL.sales__product.sales__product__product_name",
+                    "complexExpressionId": "B",
+                    "operatorName": "in",
+                    "optionsCount": 100,
+                    "options": [
+                        {
+                            "value": "Best Choice Chocolate Chip Cookies",
+                            "selected": true
+                        },
+                        {
+                            "value": "Fast Chocolate Chip Cookies",
+                            "selected": true
+                        },
+                        {
+                            "value": "Fort West Chocolate Chip Cookies",
+                            "selected": true
+                        },
+                        {
+                            "value": "Horatio Chocolate Chip Cookies",
+                            "selected": true
+                        },
+                        {
+                            "value": "Nationeel Chocolate Chip Cookies",
+                            "selected": true
+                        }
+                    ]
+                }
+            ],
+            "complexExpression": "A or B"
+        },
+        "order": [
+            {
+                "id": "sales_fact_ALL.sales__store.sales__store__store_type",
+                "asc": true
+            }
+        ],
+        "toggleNodes": ["ab/bc", ""],
+        "limit": 30,
+        "offset": 30
+    }
+}

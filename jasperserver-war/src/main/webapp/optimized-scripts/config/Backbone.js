@@ -1,0 +1,1 @@
+define(["require","backbone.original","request"],function(e){"use strict";var n=e("backbone.original"),r=e("request");return n.ajax=r,n.noConflict(),n});

@@ -1,0 +1,6 @@
+{{ if (model.value.tenantDesc) { }}
+<!--<p class="message label">{{- i18n['tooltip.description'] }}</p><p class="message">{{- model.value.tenantDesc }}</p>-->
+{{ } }}
+{{ if (model.value.uri) { }}
+<p class="message label">{{- i18n['tooltip.path'] }}</p><p class="message">{{- model.value.uri }}</p>
+{{ } }}

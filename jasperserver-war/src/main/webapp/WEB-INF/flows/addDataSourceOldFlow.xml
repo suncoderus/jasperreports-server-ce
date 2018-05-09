@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<flow xmlns="http://www.springframework.org/schema/webflow" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+      ns0:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd"
+      start-state="initAction">
+
+    <!-- example:
+        "http://localhost:8080/jasperserver-pro/flow.html?_flowId=addDataSourceFlow"
+    -->
+    <input name="masterFlow"/>
+    <input name="masterFlowStep"/>
+    <input name="dataResource"/>
+    <input name="lastSubflow" type="boolean"/>
+
+    <decision-state id="checkType">
+        <!--<if test="not (flowScope.type == null or flowScope.type == '')" then="${flowScope.type}" else="jdbc"/>-->
+        <if test="flowScope.type == null or flowScope.type == ''" then="jdbc"/>
+        <if test="flowScope.type=='virtual'" then="virtual"/>
+        <if test="flowScope.type=='jdbc'" then="jdbc"/>
+        <if test="flowScope.type=='aws'" then="aws"/>
+        <if test="flowScope.type=='bean'" then="bean"/>
+        <if test="flowScope.type=='jndi'" then="jndi"
+            else="custom"/>
+    </decision-state>
+
+    <action-state id="initAction">
+        <on-entry>
+			<set name="lastSubflow" value="lastSubflow==null?true:lastSubflow"/> <!-- workaround for default value - constants not allowed in input definition -->
+		</on-entry>
+        <evaluate expression="dataSourceAction"/>
+        <transition on="success" to="checkType"/>
+        <on-exit>
+            <evaluate expression="dataSourceAction.bind"/>
+        </on-exit>
+    </action-state>
+
+    <view-state id="jdbc" view="modules/addResource/dataSource/addDataSourceJDBC">
+        <on-entry>
+            <evaluate expression="dataSourceAction.prepareChooseType"/>
+        </on-entry>
+        <transition on="back" to="cancel"/>
+        <transition on="cancel" to="cancel"/>
+        <transition on="save" to="saveDatasource">
+            <evaluate expression="dataSourceAction.bindAndValidate">
+            </evaluate>
+        </transition>
+        <transition on="upload" to="ajaxView">
+            <evaluate expression="dataSourceAction.uploadJDBCDrivers"/>
+        </transition>
+        <transition on="testDataSource" to="testJdbcDataSource">
+            <evaluate expression="dataSourceAction.bind">
+            </evaluate>
+        </transition>
+        <transition on="initAction" to="initAction"/>
+    </view-state>
+
+    <view-state id="jndi" view="modules/addResource/dataSource/addDataSourceJNDI">
+        <on-entry>
+            <evaluate expression="dataSourceAction.prepareChooseType"/>
+        </on-entry>
+        <transition on="back" to="cancel"/>
+        <transition on="cancel" to="cancel"/>
+        <transition on="save" to="saveDatasource">
+            <evaluate expression="dataSourceAction.bindAndValidate">
+            </evaluate>
+        </transition>
+        <transition on="testDataSource" to="testJndiDataSource">
+            <evaluate expression="dataSourceAction.bind">
+            </evaluate>
+        </transition>
+        <transition on="initAction" to="initAction"/>
+    </view-state>
+
+    <view-state id="virtual" view="modules/addResource/dataSource/addDataSourceVirtual">
+        <on-entry>
+            <evaluate expression="dataSourceAction.prepareChooseType"/>
+        </on-entry>
+        <transition on="back" to="cancel"/>
+        <transition on="cancel" to="cancel"/>
+        <transition on="save" to="saveDatasource">
+            <evaluate expression="dataSourceAction.bindAndValidate">
+            </evaluate>
+            <evaluate expression="dataSourceAction.bindSubDatasources">
+            </evaluate>
+        </transition>
+        <transition on="initAction" to="initAction"/>
+    </view-state>
+
+    <view-state id="bean" view="modules/addResource/dataSource/addDataSourceBean">
+        <on-entry>
+            <evaluate expression="dataSourceAction.prepareChooseType"/>
+        </on-entry>
+        <transition on="back" to="cancel"/>
+        <transition on="cancel" to="cancel"/>
+        <transition on="save" to="saveDatasource">
+            <evaluate expression="dataSourceAction.bindAndValidate">
+            </evaluate>
+        </transition>
+        <transition on="testDataSource" to="testBeanDataSource">
+            <evaluate expression="dataSourceAction.bind">
+            </evaluate>
+        </transition>
+        <transition on="initAction" to="initAction"/>
+    </view-state>
+
+    <view-state id="custom" view="modules/addResource/dataSource/addDataSourceCustom">
+        <on-entry>
+            <evaluate expression="dataSourceAction.prepareChooseType"/>
+        </on-entry>
+        <transition on="back" to="cancel"/>
+        <transition on="cancel" to="cancel"/>
+        <transition on="save" to="saveDatasource">
+            <evaluate expression="dataSourceAction.bindAndValidate">
+            </evaluate>
+        </transition>
+        <transition on="testDataSource" to="testCustomDataSource">
+            <evaluate expression="dataSourceAction.bind">
+            </evaluate>
+        </transition>
+        <transition on="initAction" to="initAction"/>
+    </view-state>
+
+    <view-state id="aws" view="modules/addResource/dataSource/addDataSourceAws">
+        <on-entry>
+            <evaluate expression="dataSourceAction.prepareChooseType"/>
+        </on-entry>
+        <transition on="back" to="cancel"/>
+        <transition on="cancel" to="cancel"/>
+        <transition on="save" to="saveDatasource">
+            <evaluate expression="dataSourceAction.bindAndValidate">
+            </evaluate>
+        </transition>
+        <transition on="upload" to="ajaxView">
+            <evaluate expression="dataSourceAction.uploadJDBCDrivers"/>
+        </transition>
+        <transition on="testDataSource" to="testAwsDataSource">
+            <evaluate expression="dataSourceAction.bind">
+            </evaluate>
+        </transition>
+        <transition on="initAction" to="initAction"/>
+    </view-state>
+
+    <action-state id="testCustomDataSource">
+        <evaluate expression="dataSourceAction"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="testJdbcDataSource">
+        <evaluate expression="dataSourceAction"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="testJndiDataSource">
+        <evaluate expression="dataSourceAction"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="testBeanDataSource">
+        <evaluate expression="dataSourceAction"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="testAwsDataSource">
+        <evaluate expression="dataSourceAction"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="saveDatasource">
+        <evaluate expression="dataSourceAction"/>
+        <transition on="error" to="jdbc"/>
+        <transition on="yes" to="backToSearch"/>
+        <transition on="success" to="done"/>
+    </action-state>
+
+    <!-- ajax views -->
+    <view-state id="ajaxView" view="ajax/ajaxresponse"/>
+
+    <view-state id="ajaxError" view="ajax/ajaxerror"/>
+
+    <!-- redirect to another flow, e.g. run report, edit resource, etc. -->
+    <end-state id="backToSearch" view="flowRedirect:searchFlow" />
+    <end-state id="done">
+        <output name="dataResource"/>
+    </end-state>
+    <end-state id="redirect" view="flowRedirect:${requestParameters.flowParams}"/>
+    <end-state id="cancel" view="flowRedirect:searchFlow?lastMode=true"/>
+    <end-state id="none"/>
+
+    <!-- exceptions handling -->
+    <decision-state id="backFromError">
+        <if test="not (flowScope.prevForm == null or flowScope.prevForm == '')" then="${flowScope.prevForm}"
+            else="cancel"/>
+    </decision-state>
+
+    <view-state id="errorPage" view="modules/system/errorPage">
+        <on-entry>
+            <evaluate expression="errorPageHandlerAction"/>
+        </on-entry>
+    </view-state>
+
+    <global-transitions>
+        <transition on="backFromErrorPage" to="backFromError"/>
+        <transition on-exception="java.lang.Throwable" to="errorPage"/>
+    </global-transitions>
+
+    <bean-import resource="spring-config.xml"/>
+    <bean-import resource="reportDataSourceBeans.xml"/>
+
+</flow>

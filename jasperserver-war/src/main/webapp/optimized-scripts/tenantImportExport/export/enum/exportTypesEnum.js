@@ -1,0 +1,1 @@
+define({ROOT_TENANT:"rootTenant",TENANT:"tenant",SERVER_CE:"serverCE",SERVER_PRO:"serverPRO",REPOSITORY:"repository"});

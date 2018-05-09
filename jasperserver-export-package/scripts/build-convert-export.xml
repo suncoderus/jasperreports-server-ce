@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!-- =============================================================== -->
+<!-- Ant build file                                                  -->
+<!-- =============================================================== -->
+
+<project name="convert-export-to-JS-3.0" default="usage" basedir=".">
+
+  <description>Convert an exported repository to 3.0</description>
+
+  <property name="import-dir" value="my-2.0-resources"/>     <!-- UPDATE HERE -->
+
+  <!-- FOR EXAMPLE  -->
+  <!-- <property name="import-dir" value="C:\Program Files\jasperserver-pro-2.0\my-2.0-resources"/> -->
+  
+  <property name="import-arg1" value="--input-dir=${import-dir}"/>
+
+  <property name="prior-JS-export-dir" value="${import-dir}"/>
+
+  <property name="JS-Pro-3.0-converted-dir" value="${import-dir}/../converted"/>
+  
+  <!-- paths for important prop files -->
+  
+  <!-- props for import/export and other uses -->
+  <property name="common.prop.file" value="config/js.jdbc.properties"/>
+
+  <property file="${common.prop.file}"/>
+  
+  <!-- ============================================================= -->
+  <!-- COMMENT:                                                      -->
+  <!--  This file works for Pro                                      -->  
+  <!-- ============================================================= -->
+
+
+
+  <!-- ============================================================= -->
+  <!-- import-pro                                                    -->
+  <!-- ============================================================= -->
+  <target name="import-pro">
+    <java classname="com.jaspersoft.jasperserver.export.ImportCommand">
+        <arg value="--import"/>
+        <arg value="--configResources=config/applicationContext-export-import.xml,config/applicationContext-export-import-pro.xml,config/applicationContext-for-export.xml,config/applicationContext-for-export-pro.xml,config/applicationContext-report-options.xml,config/applicationContext-report-scheduling-for-export.xml,config/applicationContext-security.xml"/>
+        
+        <arg value="${import-arg1}"/>
+        
+        <classpath>
+            <pathelement location="./"/>
+            <pathelement location="config"/>        
+            <fileset dir="lib">
+                <include name="**/*.jar"/>
+            </fileset>
+        </classpath>
+     </java>
+  </target>
+
+
+  <!-- ============================================================= -->
+  <!-- update-jasperserver-export-to-3.0-Pro                         -->
+  <!-- Call script to update repo repository export from a prior     -->
+  <!-- version to a 3.0 compatible version.                  -->
+  <!-- The updated export can then be imported into a 3.0 repo       -->
+  <!-- ============================================================= -->
+  <target name="update-jasperserver-export-to-3.0-Pro">
+    <delete dir="${JS-Pro-3.0-converted-dir}"/>
+    <xslt basedir="${prior-JS-export-dir}" destdir="${JS-Pro-3.0-converted-dir}" includes="resources/**/*.xml"
+          extension=".xml" style="${basedir}/config/toSecureMondrianConnection.xsl">
+    </xslt>
+      <copy todir="${JS-Pro-3.0-converted-dir}">
+        <fileset dir="${prior-JS-export-dir}">
+          <exclude name="resources/**/*.xml"/>
+        </fileset>
+      </copy>
+  </target>
+  
+  <!-- ============================================================= -->
+  <!-- import-converted-3.0-export                                   -->
+  <!-- Import the export converted to 3.0                            -->
+  <!-- ============================================================= -->
+  <target name="import-converted-3.0-export">
+    <antcall target="import-pro">
+        <param name="import-arg1" value="--input-dir=${JS-Pro-3.0-converted-dir}"/>
+    </antcall>
+  </target>
+  
+  <!-- ============================================================= -->
+  <!-- convert-repository-to-3.0-from-export                         -->
+  <!-- Do the full conversion and import process                     -->
+  <!-- ============================================================= -->
+  <target name="convert-repository-to-3.0-from-export">
+    <antcall target="update-jasperserver-export-to-3.0-Pro"/>
+    <antcall target="import-converted-3.0-export"/>
+  </target>
+
+  <!-- ============================================================= -->
+  <!-- usage                                                         -->
+  <!-- ============================================================= -->
+
+  <target name="usage">
+    <echo message="  " />  
+    <echo message=" Process:" />
+    <echo message="     Create a repository export from a previous open source or Pro repository. " />
+    <echo message="     With the standard Pro 3.0 import-export script, create a new empty 3.0 repository database. " />
+    <echo message="     Modify the runtime arg values in this ant script to point to the repository export. " />
+    <echo message="  " />  
+    <echo message="  " />  
+    <echo message=" Then run the conversion operation with: " />
+    <echo message="  " />    
+    <echo message="   ant -f build-convert-export.xml convert-repository-to-3.0-from-export " />
+    <echo message="  " />
+  </target>
+  
+</project>  

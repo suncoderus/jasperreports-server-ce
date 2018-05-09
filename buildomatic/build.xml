@@ -1,0 +1,557 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<project name="buildomatic" default="help-build">
+
+    <!-- ======================================================================= -->
+    <!--                                                                         -->
+    <!-- This file is the starting point for buildomatic execution               -->
+    <!--                                                                         -->
+    <!-- ======================================================================= -->
+
+    <!-- Checking Ant version. -->
+
+    <property name="js.buildomatic.ant.version.prerequisite" value="1.8.1" />
+
+    <condition property="js.buildomatic.ant.version.is-compatible">
+        <antversion atleast="${js.buildomatic.ant.version.prerequisite}" />
+    </condition>
+
+    <fail unless="js.buildomatic.ant.version.is-compatible">
+        Buildomatic requires Ant ${js.buildomatic.ant.version.prerequisite} or higher. You are using an older version of Ant. Upgrade required
+    </fail>
+
+    <!-- Checking presence of Ant Contrib. -->
+
+    <condition property="js.buildomatic.ant.contrib.available">
+        <available resource="net/sf/antcontrib/antlib.xml" />
+    </condition>
+
+    <fail unless="js.buildomatic.ant.contrib.available">
+        Buildomatic requires ant-contrib library but it was not found on the classpath
+    </fail>
+
+    <!-- ======================================================================= -->
+    <!--                                                                         -->
+    <!-- File Imports                                                            -->
+    <!--                                                                         -->
+    <!-- ======================================================================= -->
+
+    <import file="bin/setup.xml"/>
+
+    <!-- load install targets -->
+    <import file="bin/install.xml"/>
+
+    <!-- Validation/test mode targets and macros. -->
+    <import file="bin/validation.xml"/>
+
+    <!-- load dev targets, if available -->
+    <import file="bin/dev.xml" optional="true"/>
+
+    <!-- load module manager, if available -->
+    <import file="bin/module-manager.xml" optional="true"/>
+
+    <!-- load targets which build separate modules -->
+    <import file="bin/restart-build.xml" optional="true"/>
+
+    <!-- load FTP targets (OPTIONAL) -->
+    <import file="../jasperserver-ftp/build.xml" optional="true"/>
+
+    <!-- ======================================================================= -->
+    <!--                                                                         -->
+    <!-- Help Info on buildomatic targets                                        -->
+    <!--                                                                         -->
+    <!-- ======================================================================= -->
+
+    <target name="help" depends="help-build">
+    </target>
+
+    <target name="help-build" depends="">
+    <echo message=" Handy Buildomatic Source Build Targets:                                                           "/>
+    <echo message="                                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Building Everything:                                                                            "/>
+    <echo message="   --------------------                                                                            "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    build-all                  (Builds ce and pro source base, builds the pro js database          "/>
+    <echo message="                                runs the integration tests and creates the production data)        "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    build-all-deploy           (Does the above steps, then deploys the pro war file)               "/>
+    <echo message="                                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    build-all-svn-update       (First updates ce, pro, and repo source code from svn,              "/>
+    <echo message="                                then does all of the build-all steps)                              "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    build-all-ce               (Builds ce source base, builds the ce js database, runs the         "/>
+    <echo message="                                ce integration tests and creates the ce production data)           "/>
+    <echo message="                                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Run Integration Tests:                                                                          "/>
+    <echo message="   ----------------------                                                                          "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    re-init-js-db-pro          (drop js db, create js db, initialize js db with schema)            "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    run-integration-tests-pro  (run integration tests [will not leave resources in the js db.      "/>
+    <echo message="                                you can run this target repeatedly])                               "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Run Your Own Integration Test:                                                                  "/>
+    <echo message="   ------------------------------                                                                  "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    run-integration-tests-pro  -DuseXmlFile=testng-example-tests-pro.xml  (use example xml file)   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Run Production Data:                                                                            "/>
+    <echo message="   --------------------                                                                            "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    re-init-js-db-pro          (drop js db, create js db, initialize js db with schema)            "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    run-production-data-pro    (run production data [this will load resources into the js db.      "/>
+    <echo message="                                you need this 'core' data in order to startup jasperserver])       "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Update and Build Source:                                                                        "/>
+    <echo message="   ------------------------                                                                        "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    cd jrs-ce-src                                                                                  "/>
+    <echo message="    svn update                 (update ce source)                                                  "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    cd jrs-pro-src                                                                                 "/>
+    <echo message="    svn update                 (update pro source)                                                 "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    build-src-all              (builds ce and pro source)                                          "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    build-ce                   (builds just the ce source)                                         "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    build-pro                  (builds just the pro source)                                        "/>
+    <echo message="                                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Deploy the WAR File:                                                                            "/>
+    <echo message="   --------------------                                                                            "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    deploy-webapp-pro          (deploy the war to your specified App Server)                       "/>
+    <echo message="                                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Build a Single Folder:                                                                          "/>
+    <echo message="   ----------------------                                                                          "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    build-dir-pro -DdirName=folder-name       (example: build-dir-pro -DdirName=datarator)         "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    build-dir-ce  -DdirName=folder-name       (example: build-dir-ce  -DdirName=jasperserver-api   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Community Source Targets:                                                                       "/>
+    <echo message="   -------------------------                                                                       "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Most of the targets ending with '-pro' have equivalent targets ending with '-ce'                "/>
+    <echo message="                                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   default_master.properties File:                                                                 "/>
+    <echo message="   -------------------------------                                                                 "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   All of these targets assume that you have a buildomatic/default_master.properties in place.     "/>
+    <echo message="   For additional information see the comments in your default_master.properties file or the       "/>
+    <echo message="   properties template file found at buildomatic/sample_conf/source/postgresql_master.properties.  "/>
+    <echo message="   Also see Section 3.4 'Configuring the Buildomatic Properties' in the JasperReports Server       "/>
+    <echo message="   Source Build Guide.                                                                             "/>
+    <echo message="                                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Collect Pro Buildomatic Files:                                                                  "/>
+    <echo message="   ------------------------------                                                                  "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   If you are an internal Jaspersoft developer and you want to setup in order to work with a       "/>
+    <echo message="   commercial database, you can run the following command to copy Pro buildomatic files to your    "/>
+    <echo message="   standard buildomatic folder:                                                                    "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    assemble-pro-buildomatic-files                                                                 "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   (If you get an error about using an 'unsupported database', make a temporary change to your     "/>
+    <echo message="   default_master.properties. Change, for instance, dbType=oracle to dbType=postgresql. Then       "/>
+    <echo message="   change this property back after the command runs successfully.)                                 "/>
+    <echo message="                                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Help Targets:                                                                                   "/>
+    <echo message="   -------------                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    ant help                  (display this current help page)                                     "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    ant help-install          (display help on how to install JasperReports Server)                "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    ant help-install-manual   (display help on manual buildomatic install steps)                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    ant help-sample-data      (display help on setup of sample databases)                          "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    ant help-java-options     (display help on settings for JasperServer Java runtime options)     "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    ant help-with-license     (display help on setup of the JasperServer license file - pro only)  "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Also, for more information, refer to the JasperReports Server Install Guide and the             "/>
+    <echo message="   JasperReports Server Source Build Guide. Both are found in the js-src/docs folder.              "/>
+    <echo message=" "/>
+    </target>
+
+    <target name="help-install" depends="">
+    <echo message="                                                                                                   "/>
+    <echo message=" JasperReports Server Installation Steps                                                           "/>
+    <echo message="                                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Install Using the js-install Script:                                                            "/>
+    <echo message="   ------------------------------------                                                            "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    First create a default_master.properties file which should be located in the                   "/>
+    <echo message="    js-install/buildomatic folder (this file will hold your local settings).                       "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    For a default_master.properties template, copy from the buildomatic/sample_conf folder.        "/>
+    <echo message="    Choose a template that matches your database type and rename to default_master.properties.     "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    Validate that you settings are correct for your Application Server and your Database.          "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    Stop your Application Server (except Glassfish) and leave your Database running.               "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    cd to folder: js-install/buildomatic                                                           "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    execute:                                                                                       "/>
+    <echo message="                                                                                                   "/>
+    <echo message="             js-install.sh    or                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="             js-install.bat                                                                        "/>
+    <echo message="                                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Java Memory Settings:                                                                           "/>
+    <echo message="   ---------------------                                                                           "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    To run JasperReports Server effectively, you will need to increase the memory settings for     "/>
+    <echo message="    your JAVA_OPTS. This is done via an environment variable or in the Application Server          "/>
+    <echo message="    startup script. See Section 6.2 'Setting JVM Options for Application Servers'.                 "/>
+    <echo message="                                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Complete Installation Information:                                                              "/>
+    <echo message="   ----------------------------------                                                              "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    For complete information on Installing JasperReports Server please see the                     "/>
+    <echo message="    js-install/docs/JasperReports-Server-Install-Guide.pdf.                                        "/>
+    <echo message="                                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Help for Manual Buildomatic Targets:                                                            "/>
+    <echo message="   ------------------------------------                                                            "/>
+    <echo message="                                                                                                   "/>
+    <echo message="    ant help-install-manual                                                                        "/>
+    <echo message=" "/>
+    </target>
+
+    <target name="help-install-manual" depends="">
+    <echo message="                                                                                                   "/>
+    <echo message=" Help for Buildomatic Manual Installation Steps                                                    "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   The recommended procedure for installing JasperReports Server is to use the 'binary' installer  "/>
+    <echo message="   or the buildomatic js-install.sh/bat script.                                                    "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   However, for many Production environments running automated installation scripts which make     "/>
+    <echo message="   database updates is not permitted. In this type of Production environment, it would be more     "/>
+    <echo message="   typical to hand the database creation and initialization scripts to the Database Administrator. "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   The Database Administrator would create and initialize the database and the Application Server  "/>
+    <echo message="   Administrator would complete the installation of the JasperReports Server WAR file and          "/>
+    <echo message="   any additional configuration settings.                                                          "/>
+    <echo message="                                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Manual Buildomatic Steps:                                                                       "/>
+    <echo message="   -------------------------                                                                       "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     (First have Database Administrator create the jasperserver database)                          "/>
+    <echo message="     (add full details here)                                                                       "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     (Then setup buildomatic/default_master.properties)                                            "/>
+    <echo message="     (add full details here)                                                                       "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     Next, run these commands:                                                                     "/>
+    <echo message="                                                                                                   "/>
+    <echo message="       js-ant import-minimal-pro                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="       js-ant deploy-webapp-pro                                                                    "/>
+    <echo message=" "/>
+    </target>
+
+    <target name="help-sample-data" depends="">
+    <echo message="                                                                                                   "/>
+    <echo message=" Help for Setup of Sample Databases                                                                "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   In order to successfully run the JasperServer integration tests, you must have two sample       "/>
+    <echo message="   databases in place. These databases are the following:                                          "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     sugarcrm                                                                                      "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     foodmart                                                                                      "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   We have scripts and functionality in place to be able to create these sample databases on       "/>
+    <echo message="   all five of our supported database platforms: PostgreSQL, MySQL, Oracle, SQL Server, and DB2    "/>
+    <echo message="                                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Create and Load Sample Databases:                                                               "/>
+    <echo message="   ---------------------------------                                                               "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     First setup your default_master.properties for your database type                             "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     js-ant create-sugarcrm-db                                                                     "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     js-ant load-sugarcrm-db                                                                       "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     js-ant create-foodmart-db                                                                     "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     js-ant load-foodmart-db                                                                       "/>
+    <echo message="                                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Load Sample Resources to jasperserver Database:                                                 "/>
+    <echo message="   -----------------------------------------------                                                 "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     js-ant re-init-js-db-pro                                                                      "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     js-ant import-sample-data-pro                                                                 "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     (or js-ant run-production-data-pro)                                                           "/>
+    <echo message="                                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Run All Targets in One Step:                                                                    "/>
+    <echo message="   ----------------------------                                                                    "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     To run all the above commands in one step, execute the following buildomatic command:         "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     js-ant create-load-all-dbs-pro                                                                "/>
+    <echo message="                      "/>
+    <echo message="                      "/>
+    <echo message="   Also, refer to the JasperReports Server Source Build Guide for more information.                "/>
+    <echo message=" "/>
+    </target>
+
+
+    <target name="help-java-options" depends="">
+    <echo message="                                                                                                   "/>
+    <echo message=" Help for Setting JasperServer Runtime Java Options                                                "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   JasperServer is a relatively large Java Web Application. Because of this it is best to increase "/>
+    <echo message="   the memory settings for the Java JVM. The typical error encountered if you do not increase      "/>
+    <echo message="   your default JVM settings will be an error regarding running out of PermGen space.              "/>
+    <echo message="                                                                                                   "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   In your Application Server startup script add the following:                                    "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     Windows:                                                                                      "/>
+    <echo message="                                                                                                   "/>
+    <echo message="       set JAVA_OPTS=%JAVA_OPTS% -Xms1024m -Xmx2048m -Xss2m -XX:+UseConcMarkSweepGC                "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     Linux:                                                                                        "/>
+    <echo message="                                                                                                   "/>
+    <echo message="       export JAVA_OPTS=&quot;$JAVA_OPTS -Xms1024m -Xmx2048m -Xss2m -XX:+UseConcMarkSweepGC&quot;  "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Also, refer to the JasperReports Server Install Guide or Source Build Guide for                 "/>
+    <echo message="   more information.                                                                               "/>
+    <echo message=" "/>
+    </target>
+
+    <target name="help-with-license" depends="">
+    <echo message="                                                                                                   "/>
+    <echo message=" Help for Setting Up the JasperServer Commercial License                                           "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   In order to run the Commercial version of JasperReports Server, you will need a                 "/>
+    <echo message="   jasperserver.license file in place. The license file is read by JasperReports Server            "/>
+    <echo message="   at startup when the Application Server starts up.                                               "/>
+    <echo message="                                                                                                   "/>
+    <echo message="   Setup JasperServer License File:                 "/>
+    <echo message="   --------------------------------                 "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     The simplest way to setup a licenase is to put your jasperserver.license file in the          "/>
+    <echo message="     home folder of the User that executes your Application Server. In this case, JasperReports    "/>
+    <echo message="     Server will automatically find the license file.                                              "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     (add more details here)                                                                       "/>
+    <echo message="                                                                                                   "/>
+    <echo message="     Also, refer to Section 6.3 &quot;Setting Up the JasperReports Server License&quot; of the     "/>
+    <echo message="     JasperReports Server Install Guide.                                                           "/>
+    <echo message=" "/>
+    </target>
+
+
+
+    <!-- ======================================================================= -->
+    <!--                                                                         -->
+    <!-- assemble files targets                                                  -->
+    <!--                                                                         -->
+    <!-- ======================================================================= -->
+
+    <target name="assemble-pro-buildomatic-files"
+        description="Copy the pro-only buildomatic files on top of the OS buildomatic files">
+        <!-- ========================================================================= -->
+        <!-- 1) Copy the Pro-Only buildomatic files on top of the OS buildomatic files -->
+        <!-- ========================================================================= -->
+        <copy toDir="${js-path}/buildomatic" overwrite="true">
+            <fileset dir="${js-pro-path}/buildomatic-additional">
+                <include name="**"/>
+            </fileset>
+        </copy>        
+    </target>
+
+    <target name="assemble-export-files-ce"
+        depends="clean-export-files-ce, init-source-paths"
+        description="Delete, then copy os import-export files from os source location">
+        <!-- ========================================================================= -->
+        <!-- The import-export files are generated in the jasperserver source code.    -->
+        <!-- In order to run import-export in buildomatic you must first get the most  -->
+        <!-- current files from the jasperserver source code.                          -->
+        <!--                                                                           -->
+        <!-- This ensures that we always have the most current import-export files in  -->
+        <!-- buildomatic.                                                              -->
+        <!--                                                                           -->
+        <!-- 1) Unpack the os import-export files in the os source                     -->
+        <!-- 2) Copy the import-export files to                                        -->        
+        <!--    buildomatic/conf_source/ieCe                                           -->        
+        <!-- ========================================================================= -->
+
+        <!-- unpack export zip in src location -->
+        <unzip dest="${js-path}/jasperserver-export-package/target" 
+            src="${js-path}/jasperserver-export-package/target/js-export-import-tool.zip" 
+            overwrite="true"/>
+
+        <copy todir="${buildBase}/conf_source/ieCe" overwrite="true">
+          <fileset dir="${js-path}/jasperserver-export-package/target/js-export-import/config">
+            <exclude name="**/js.jdbc.properties"/>
+          </fileset>
+        </copy> 
+
+        <copy todir="${buildBase}/conf_source/ieCe/lib" overwrite="true">
+          <fileset dir="${js-path}/jasperserver-export-package/target/js-export-import/lib"/>
+        </copy> 
+
+        <copy toDir="${buildBase}/conf_source/ieCe/lib">
+          <fileset dir="${dbDir}/app-srv-jdbc-drivers" includes="*.jar"/>
+        </copy>
+    </target>
+
+    <target name="assemble-export-files-pro"
+        depends="clean-export-files-pro, init-source-paths"
+        description="Delete, then copy pro import-export files from pro source location">
+        <!-- ========================================================================= -->
+        <!-- The import-export files are generated in the jasperserver source code.    -->
+        <!-- In order to run import-export in buildomatic you must first get the most  -->
+        <!-- current files from the jasperserver source code.                          -->
+        <!--                                                                           -->
+        <!-- This ensures that we always have the most current import-export files in  -->
+        <!-- buildomatic.                                                              -->
+        <!--                                                                           -->
+        <!-- 1) Unpack the pro import-export files in the pro source                   -->
+        <!-- 2) Copy the import-export files to                                        -->        
+        <!--    buildomatic/conf_source/iePro                                          -->        
+        <!-- ========================================================================= -->
+
+        <!-- unpack export zip in src location -->
+        <unzip dest="${js-pro-path}/export-tool/target" 
+            src="${js-pro-path}/export-tool/target/js-pro-export-import-tool.zip" 
+            overwrite="true"/>
+
+        <copy todir="${buildBase}/conf_source/iePro" overwrite="true">
+          <fileset dir="${js-pro-path}/export-tool/target/js-pro-export-import/config">
+            <exclude name="**/js.jdbc.properties"/>
+            <exclude name="log4j-override.properties"/>
+          </fileset>
+        </copy>
+
+        <concat destfile="${buildBase}/conf_source/iePro/log4j.properties" append="true">
+            <file file="${js-pro-path}/export-tool/target/js-pro-export-import/config/log4j-override.properties"/>
+        </concat>
+
+        <copy todir="${buildBase}/conf_source/iePro/lib" overwrite="true">
+          <fileset dir="${js-pro-path}/export-tool/target/js-pro-export-import/lib"/>
+        </copy>
+
+        <copy todir="${buildBase}/conf_source/iePro/adhoc" overwrite="true">
+          <fileset dir="${js-pro-path}/jasperserver-war/target/jasperserver-pro/WEB-INF/adhoc"/>
+        </copy>
+
+        <copy todir="${buildBase}/conf_source/iePro/bundles" overwrite="true">
+          <fileset dir="${js-path}/jasperserver-war/target/jasperserver/WEB-INF/bundles"/>
+        </copy>
+
+        <copy todir="${buildBase}/conf_source/iePro/bundles" overwrite="true">
+            <fileset dir="${js-pro-path}/jasperserver-war/target/jasperserver-pro/WEB-INF/bundles"/>
+        </copy>
+
+        <!-- 2013-09-25 bug 29095 include all the main jdbc drivers into lib folder --> 
+        <copy toDir="${buildBase}/conf_source/iePro/lib">
+          <fileset dir="${dbDir}/app-srv-jdbc-drivers" includes="*.jar"/>
+        </copy>
+    </target>
+ 
+    <target name="clean-export-files-ce"
+        description="Delete all files inside the conf_source/ieCe dir">
+        <delete includeEmptyDirs="true" failonerror="false">
+            <fileset dir="${buildBase}/conf_source/ieCe"/>
+        </delete>
+    </target>
+ 
+    <target name="clean-export-files-pro"
+        description="Delete all files inside the conf_source/iePro dir">
+        <delete includeEmptyDirs="true" failonerror="false">
+            <fileset dir="${buildBase}/conf_source/iePro"/>
+        </delete>
+    </target>
+
+    <target name="copy-dist-war"
+        description="Copy buildomatic to targetDir. Specify targetDir with -DtargetDir">
+        <!-- ========================================================================= -->
+        <!-- This target is a convenience for copying buildomatic files                -->
+        <!-- to a specified location.                                                  -->
+        <!--                                                                           -->
+        <!-- 1) Be in the buildomatic dir when you execute this task.                  -->
+        <!-- 2) Specify the target directory with -DtargetDir=<path>                   -->
+        <!--    Ex: ant -DtargetDir=/home/devuser/js-installer/trunk/target/js-dir     -->
+        <!-- ========================================================================= -->
+
+        <if>
+        <isset property="targetDir"/>
+            <then>
+                <property name="copydest" value="${targetDir}"/>
+            </then>
+            <else>
+                <echo message="-DtargetDir paramater IS *NOT* SET"/>
+                <fail>Error: The copy-dist-war target requires:  -DtargetDir option</fail>
+            </else>
+        </if>
+
+        <copy toDir="${copydest}/buildomatic">
+            <fileset dir=".">
+                <include name="bin/**"/>
+                <include name="conf_source/**"/>
+                <include name="sample_conf/**"/>
+                <include name="install_resources/sql/**"/>
+                <include name="install_resources/export/**"/>
+                <include name="src/**"/>
+                <include name="target/*.jar"/>
+                <include name="*.xml"/>
+                <include name="*.sh"/>
+                <include name="*.bat"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="encrypt-diagnostics-data">
+        <encrypt-zip inFile="${inFile}"
+                     encProps="${encProps}" />
+    </target>
+
+    <target name="decrypt-diagnostics-data">
+        <decrypt-zip inFile="${inFile}"
+                     encProps="${encProps}" />
+    </target>
+</project>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spinner</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <link type="text/css" href="../../../../demos/css/jasper-ui-dev.css" rel="stylesheet">
+    <link type="text/css" href="../../../../themes/default/jquery-ui/jquery-ui.css" rel="stylesheet">
+
+    <script type="text/javascript" src="../../requireSnippetsConfig.js"></script>
+    <script type="text/javascript" src="../../../bower_components/requirejs/require.js"></script>
+    <script type="text/javascript" src="../../../../config.js"></script>
+
+    <style type="text/css">
+        /* these styles are only applicable to this demo only—do not implement */
+        body {background-color:#f7f7f7}
+
+        h2.jr {
+            margin-top: 1em;
+            margin-bottom: 1em;
+        }
+
+        .test-block {
+            height: 300px;
+            width: 100%;
+
+            background: url("http://placehold.it/350x150");
+        }
+
+    </style>
+</head>
+<body>
+    <h2 class="jr">Loading Overlay on Data Table</h2>
+    <div class="container">
+        <div class="test-block"></div>
+
+
+        <div class="jr-mOverlay jr-isHidden jr jr-jOverlay">
+            <div class="jr-mOverlay-centroid jr">
+                <div class="jr-mSpinner jr"></div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <script type="text/javascript">
+        require(["components/overlay/Overlay"], function(Overlay){
+            var overlay = new Overlay({
+                el: $(".jr-jOverlay")
+            });
+
+            overlay.show();
+        });
+
+    </script>
+</body>
+</html>

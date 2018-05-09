@@ -1,0 +1,9 @@
+{{ if( !_.isUndefined(model.value) ) { }}
+    <p class='message label'>{{- i18n['attributes.value'] + ':'}}</p>
+    <p class='message'>{{- model.value }}</p>
+{{ }else{ }}
+    <p class='message label'>{{- i18n['attributes.name'] + ':'}}</p>
+    <p class='message'>{{- model.name }}</p>
+    <p class='message label'>{{- i18n['attributes.description'] + ':'}}</p>
+    <p class='message'>{{- model.description }}</p>
+{{ } }}

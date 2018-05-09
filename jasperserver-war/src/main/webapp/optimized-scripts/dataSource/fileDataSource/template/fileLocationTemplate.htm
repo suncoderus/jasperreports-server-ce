@@ -1,0 +1,100 @@
+<div name="fileLocationContainer" id="fileLocation" class="section">
+
+	<h4 class="title">{{- i18n['resource.datasource.text.fileLocation.title']}}</h4>
+
+	<div class="group first">
+		<label title="{{- i18n['resource.datasource.text.fileLocation.source'] }}" class="control select">
+			<span class="wrap">{{- i18n['resource.datasource.text.fileLocation.source'] }}:</span>
+			<select id="fileSourceSelect" name="fileSourceType" {{- isEditMode ? 'disabled="disabled"' : ''}}>
+				{{ _.each(fileSourceTypeOptions, function(item) {
+				}}
+				<option value="{{- item.name }}" {{- (item.name == modelAttributes.fileSourceType) ? "selected='selected'" : "" }} > {{- i18n[item.label] }}</option>
+				{{ }); }}
+			</select>
+			<span class="message warning"></span>
+		</label>
+	</div>
+
+	{{ if (modelAttributes.fileSourceType === "repository") { }}
+
+	<div id="repositoryInput" class="group">
+		<label title="{{- i18n['resource.datasource.text.fileLocation.repository.fileLocation']}}" class="control input text">
+			<span class="wrap">{{- i18n['resource.datasource.text.fileLocation.repository.fileLocation']}} ({{- i18n['required.field']}}):</span>
+			<input type="text" value="{{- modelAttributes.repositoryFileName }}" name="repositoryFileName" {{- isEditMode ? 'disabled="disabled"' : ''}}>
+			<button type="button" name="repositoryBrowserButton"  {{- isEditMode ? 'disabled="disabled"' : ''}}><span class="wrap">{{- i18n['dialog.file.browse'] }}...<span class="icon"></span></span></button>
+			<span class="message warning"></span>
+		</label>
+	</div>
+
+	{{ } else if (modelAttributes.fileSourceType === "serverFileSystem") { }}
+
+	<div id="serverInput" class="group">
+		<label title="{{- i18n['resource.datasource.text.fileLocation.serverFileSystem.fileLocation']}}" class="control browser">
+			<span class="wrap">{{- i18n['resource.datasource.text.fileLocation.serverFileSystem.fileLocation']}} ({{- i18n['required.field']}}):</span>
+			<input type="text" value="{{- modelAttributes.serverFileName }}" name="serverFileName" {{- isEditMode ? 'disabled="disabled"' : ''}}>
+			<span class="message warning"></span>
+		</label>
+	</div>
+
+	<div class="group">
+		<button type="button" class="button action" name="serverFileSystemConnectToServer" {{- isEditMode ? 'disabled="disabled"' : ''}}>
+			<span class="wrap">{{- i18n['resource.datasource.text.fileLocation.serverFileSystem.connectToServer']}}
+				<span class="icon"></span>
+			</span>
+		</button>
+		<span class="message warning"></span>
+	</div>
+
+	{{ } else { }}
+
+	<div id="ftpInput" title="{{- i18n['resource.datasource.text.fileLocation.ftpServer.serverAddress.label']}}" class="group inputRow">
+		<div class="group">
+			<fieldset>
+				<label class="control input text">
+					<span class="wrap">{{- i18n['resource.datasource.text.fileLocation.ftpServer.serverAddress']}} ({{- i18n['required.field']}}):</span>
+					<input type="text" value="{{- modelAttributes.serverAddress }}" name="serverAddress" {{- isEditMode ? 'disabled="disabled"' : ''}}>
+					<span class="message warning"></span>
+				</label>
+
+				<label class="control input text">
+					<span class="wrap">{{- i18n['resource.datasource.text.fileLocation.ftpServer.serverPath']}} ({{- i18n['required.field']}}):</span>
+					<input type="text" value="{{- modelAttributes.serverPath }}" name="serverPath" {{- isEditMode ? 'disabled="disabled"' : ''}}>
+					<span class="message warning"></span>
+				</label>
+
+				<label class="control input text">
+					<span class="wrap">{{- i18n['resource.datasource.text.fileLocation.ftpServer.serverUsername']}}:</span>
+					<input type="text" value="{{- modelAttributes.serverUsername }}" name="serverUsername" {{- isEditMode ? 'disabled="disabled"' : ''}}>
+					<span class="message warning"></span>
+				</label>
+
+				<label class="control input text last">
+					<span class="wrap">{{- i18n['resource.datasource.text.fileLocation.ftpServer.serverPassword']}}:</span>
+					<input type="text" value="{{- modelAttributes.serverPassword }}" name="serverPassword" {{- isEditMode ? 'disabled="disabled"' : ''}}>
+					<span class="message warning"></span>
+				</label>
+			</fieldset>
+		</div>
+		<div class="group">
+			<fieldset>
+				<label class="control input text">
+					<span class="wrap">{{- i18n['resource.datasource.text.fileLocation.ftpServer.ftpsPort']}} ({{- i18n['required.field']}}):</span>
+					<input type="text" value="{{- modelAttributes.ftpsPort }}" name="ftpsPort" {{- isEditMode ? 'disabled="disabled"' : ''}}>
+					<span class="message warning"></span>
+				</label>
+			</fieldset>
+		</div>
+	</div>
+
+	<div class="group">
+		<button type="button" class="button action" name="ftpConnectToServer" {{- isEditMode ? 'disabled="disabled"' : ''}}>
+			<span class="wrap">{{- i18n['resource.datasource.text.fileLocation.serverFileSystem.connectToServer']}}
+				<span class="icon"></span>
+			</span>
+		</button>
+		<span class="message warning"></span>
+	</div>
+
+	{{ } }}
+
+</div>

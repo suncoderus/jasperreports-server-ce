@@ -1,0 +1,34 @@
+<div id="dependencies" class="panel dialog overlay dependencies sizeable moveable hidden centered_vert centered_horz">
+    <div class="sizer diagonal"></div>
+    <div class="content hasFooter ">
+        <div class="header mover">
+            <div class="title">{{- i18n["dialog.dependencies.title"] }}</div>
+        </div>
+        <div class="body">
+            <p id="topMessage"></p>
+
+            <div class="control groupBox">
+                <ul id="dependenciesList"></ul>
+            </div>
+            <p id="bottomMessage" class="saveMessage"></p>
+        </div>
+        <div class="footer ">
+            <button id="dependenciesBtnSave" class="button action primary up">
+                <span class="wrap">{{- i18n["button.save"] }}</span>
+                <span class="icon"></span>
+            </button>
+            <button id="dependenciesBtnSaveAs" class="button action primary up">
+                <span class="wrap">{{- i18n["button.saveAs"] }}</span>
+                <span class="icon"></span>
+            </button>
+            <button id="dependenciesBtnOk" class="button action primary up">
+                <span class="wrap">{{- i18n["button.ok"] }}</span>
+                <span class="icon"></span>
+            </button>
+            <button id="dependenciesBtnCancel" class="button action up">
+                <span class="wrap">{{- i18n["button.cancel"] }}</span>
+                <span class="icon"></span>
+            </button>
+        </div>
+    </div>
+</div>

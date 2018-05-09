@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<actions>
+    <!--Toolbar menus-->
+    <context name="toolbar_save">
+        <condition test="getCanSave">
+            <!-- We display different Save menu when Ad Hoc Designer is run from Dashboard-->
+            <condition test="isEmbeddedDesigner">
+                <simpleAction labelKey="ADH_030_MENU_SAVE_REPORT" action="adhocDesigner.handleBack"/>
+                <simpleAction labelKey="ADH_010_BUTTON_CANCEL" action="adhocDesigner.handleCancel"/>
+            </condition>
+            <!-- Ordinary Ad Hoc Save Menu-->
+            <condition test="!isEmbeddedDesigner">
+                <condition test="getIsNotWritable">
+                    <simpleAction labelKey="ADH_030_MENU_SAVE_REPORT" disabled="disabled"/>
+                </condition>
+                <condition test="getIsWritable">
+                    <simpleAction labelKey="ADH_030_MENU_SAVE_REPORT" action="designerBase.handleSave"/>
+                </condition>
+
+                <simpleAction labelKey="ADH_037_MENU_SAVE_REPORT_AS" action="designerBase.handleSaveAs"/>
+
+                <condition test="getIsNotWritable">
+                    <simpleAction labelKey="ADH_037_MENU_SAVE_DATA_VIEW_AND_REPORT" disabled="disabled"/>
+                </condition>
+                <condition test="getIsWritable">
+                    <simpleAction labelKey="ADH_037_MENU_SAVE_DATA_VIEW_AND_REPORT" action="designerBase.handleSaveAndGenerate"/>
+                </condition>
+            </condition>
+        </condition>
+    </context>
+
+    <!--menu for toolbar options-->
+    <context name="toolbar_options">
+        <selectAction labelKey="hidden">
+            <option labelKey="ADH_1150_TOOLBAR_MENU_TOGGLE_TITLE_BAR" action="adhocDesigner.toggleTitleBar"/>
+        </selectAction>
+        <simpleAction labelKey="ADH_1213_SHOW_DISPLAY_MANAGER" clientTest="!adhocDesigner.isDisplayManagerVisible" action="adhocDesigner.toggleDisplayManager"/>
+        <simpleAction labelKey="ADH_1213_HIDE_DISPLAY_MANAGER" clientTest="adhocDesigner.isDisplayManagerVisible" action="adhocDesigner.toggleDisplayManager"/>
+
+        <condition test="allowToggleUseDomainLabels">
+
+            <simpleAction labelKey="adhoc.designer.menu.use.domain.labels" clientTest="!adhocDesigner.isUseDomainLabels"
+                          action="adhocDesigner.toggleUseDomainLabels"/>
+            <simpleAction labelKey="adhoc.designer.menu.use.previous.labels"
+                          clientTest="adhocDesigner.isUseDomainLabels" action="adhocDesigner.toggleUseDomainLabels"/>
+        </condition>
+
+    </context>
+
+    <!--menu for toolbar export-->
+    <context name="toolbar_export">
+        <condition test="getCanSave"><!-- condition is same as for save -->
+            <generatedOptions id="exportTo_${optionId}" function="getExportFormats" labelExpression="${optionValue}" action="adhocDesigner.exportReport"/>
+        </condition>
+    </context>
+
+    <!--Context menus-->
+    <context name="chartLevel">
+        <selectAction className="flyout" labelKey="ADH_561_MENU_CHANGE_CHART_TYPE">
+            <generatedOptions function="getTypeDisplayMap" isSelectedTest="isType" action="changeChartType"/>
+        </selectAction>
+        
+        <separator/>
+
+        <selectAction className="flyout" labelKey="ADH_562_MENU_DISPLAY_OPTIONS">
+            <condition test="getIsBarChart">
+                <option labelCondition="is3D" action="toggle3D">
+                    <labelOption functionResponse="true" labelKey="ADH_508_FLAT_BARS_LABEL"/>
+                    <labelOption functionResponse="false" labelKey="ADH_509_3D_BARS_LABEL"/>
+                </option>
+            </condition>
+            <condition test="getIsPieChart">
+                    <option labelCondition="is3D" action="toggle3D">
+                    <labelOption functionResponse="true" labelKey="ADH_510_FLAT_PIE_LABEL"/>
+                    <labelOption functionResponse="false" labelKey="ADH_511_3D_PIE_LABEL"/>
+                </option>
+            </condition>
+            <condition test="getCanHavePoints">
+                <option labelCondition="getHasPoints" action="togglePoints">
+                    <labelOption functionResponse="true" labelKey="ADH_520b_HIDE_POINTS"/>
+                    <labelOption functionResponse="false" labelKey="ADH_520a_SHOW_POINTS"/>
+                </option>
+            </condition>
+            <condition test="getCanHaveLines">
+                <option labelCondition="getHasLines" action="toggleLines">
+                    <labelOption functionResponse="true" labelKey="ADH_521b_HIDE_LINES"/>
+                    <labelOption functionResponse="false" labelKey="ADH_521a_SHOW_LINES"/>
+                </option>
+            </condition>
+            <condition test="isStackable">
+                <option labelCondition="isStacked" action="toggleStack">
+                    <labelOption functionResponse="true" labelKey="ADH_512_SINGLE_LABEL"/>
+                    <labelOption functionResponse="false" labelKey="ADH_513_STACKED_LABEL"/>
+                </option>
+            </condition>
+            <condition test="getCanToggleOrientation">
+                <option labelCondition="isHorizontal" action="toggleOrientation">
+                    <labelOption functionResponse="true" labelKey="ADH_514_VERTICAL"/>
+                    <labelOption functionResponse="false" labelKey="ADH_515_HORIZONTAL"/>
+                </option>
+            </condition>
+
+            <separator/>
+
+            <option labelCondition="getGradientApplied" action="toggleGradient">
+                <labelOption functionResponse="true" labelKey="ADH_522b_HIDE_GRADIENT"/>
+                <labelOption functionResponse="false" labelKey="ADH_522a_APPLY_GRADIENT"/>
+            </option>
+            <option labelCondition="getBackgroundFilled" action="toggleBackground">
+                <labelOption functionResponse="true" labelKey="ADH_523b_HIDE_BACKGROUND"/>
+                <labelOption functionResponse="false" labelKey="ADH_523a_FILL_BACKGROUND"/>
+            </option>
+        </selectAction>
+
+        <selectAction className="flyout" labelKey="ADH_563_MENU_LEGEND_AND_LABELS">
+            <option labelCondition="getDisplayLegend" action="toggleLegend">
+                <labelOption functionResponse="true" labelKey="ADH_502_HIDE_LEGEND"/>
+                <labelOption functionResponse="false" labelKey="ADH_503_SHOW_LEGEND"/>
+            </option>
+            <condition test="!getIsPieChart">
+                <option labelCondition="getDisplayXAxisLabel" action="toggleXAxisLabel">
+                    <labelOption functionResponse="true" labelKey="ADH_504_HIDE_X_AXIS_LABEL"/>
+                    <labelOption functionResponse="false" labelKey="ADH_505_SHOW_X_AXIS_LABEL"/>
+                </option>
+                <condition test="!hasMultipleMeasures">
+                    <option labelCondition="getDisplayYAxisLabel" action="toggleYAxisLabel">
+                        <labelOption functionResponse="true" labelKey="ADH_506_HIDE_Y_AXIS_LABEL"/>
+                        <labelOption functionResponse="false" labelKey="ADH_507_SHOW_Y_AXIS_LABEL"/>
+                    </option>
+                </condition>
+            </condition>
+        </selectAction>
+        
+        <condition test="getIsDesignView">
+            <condition test="getHasGroup">
+                <separator className="separator"/>
+                <simpleAction labelKey="ADH_564_MENU_REMOVE_GROUP" action="removeGroup"/>
+            </condition>
+        </condition>
+
+        <condition test="hasMultipleMeasuresInMenu">
+            <selectAction className="flyout" labelKey="ADH_530_MEASURES" clientTest="!isIE6">
+                <generateFromTemplate function="getMeasureNames">
+                    <selectAction className="flyout" labelKey="${templateInjectionValue}">
+                        <option labelKey="ADH_560_MENU_EDIT_LEGEND_LABEL" action="adhocDesigner.selectAndEditLabel" actionArgs="${templateInjectionIndex}"/>
+                        <condition test="getUseSummaries">
+                            <selectAction className="flyout" clientTest="selectedMeasureShowsSummaryOptions"  clientTestArgs="${templateInjectionIndex}" labelKey="ADH_230_MENU_CHANGE_FUNCTION">
+                                <option labelKey="ADH_074_MENU_SUM" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Sum@@${templateInjectionIndex}" action="functionSelected" actionArgs="Sum@@${templateInjectionIndex}"/>
+                                <option labelKey="ADH_073_MENU_AVERAGE" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Average@@${templateInjectionIndex}" action="functionSelected" actionArgs="Average@@${templateInjectionIndex}"/>
+                                <option labelKey="ADH_071_MENU_MAXIMUM" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Highest@@${templateInjectionIndex}" action="functionSelected" actionArgs="Highest@@${templateInjectionIndex}"/>
+                                <option labelKey="ADH_072_MENU_MINIMUM"  clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Lowest@@${templateInjectionIndex}" action="functionSelected" actionArgs="Lowest@@${templateInjectionIndex}"/>
+                                <option labelKey="ADH_163_MENU_COUNT_DISTINCT" isSelectedTest="isFunctionSelected" isSelectedTestArgs="DistinctCount@@${templateInjectionIndex}" action="functionSelected" actionArgs="DistinctCount@@${templateInjectionIndex}"/>
+                                <option labelKey="ADH_075_MENU_COUNT_ALL" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Count@@${templateInjectionIndex}" action="functionSelected" actionArgs="Count@@${templateInjectionIndex}"/>
+                            </selectAction>
+                        </condition>
+                        <selectAction className="flyout" labelKey="ADH_040_MENU_CHANGE_DATA_FORMAT">
+                            <generatedOptions clientTest="isDataType" clientTestArgs="int@@${templateInjectionIndex}" function="getMaskMapForType" functionArgs="int" labelExpression="${optionValue}" action="maskSelected" actionArgs="${optionId}@@${templateInjectionIndex}" isSelectedTest="isMask" isSelectedTestArgs="${optionId}@@${templateInjectionIndex}" />
+                            <generatedOptions clientTest="isDataType" clientTestArgs="dec@@${templateInjectionIndex}" function="getMaskMapForType" functionArgs="dec" labelExpression="${optionValue}" action="maskSelected" actionArgs="${optionId}@@${templateInjectionIndex}" isSelectedTest="isMask" isSelectedTestArgs="${optionId}@@${templateInjectionIndex}" />
+                            <generatedOptions clientTest="isDataType" clientTestArgs="date@@${templateInjectionIndex}" function="getMaskMapForType" functionArgs="date" labelExpression="${optionValue}" action="maskSelected" actionArgs="${optionId}@@${templateInjectionIndex}" isSelectedTest="isMask" isSelectedTestArgs="${optionId}@@${templateInjectionIndex}" />
+                            <generatedOptions clientTest="isDataType" clientTestArgs="time@@${templateInjectionIndex}" function="getMaskMapForType" functionArgs="time" labelExpression="${optionValue}" action="maskSelected" actionArgs="${optionId}@@${templateInjectionIndex}" isSelectedTest="isMask" isSelectedTestArgs="${optionId}@@${templateInjectionIndex}" />
+                        </selectAction>
+                        <condition test="getIsDesignView">
+                            <option labelKey="ADH_580_REMOVE_MEASURE" action="removeMeasure" actionArgs="${templateInjectionIndex}"/>
+                        </condition>
+                    </selectAction>
+                </generateFromTemplate>
+            </selectAction>
+        </condition>
+        <condition test="hasExactlyOneMeasureInMenu">
+            <separator/>
+            <condition test="!getIsPieChart">
+                <simpleAction labelKey="ADH_560_MENU_EDIT_LEGEND_LABEL" action="adhocDesigner.selectAndEditLabel" actionArgs="0"/>
+            </condition>
+            <condition test="getUseSummaries">
+                <selectAction className="flyout" clientTest="selectedMeasureShowsSummaryOptions" labelKey="ADH_230_MENU_CHANGE_FUNCTION">
+                    <option labelKey="ADH_074_MENU_SUM" clientTest="isMeasureNumeric" clientTestArgs="0" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Sum@@0" action="functionSelected" actionArgs="Sum@@0"/>
+                    <option labelKey="ADH_073_MENU_AVERAGE" clientTest="isMeasureNumeric" clientTestArgs="0" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Average@@0" action="functionSelected" actionArgs="Average@@0"/>
+                    <option labelKey="ADH_071_MENU_MAXIMUM" clientTest="isMeasureNumeric" clientTestArgs="0" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Highest@@0" action="functionSelected" actionArgs="Highest@@0"/>
+                    <option labelKey="ADH_072_MENU_MINIMUM" clientTest="isMeasureNumeric" clientTestArgs="0" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Lowest@@$0" action="functionSelected" actionArgs="Lowest@@0"/>
+                    <option labelKey="ADH_163_MENU_COUNT_DISTINCT" isSelectedTest="isFunctionSelected" isSelectedTestArgs="DistinctCount@@0" action="functionSelected" actionArgs="DistinctCount@@0"/>
+                    <option labelKey="ADH_075_MENU_COUNT_ALL" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Count@@0" action="functionSelected" actionArgs="Count@@0"/>
+                </selectAction>
+            </condition>
+            <selectAction className="flyout" labelKey="ADH_040_MENU_CHANGE_DATA_FORMAT">
+                <generatedOptions clientTest="isDataType" clientTestArgs="int@@0" function="getMaskMapForType" functionArgs="int" labelExpression="${optionValue}" action="maskSelected" actionArgs="${optionId}@@0" isSelectedTest="isMask" isSelectedTestArgs="${optionId}@@0" />
+                <generatedOptions clientTest="isDataType" clientTestArgs="dec@@0" function="getMaskMapForType" functionArgs="dec" labelExpression="${optionValue}" action="maskSelected" actionArgs="${optionId}@@0" isSelectedTest="isMask" isSelectedTestArgs="${optionId}@@0" />
+                <generatedOptions clientTest="isDataType" clientTestArgs="date@@0" function="getMaskMapForType" functionArgs="date" labelExpression="${optionValue}" action="maskSelected" actionArgs="${optionId}@@0" isSelectedTest="isMask" isSelectedTestArgs="${optionId}@@0" />
+                <generatedOptions clientTest="isDataType" clientTestArgs="time@@0" function="getMaskMapForType" functionArgs="time" labelExpression="${optionValue}" action="maskSelected" actionArgs="${optionId}@@0" isSelectedTest="isMask" isSelectedTestArgs="${optionId}@@0" />
+            </selectAction>
+            <condition test="getIsDesignView">
+                <simpleAction labelKey="ADH_580_REMOVE_MEASURE" action="removeMeasure"/>
+            </condition>
+        </condition>
+    </context>
+
+    <!--chart legends-->
+    <context name="legendItemLevel">
+        <condition test="!getIsPieChart">
+            <simpleAction labelKey="ADH_560_MENU_EDIT_LEGEND_LABEL" action="adhocDesigner.editLegendLabel"/>
+        </condition>
+        <separator/>
+        <condition test="getUseSummaries">
+            <selectAction className="flyout" clientTest="selectedMeasureShowsSummaryOptions" labelKey="ADH_230_MENU_CHANGE_FUNCTION">
+                <option clientTest="isMeasureNumeric" labelKey="ADH_074_MENU_SUM" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Sum" action="functionSelected" actionArgs="Sum"/>
+                <option clientTest="isMeasureNumeric" labelKey="ADH_073_MENU_AVERAGE" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Average" action="functionSelected" actionArgs="Average"/>
+                <option clientTest="isMeasureNumeric" labelKey="ADH_071_MENU_MAXIMUM" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Highest" action="functionSelected" actionArgs="Highest"/>
+                <option clientTest="isMeasureNumeric" labelKey="ADH_072_MENU_MINIMUM" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Lowest" action="functionSelected" actionArgs="Lowest"/>
+                <option labelKey="ADH_163_MENU_COUNT_DISTINCT" isSelectedTest="isFunctionSelected" isSelectedTestArgs="DistinctCount" action="functionSelected" actionArgs="DistinctCount"/>
+                <option labelKey="ADH_075_MENU_COUNT_ALL" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Count" action="functionSelected" actionArgs="Count"/>
+            </selectAction>
+        </condition>
+        <selectAction className="flyout" labelKey="ADH_040_MENU_CHANGE_DATA_FORMAT">
+            <generatedOptions clientTest="isDataType" clientTestArgs="int" function="getMaskMapForType" functionArgs="int" labelExpression="${optionValue}" action="maskSelected" actionArgs="${optionId}" isSelectedTest="isMask" isSelectedTestArgs="${optionId}" />
+            <generatedOptions clientTest="isDataType" clientTestArgs="dec" function="getMaskMapForType" functionArgs="dec" labelExpression="${optionValue}" action="maskSelected" actionArgs="${optionId}" isSelectedTest="isMask" isSelectedTestArgs="${optionId}" />
+            <generatedOptions clientTest="isDataType" clientTestArgs="date" function="getMaskMapForType" functionArgs="date" labelExpression="${optionValue}" action="maskSelected" actionArgs="${optionId}" isSelectedTest="isMask" isSelectedTestArgs="${optionId}" />
+            <generatedOptions clientTest="isDataType" clientTestArgs="time" function="getMaskMapForType" functionArgs="time" labelExpression="${optionValue}" action="maskSelected" actionArgs="${optionId}" isSelectedTest="isMask" isSelectedTestArgs="${optionId}" />
+        </selectAction>
+        <condition test="getIsDesignView">
+            <simpleAction labelKey="ADH_580_REMOVE_MEASURE" action="removeMeasure"/>
+        </condition>
+    </context>
+
+    <!--Display Manager Column-->
+    <context name="displayManagerColumn">
+        <condition test="!getIsPieChart">
+            <simpleAction labelKey="ADH_560_MENU_EDIT_LEGEND_LABEL" action="adhocDesigner.editLegendLabel"/>
+        </condition>
+        	<simpleAction labelKey="ADH_1212_DYNAMIC_FILTER_CREATE" clientTest="adhocDesigner.canShowFilterOption" action="adhocDesigner.filtersController.addFilter" actionArgs="${selected}"/>
+        <separator />
+        <condition test="getUseSummaries">
+            <selectAction className="flyout" clientTest="selectedMeasureShowsSummaryOptions" labelKey="ADH_230_MENU_CHANGE_FUNCTION">
+                <option clientTest="isMeasureNumeric" labelKey="ADH_074_MENU_SUM" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Sum" action="functionSelected" actionArgs="Sum"/>
+                <option clientTest="isMeasureNumeric" labelKey="ADH_073_MENU_AVERAGE" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Average" action="functionSelected" actionArgs="Average"/>
+                <option clientTest="isMeasureNumeric" labelKey="ADH_071_MENU_MAXIMUM" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Highest" action="functionSelected" actionArgs="Highest"/>
+                <option clientTest="isMeasureNumeric" labelKey="ADH_072_MENU_MINIMUM" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Lowest" action="functionSelected" actionArgs="Lowest"/>
+                <option labelKey="ADH_163_MENU_COUNT_DISTINCT" isSelectedTest="isFunctionSelected" isSelectedTestArgs="DistinctCount" action="functionSelected" actionArgs="DistinctCount"/>
+                <option labelKey="ADH_075_MENU_COUNT_ALL" isSelectedTest="isFunctionSelected" isSelectedTestArgs="Count" action="functionSelected" actionArgs="Count"/>
+            </selectAction>
+        </condition>
+        <selectAction className="flyout" labelKey="ADH_040_MENU_CHANGE_DATA_FORMAT">
+            <generatedOptions clientTest="isDataType" clientTestArgs="int" function="getMaskMapForType" functionArgs="int" labelExpression="${optionValue}" action="maskSelected" actionArgs="${optionId}" isSelectedTest="isMask" isSelectedTestArgs="${optionId}" />
+            <generatedOptions clientTest="isDataType" clientTestArgs="dec" function="getMaskMapForType" functionArgs="dec" labelExpression="${optionValue}" action="maskSelected" actionArgs="${optionId}" isSelectedTest="isMask" isSelectedTestArgs="${optionId}" />
+            <generatedOptions clientTest="isDataType" clientTestArgs="date" function="getMaskMapForType" functionArgs="date" labelExpression="${optionValue}" action="maskSelected" actionArgs="${optionId}" isSelectedTest="isMask" isSelectedTestArgs="${optionId}" />
+        </selectAction>
+        <separator />
+        <condition test="getIsDesignView">
+            <simpleAction labelKey="ADH_580_REMOVE_MEASURE" action="removeMeasure"/>
+        </condition>
+        <separator />
+        <simpleAction clientTest="canMoveMeasureDown" labelKey="ADH_060_MENU_MOVE_LEFT" action="moveMeasureDown"/>
+        <simpleAction clientTest="canMoveMeasureUp" labelKey="ADH_061_MENU_MOVE_RIGHT" action="moveMeasureUp"/>
+    </context>
+
+    <!--Display Manager Row-->
+    <context name="displayManagerRow">
+        <condition test="getIsDesignView">
+            <simpleAction labelKey="ADH_564_MENU_REMOVE_GROUP" action="removeGroup"/>
+            <simpleAction labelKey="ADH_1212_DYNAMIC_FILTER_CREATE" clientTest="adhocDesigner.canShowFilterOption" action="adhocDesigner.filtersController.addFilter" actionArgs="${selected}"/>
+            <separator/>
+        </condition>
+    </context>
+
+   <!--available fields menu-->
+    <context name="fieldLevel">
+        <simpleAction labelKey="ADH_315_ADD_AS_MEASURE" clientTest="canAddAsMeasure"  action="addFieldAsMeasure"/>
+        <simpleAction labelKey="ADH_316_REPLACE_MEASURE" clientTest="canReplaceMeasure" action="addFieldAsMeasure"/>
+        <simpleAction labelKey="ADH_091_ADD_AS_GROUP" clientTest="canAddAsGroup" action="addFieldAsGroup"/>
+        <simpleAction labelKey="ADH_317_REPLACE_GROUP" clientTest="canReplaceGroup" action="addFieldAsGroup"/>
+        <simpleAction labelKey="ADH_1212_DYNAMIC_FILTER_CREATE" clientTest="adhocDesigner.canShowFilterOption" action="adhocDesigner.filtersController.addFilter" actionArgs="${selected}"/>
+        <condition test="getIsDesignView">
+        <separator />
+            <simpleAction labelKey="ADH_1213_USE_AS_MEASURE" clientTest="adhocDesigner.canMoveToMeasures" action="adhocDesigner.moveToMeasures"/>
+            <simpleAction labelKey="ADH_1213_USE_AS_FIELD" clientTest="adhocDesigner.canMoveToDimensions" action="adhocDesigner.moveToDimensions"/>
+            <separator clientTest="adhocDesigner.isSelectedFieldCustom" />
+            <simpleAction labelKey="ADH_400_MENU_EDIT_CALCULATED_FIELD" clientTest="adhocDesigner.isSelectedFieldCustom" action="adhocDesigner.editCalculatedField" className="requiresInput"/>
+            <simpleAction labelKey="ADH_400_MENU_DELETE_CALCULATED_FIELD" clientTest="adhocDesigner.isDeleteAllowed" action="adhocDesigner.deleteCalculatedField"/>
+        </condition>
+    </context>
+
+    <!--folder level-->
+    <context name="fieldSetLevel">
+        <simpleAction labelKey="ADH_318_ADD_SET_AS_MEASURE" action="addFieldAsMeasure" actionArgs="true"/>
+    </context>
+
+    <!--menu for filer pod-->
+    <context name="filterPodMenu">
+        <simpleAction labelKey="ADH_1218_DYNAMIC_FILTER_SHOW_OPERATION" clientTest="adHocFilterModule.isFilterThisPodOptionsHidden" action="adHocFilterModule.toggleFilterCondition"/>
+        <simpleAction labelKey="ADH_1218_DYNAMIC_FILTER_HIDE_OPERATION" clientTest="adHocFilterModule.isFilterThisPodOptionsVisible" action="adHocFilterModule.toggleFilterCondition"/>
+        <separator />
+        <simpleAction labelKey="ADH_1217_DYNAMIC_FILTER_REMOVE_FILTER" clientTest="adHocFilterModule.isRemoveFilterAllowed" action="adHocFilterModule.removeFilter"/>
+    </context>
+
+    <!--menu for filter panel-->
+    <context name="filterPanelMenu">
+        <simpleAction labelKey="ADH_1220_DYNAMIC_FILTER_MINIMIZE_ALL" clientTest="adHocFilterModule.isMinimizeAllFilterPodsAllowed" action="adHocFilterModule.minimizeAllPods"/>
+        <simpleAction labelKey="ADH_1221_DYNAMIC_FILTER_MAXIMIZE_ALL" clientTest="adHocFilterModule.isMaximizeAllFilterPodsAllowed" action="adHocFilterModule.maximizeAllPods"/>
+        <simpleAction labelKey="ADH_1225_DYNAMIC_FILTER_ADVANCED_SHOW" clientTest="adHocFilterModule.isShowComplexExpressionPodAllowed" action="adHocFilterModule.showHideComplexExpressionPod"/>
+        <simpleAction labelKey="ADH_1225_DYNAMIC_FILTER_ADVANCED_HIDE" clientTest="adHocFilterModule.isHideComplexExpressionPodAllowed" action="adHocFilterModule.showHideComplexExpressionPod"/>
+        <separator />
+        <simpleAction labelKey="ADH_1219_DYNAMIC_FILTER_REMOVE_ALL" clientTest="adHocFilterModule.isRemoveAllFilterAllowed" action="adHocFilterModule.deleteAllAdhocFilters"/>
+    </context>
+
+    <!--menu for topic (available fields panel header)-->
+    <context name="topicMenu">
+        <simpleAction labelKey="ADH_1222_DYNAMIC_FILTER_CHANGE_SOURCE" action="adhocDesigner.goToTopicView"/>
+        <simpleAction labelKey="ADH_1223_DYNAMIC_FILTER_SELECT_FIELDS" clientTest="adhocDesigner.isSelectFieldsAllowed" action="adhocDesigner.selectFields"/>
+    </context>
+
+    <!--menu for available fields-->
+    <context name="availableFieldsMenu">
+        <condition test="!getIsOlapMode">
+            <simpleAction labelKey="ADH_400_MENU_CREATE_CALCULATED_FIELD" action="adhocDesigner.createCalculatedField"/>
+        </condition>
+    </context>
+
+    <!--menu for available measures-->
+    <context name="availableMeasuresMenu">
+        <condition test="!getIsOlapMode">
+            <simpleAction labelKey="ADH_400_MENU_CREATE_CALCULATED_MEASURE" action="adhocDesigner.createCalculatedMeasure"/>
+        </condition>
+    </context>
+
+</actions>
+

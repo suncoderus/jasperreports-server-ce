@@ -1,0 +1,66 @@
+<div class="schedulerEditor page column decorated primary tabbed">
+	<div class="content hasFooter ">
+
+		<div class="header ">
+			<div class="title">{{- i18n["report.scheduling.new.schedule"] }}</div>
+			<div class="tabs">
+				<ul name="tabs" disableCoreEvents="true" class="control tabSet buttons horizontal">
+					<li data-tab="scheduleTab" class="tab">
+						<a class="button">
+							<span class="wrap">{{- i18n["report.scheduling.schedule"] }}</span>
+						</a>
+					</li>
+					<li data-tab="parametersTab" class="tab">
+						<a class="button">
+							<span class="wrap">{{- i18n["report.scheduling.job.edit.parameters.button"] }}</span>
+						</a>
+					</li>
+					<li data-tab="outputTab" class="tab">
+						<a class="button">
+							<span class="wrap">{{- i18n["report.scheduling.job.edit.output"] }}</span>
+						</a>
+					</li>
+					<li data-tab="notificationsTab" class="tab">
+						<a class="button">
+							<span class="wrap">{{- i18n["report.scheduling.job.edit.notifications"] }}</span>
+						</a>
+					</li>
+				</ul>
+
+				<div class="control tabSet anchor"></div>
+			</div>
+		</div>
+
+		<div class="body">
+			<fieldset class="schedule_for">
+				<legend class="title">{{- i18n["report.scheduling.job.edit.shedulefor"] }}:
+					<span class="path">{{- reportUri }}</span>
+				</legend>
+			</fieldset>
+
+			<div name="tabHolder">
+				<div class="tab" name="scheduleTab"></div>
+				<div class="tab" name="parametersTab"></div>
+				<div class="tab" name="outputTab"></div>
+				<div class="tab" name="notificationsTab"></div>
+			</div>
+		</div>
+
+		<div class="footer">
+			<fieldset>
+				{{ if (!runNowMode) { }}
+					<button name="openSaveDialog" class="button primary action up">
+						<span class="wrap">{{- i18n["button.save"] }}</span><span class="icon"></span>
+					</button>
+				{{ } else { }}
+					<button name="openSaveDialog" class="button primary action up">
+						<span class="wrap">{{- i18n["button.submit"] }}</span><span class="icon"></span>
+					</button>
+				{{ } }}
+				<button name="cancelJobCreation" class="button action up">
+					<span class="wrap">{{- i18n["button.cancel"] }}</span><span class="icon"></span>
+				</button>
+			</fieldset>
+		</div>
+	</div>
+</div>

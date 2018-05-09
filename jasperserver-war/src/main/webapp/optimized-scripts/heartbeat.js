@@ -1,0 +1,1 @@
+function checkHeartBeat(){var e=(new Date).getTime(),t=e-lastime;lastime=e,hb.html(t)}var hb;jQuery(function(){hb=jQuery("#hb")});var lastime=0;

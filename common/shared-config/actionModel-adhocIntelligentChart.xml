@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<actions>
+    <!--Toolbar menus-->
+    <context name="toolbar_save">
+        <condition test="getCanSave">
+            <!-- We display different Save menu when Ad Hoc Designer is run from Dashboard-->
+            <condition test="isEmbeddedDesigner">
+                <simpleAction labelKey="ADH_030_MENU_SAVE_REPORT" action="adhocDesigner.handleBack"/>
+                <simpleAction labelKey="ADH_010_BUTTON_CANCEL" action="adhocDesigner.handleCancel"/>
+            </condition>
+            <!-- Ordinary Ad Hoc Save Menu-->
+            <condition test="!isEmbeddedDesigner">
+                <condition test="getIsNotWritable">
+                    <simpleAction labelKey="ADH_030_MENU_SAVE_REPORT" disabled="disabled"/>
+                </condition>
+                <condition test="getIsWritable">
+                    <simpleAction labelKey="ADH_030_MENU_SAVE_REPORT" action="designerBase.handleSave"/>
+                </condition>
+
+                <simpleAction labelKey="ADH_037_MENU_SAVE_REPORT_AS" action="designerBase.handleSaveAs"/>
+
+                <condition test="getIsNotWritable">
+                    <simpleAction labelKey="ADH_037_MENU_SAVE_DATA_VIEW_AND_REPORT" disabled="disabled"/>
+                </condition>
+                <condition test="getIsWritable">
+                    <simpleAction labelKey="ADH_037_MENU_SAVE_DATA_VIEW_AND_REPORT" action="designerBase.handleSaveAndGenerate"/>
+                </condition>
+            </condition>
+        </condition>
+    </context>
+
+    <context name="toolbar_options">
+        <selectAction labelKey="hidden">
+            <option labelKey="ADH_1150_TOOLBAR_MENU_TOGGLE_TITLE_BAR" action="adhocDesigner.toggleTitleBar"/>
+        </selectAction>
+        <simpleAction labelKey="ADH_1213_SHOW_DISPLAY_MANAGER" clientTest="!adhocDesigner.isDisplayManagerVisible" action="adhocDesigner.toggleDisplayManager"/>
+        <simpleAction labelKey="ADH_1213_HIDE_DISPLAY_MANAGER" clientTest="adhocDesigner.isDisplayManagerVisible" action="adhocDesigner.toggleDisplayManager"/>
+
+        <condition test="getIsOlapMode">
+            <selectAction labelKey="hidden">
+                <option labelKey="ADH_1213_HIDE_EMPTY_ROWS" isSelectedTest="hideEmptyRowsEquals" isSelectedTestArgs="true" action="setHideEmptyRows"/>
+                <option labelKey="ADH_1213_UNHIDE_EMPTY_ROWS" isSelectedTest="hideEmptyRowsEquals" isSelectedTestArgs="false" action="setUnhideEmptyRows"/>
+            </selectAction>
+        </condition>
+
+        <condition test="allowToggleUseDomainLabels">
+
+            <simpleAction labelKey="adhoc.designer.menu.use.domain.labels" clientTest="!adhocDesigner.isUseDomainLabels"
+                          action="adhocDesigner.toggleUseDomainLabels"/>
+            <simpleAction labelKey="adhoc.designer.menu.use.previous.labels"
+                          clientTest="adhocDesigner.isUseDomainLabels" action="adhocDesigner.toggleUseDomainLabels"/>
+        </condition>
+
+    </context>
+
+    <context name="toolbar_export">
+        <condition test="getCanSave"><!-- condition is same as for save -->
+            <generatedOptions id="exportTo_${optionId}" function="getExportFormats" labelExpression="${optionValue}" action="adhocDesigner.exportReport"/>
+        </condition>
+    </context>
+
+    <!--Context menus-->
+    <!-- menu for slicing operations -->
+    <context name="memberGroupCell">
+        <condition test="getIsDesignView">
+            <simpleAction labelKey="ADH_1208_DYNAMIC_FILTER_KEEP" clientTest="canAddSliceFilter" action="adhocDesigner.filtersController.addSliceFilter" actionArgs="true@@${selected}"/>
+            <simpleAction labelKey="ADH_1209_DYNAMIC_FILTER_EXCLUDE" clientTest="canAddSliceFilter" action="adhocDesigner.filtersController.addSliceFilter" actionArgs="false@@${selected}"/>
+        </condition>
+    </context>
+
+    <!--Display Manager column clicked-->
+    <context name="displayManagerColumn">
+        <condition test="getIsDesignView">
+            <condition test="!getIsOlapMode">
+                <selectAction className="flyout" labelKey="ADH_230_MENU_CHANGE_FUNCTION" clientTest="AdHocCrosstab.selectedMeasureShowsSummaryOptions" selectionConstraint="singleSelect">
+                </selectAction>
+                <selectAction className="flyout" labelKey="ADH_TIME_CALC_SUMMARY_SELECTION" selectionConstraint="singleSelect" clientTest="AdHocCrosstab.selectedMeasureShowsSummaryOptions">
+                    <option labelKey="ADH_TIME_CALC_SUM" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="AdHocCrosstab.isSelectedTimeSummaryFunction" isSelectedTestArgs="TimeBalanceDefault@@${templateInjectionIndex}" action="AdhocIntelligentChart.selectTimeFunction" actionArgs="TimeBalanceDefault@@${templateInjectionIndex}"/>
+                    <option labelKey="ADH_TIME_CALC_FIRST" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="AdHocCrosstab.isSelectedTimeSummaryFunction" isSelectedTestArgs="TimeBalanceFirst@@${templateInjectionIndex}" action="AdhocIntelligentChart.selectTimeFunction" actionArgs="TimeBalanceFirst@@${templateInjectionIndex}"/>
+                    <option labelKey="ADH_TIME_CALC_LAST" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="AdHocCrosstab.isSelectedTimeSummaryFunction" isSelectedTestArgs="TimeBalanceLast@@${templateInjectionIndex}" action="AdhocIntelligentChart.selectTimeFunction" actionArgs="TimeBalanceLast@@${templateInjectionIndex}"/>
+                </selectAction>
+                <selectAction className="flyout" labelKey="ADH_225_CHANGE_GROUPING" clientTest="AdhocIntelligentChart.isDateType" >
+                    <generatedOptions function="getCatMapForType" functionArgs="date" labelExpression="${optionValue}" isSelectedTest="AdhocIntelligentChart.isCurrentDateType" action="AdhocIntelligentChart.setCatForColumnGroup" actionArgs="${optionId}"/>
+                </selectAction>
+                <selectAction className="flyout" labelKey="ADH_225_CHANGE_GROUPING" clientTest="AdhocIntelligentChart.isTimestampType" >
+                    <generatedOptions function="getCatMapForType" functionArgs="timestamp" labelExpression="${optionValue}" isSelectedTest="AdhocIntelligentChart.isCurrentDateType" action="AdhocIntelligentChart.setCatForColumnGroup" actionArgs="${optionId}"/>
+                </selectAction>
+                <selectAction className="flyout" labelKey="ADH_225_CHANGE_GROUPING" clientTest="AdhocIntelligentChart.isTimeType" >
+                    <generatedOptions function="getCatMapForType" functionArgs="time" labelExpression="${optionValue}" isSelectedTest="AdhocIntelligentChart.isCurrentDateType" action="AdhocIntelligentChart.setCatForColumnGroup" actionArgs="${optionId}"/>
+                </selectAction>
+            </condition>
+            <separator className="separator"/>
+            <simpleAction labelKey="ADH_038_MENU_REMOVE_FROM_CHART" action="removeLevelFromColumn"/>
+            <simpleAction labelKey="ADH_235a_MENU_SWITCH_TO_ROW_GROUP" clientTest="canSwitchToRow" action="switchToRowGroup"/>
+            <simpleAction labelKey="ADH_1212_DYNAMIC_FILTER_CREATE" clientTest="adhocDesigner.canShowFilterOption" action="adhocDesigner.filtersController.addFilter" actionArgs="${selected}"/>
+            <separator/>
+        </condition>
+        <simpleAction clientTest="canMoveUpOrLeft" labelKey="ADH_060_MENU_MOVE_LEFT" action="moveColumnGroupLeft"/>
+        <simpleAction clientTest="canMoveDownOrRight" labelKey="ADH_061_MENU_MOVE_RIGHT" action="moveColumnGroupRight"/>
+        <selectAction clientTest="canAddSiblingLevels" labelKey="ADH_1213_CROSSTAB_LEVEL_ADD_LEVELS" className="flyout" />
+    </context>
+
+    <!--Display Manager row clicked-->
+    <context name="displayManagerRow">
+        <condition test="getIsDesignView">
+            <condition test="!getIsOlapMode">
+                <selectAction className="flyout" labelKey="ADH_230_MENU_CHANGE_FUNCTION" clientTest="AdHocCrosstab.selectedMeasureShowsSummaryOptions" selectionConstraint="singleSelect">
+                </selectAction>
+                <selectAction className="flyout" labelKey="ADH_TIME_CALC_SUMMARY_SELECTION" selectionConstraint="singleSelect" clientTest="AdHocCrosstab.selectedMeasureShowsSummaryOptions">
+                    <option labelKey="ADH_TIME_CALC_SUM" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="AdHocCrosstab.isSelectedTimeSummaryFunction" isSelectedTestArgs="TimeBalanceDefault@@${templateInjectionIndex}" action="AdhocIntelligentChart.selectTimeFunction" actionArgs="TimeBalanceDefault@@${templateInjectionIndex}"/>
+                    <option labelKey="ADH_TIME_CALC_FIRST" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="AdHocCrosstab.isSelectedTimeSummaryFunction" isSelectedTestArgs="TimeBalanceFirst@@${templateInjectionIndex}" action="AdhocIntelligentChart.selectTimeFunction" actionArgs="TimeBalanceFirst@@${templateInjectionIndex}"/>
+                    <option labelKey="ADH_TIME_CALC_LAST" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="AdHocCrosstab.isSelectedTimeSummaryFunction" isSelectedTestArgs="TimeBalanceLast@@${templateInjectionIndex}" action="AdhocIntelligentChart.selectTimeFunction" actionArgs="TimeBalanceLast@@${templateInjectionIndex}"/>
+                </selectAction>
+                <selectAction className="flyout" labelKey="ADH_225_CHANGE_GROUPING" clientTest="AdhocIntelligentChart.isDateType" >
+                    <generatedOptions function="getCatMapForType" functionArgs="date" labelExpression="${optionValue}" isSelectedTest="AdhocIntelligentChart.isCurrentDateType" action="AdhocIntelligentChart.setCatForRowGroup" actionArgs="${optionId}"/>
+                </selectAction>
+                <selectAction className="flyout" labelKey="ADH_225_CHANGE_GROUPING" clientTest="AdhocIntelligentChart.isTimestampType" >
+                    <generatedOptions function="getCatMapForType" functionArgs="timestamp" labelExpression="${optionValue}" isSelectedTest="AdhocIntelligentChart.isCurrentDateType" action="AdhocIntelligentChart.setCatForRowGroup" actionArgs="${optionId}"/>
+                </selectAction>
+                <selectAction className="flyout" labelKey="ADH_225_CHANGE_GROUPING" clientTest="AdhocIntelligentChart.isTimeType" >
+                    <generatedOptions function="getCatMapForType" functionArgs="time" labelExpression="${optionValue}" isSelectedTest="AdhocIntelligentChart.isCurrentDateType" action="AdhocIntelligentChart.setCatForRowGroup" actionArgs="${optionId}"/>
+                </selectAction>
+            </condition>
+            <separator className="separator"/>
+            <simpleAction labelKey="ADH_038_MENU_REMOVE_FROM_CHART" action="removeLevelFromRow"/>
+            <simpleAction labelKey="ADH_235_MENU_SWITCH_TO_COLUMN_GROUP" action="switchToColumnGroup"/>
+            <simpleAction labelKey="ADH_1212_DYNAMIC_FILTER_CREATE" clientTest="adhocDesigner.canShowFilterOption" action="adhocDesigner.filtersController.addFilter" actionArgs="${selected}"/>
+            <separator/>
+        </condition>
+        <simpleAction clientTest="canMoveUpOrLeft" labelKey="ADH_060_MENU_MOVE_LEFT" action="moveRowGroupLeft"/>
+        <simpleAction clientTest="canMoveDownOrRight" labelKey="ADH_061_MENU_MOVE_RIGHT" action="moveRowGroupRight"/>
+        <selectAction clientTest="canAddSiblingLevels" labelKey="ADH_1213_CROSSTAB_LEVEL_ADD_LEVELS" className="flyout" />
+    </context>
+
+    <!-- dimension tree -->
+    <context name="dimensionsTree_dimension">
+        <simpleAction selectionConstraint="singleSelect" labelKey="ADH_1213_AVAILABLE_FIELDS_ADD_TO_COLUMNS" clientTest="canAddDimensionAsColumnGroup" action="appendDimensionToColumnAxisWithLevel"/>
+        <simpleAction selectionConstraint="singleSelect" labelKey="ADH_1213_AVAILABLE_FIELDS_ADD_TO_ROWS" clientTest="canAddDimensionAsRowGroup"  action="appendDimensionToRowAxisWithLevel"/>
+    </context>
+
+    <context name="dimensionsTree_level">
+        <simpleAction selectionConstraint="singleSelect" labelKey="ADH_1213_AVAILABLE_FIELDS_ADD_TO_COLUMNS" clientTest="canAddLevelAsColumnGroup" action="appendDimensionToColumnAxisWithLevel"/>
+        <simpleAction selectionConstraint="singleSelect" labelKey="ADH_1213_AVAILABLE_FIELDS_ADD_TO_ROWS" clientTest="canAddLevelAsRowGroup" action="appendDimensionToRowAxisWithLevel"/>
+        <simpleAction labelKey="ADH_1212_DYNAMIC_FILTER_CREATE" clientTest="adhocDesigner.canShowFilterOption" action="adhocDesigner.filtersController.addFilter" actionArgs="${selected}"/>
+        <condition test="!getIsOlapMode">
+            <condition test="getIsDesignView">
+                <separator />
+                <simpleAction labelKey="ADH_1213_USE_AS_MEASURE" clientTest="adhocDesigner.canMoveToMeasures" action="adhocDesigner.moveToMeasures"/>
+                <separator clientTest="adhocDesigner.isSelectedFieldCustom" />
+                <simpleAction labelKey="ADH_400_MENU_EDIT_CALCULATED_FIELD" clientTest="adhocDesigner.isSelectedFieldCustom" action="adhocDesigner.editCalculatedField" className="requiresInput"/>
+                <simpleAction labelKey="ADH_400_MENU_DELETE_CALCULATED_FIELD" clientTest="adhocDesigner.isDeleteAllowed" action="adhocDesigner.deleteCalculatedField"/>
+            </condition>
+        </condition>
+    </context>
+
+    <!-- Measure Tree -->
+    <context name="measuresTree_group">
+        <condition test="!getIsOlapMode">
+            <simpleAction selectionConstraint="singleSelect" labelKey="ADH_1213_AVAILABLE_FIELDS_ADD_TO_COLUMNS" clientTest="canAddDimensionAsColumnGroup" action="appendDimensionToColumnAxisWithLevel"/>
+            <simpleAction selectionConstraint="singleSelect" labelKey="ADH_1213_AVAILABLE_FIELDS_ADD_TO_ROWS" clientTest="canAddDimensionAsRowGroup"  action="appendDimensionToRowAxisWithLevel"/>
+        </condition>
+    </context>
+
+    <context name="measuresTree">
+        <simpleAction labelKey="ADH_1213_AVAILABLE_FIELDS_ADD_TO_COLUMNS" clientTest="canAddLevelAsColumnGroup" action="appendMeasureToColumn"/>
+        <simpleAction labelKey="ADH_1213_AVAILABLE_FIELDS_ADD_TO_ROWS" clientTest="canAddLevelAsRowGroup" action="appendMeasureToRow"/>
+        <simpleAction labelKey="ADH_1212_DYNAMIC_FILTER_CREATE" clientTest="adhocDesigner.canShowFilterOption" action="adhocDesigner.filtersController.addFilter" actionArgs="${selected}"/>
+        <condition test="!getIsOlapMode">
+            <condition test="getIsDesignView">
+                <separator />
+                <simpleAction labelKey="ADH_1213_USE_AS_FIELD" clientTest="adhocDesigner.canMoveToDimensions" action="adhocDesigner.moveToDimensions"/>
+                <separator clientTest="adhocDesigner.isSelectedFieldCustom" />
+                <simpleAction labelKey="ADH_400_MENU_EDIT_CALCULATED_FIELD" clientTest="adhocDesigner.isSelectedFieldCustom" action="adhocDesigner.editCalculatedField" className="requiresInput"/>
+                <simpleAction labelKey="ADH_400_MENU_DELETE_CALCULATED_FIELD" clientTest="adhocDesigner.isDeleteAllowed" action="adhocDesigner.deleteCalculatedField"/>
+            </condition>
+        </condition>
+    </context>
+
+    <!--menu for filer pod-->
+    <context name="filterPodMenu">
+        <simpleAction labelKey="ADH_1218_DYNAMIC_FILTER_SHOW_OPERATION" clientTest="adHocFilterModule.isFilterThisPodOptionsHidden" action="adHocFilterModule.toggleFilterCondition"/>
+        <simpleAction labelKey="ADH_1218_DYNAMIC_FILTER_HIDE_OPERATION" clientTest="adHocFilterModule.isFilterThisPodOptionsVisible" action="adHocFilterModule.toggleFilterCondition"/>
+        <separator />
+        <simpleAction labelKey="ADH_1217_DYNAMIC_FILTER_REMOVE_FILTER" clientTest="adHocFilterModule.isRemoveFilterAllowed" action="adHocFilterModule.removeFilter"/>
+    </context>
+
+    <!--menu for filter panel-->
+    <context name="filterPanelMenu">
+        <simpleAction labelKey="ADH_1220_DYNAMIC_FILTER_MINIMIZE_ALL" clientTest="adHocFilterModule.isMinimizeAllFilterPodsAllowed" action="adHocFilterModule.minimizeAllPods"/>
+        <simpleAction labelKey="ADH_1221_DYNAMIC_FILTER_MAXIMIZE_ALL" clientTest="adHocFilterModule.isMaximizeAllFilterPodsAllowed" action="adHocFilterModule.maximizeAllPods"/>
+        <condition test="!getIsOlapMode">
+            <simpleAction labelKey="ADH_1225_DYNAMIC_FILTER_ADVANCED_SHOW" clientTest="adHocFilterModule.isShowComplexExpressionPodAllowed" action="adHocFilterModule.showHideComplexExpressionPod"/>
+            <simpleAction labelKey="ADH_1225_DYNAMIC_FILTER_ADVANCED_HIDE" clientTest="adHocFilterModule.isHideComplexExpressionPodAllowed" action="adHocFilterModule.showHideComplexExpressionPod"/>
+        </condition>
+        <separator />
+        <simpleAction labelKey="ADH_1219_DYNAMIC_FILTER_REMOVE_ALL" clientTest="adHocFilterModule.isRemoveAllFilterAllowed" action="adHocFilterModule.deleteAllAdhocFilters"/>
+    </context>
+
+    <!--menu for topic (available fields panel header)-->
+    <context name="topicMenu">
+        <simpleAction labelKey="ADH_1222_DYNAMIC_FILTER_CHANGE_SOURCE" action="adhocDesigner.goToTopicView"/>
+        <condition test="!getIsOlapMode">
+            <simpleAction labelKey="ADH_1223_DYNAMIC_FILTER_SELECT_FIELDS" clientTest="adhocDesigner.isSelectFieldsAllowed" action="adhocDesigner.selectFields"/>
+        </condition>
+    </context>
+
+    <!--menu for available fields-->
+    <context name="availableFieldsMenu">
+        <condition test="!getIsOlapMode">
+            <simpleAction labelKey="ADH_400_MENU_CREATE_CALCULATED_FIELD" action="adhocDesigner.createCalculatedField"/>
+        </condition>
+    </context>
+
+    <!--menu for available measures-->
+    <context name="availableMeasuresMenu">
+        <condition test="!getIsOlapMode">
+            <simpleAction labelKey="ADH_400_MENU_CREATE_CALCULATED_MEASURE" action="adhocDesigner.createCalculatedMeasure"/>
+        </condition>
+    </context>
+
+</actions>
+

@@ -1,0 +1,1412 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+
+
+<project name="defaultTargets">
+
+    <!-- property settings -->
+
+    <!-- properties to specify current upgrade source and target version values -->
+    <!-- these are used to help specify the sql update script to be executed    -->
+    <property name="defaultUpgradeFromVersion" value="6.4" />
+    <property name="defaultUpgradeToVersion" value="7.1" />
+
+    <!-- failonerror="false"  -->
+    <target name="drop-js-db" 
+            description="drop jasperserver repository db">
+        <echo message="Dropping database. js.dbName = ${js.dbName}"/>
+        <runSQL jdbcUrl="${admin.jdbcUrl}" print="true" onerror="continue">
+            ${js.drop}
+        </runSQL>
+    </target>
+
+    <target name="create-js-db"
+            description="create jasperserver repository db">
+        <echo message="Creating database, js.dbName = ${js.dbName}, ${js.create}"/>
+        <runSQL jdbcUrl="${admin.jdbcUrl}" print="true" onerror="abort">
+            ${js.create}
+        </runSQL>
+    </target>
+
+    <target name="drop-foodmart-db"
+            description="drop foodmart db">
+        <runSQL jdbcUrl="${admin.jdbcUrl}" print="true" onerror="abort">
+            ${foodmart.drop}
+        </runSQL>
+    </target>
+
+    <target name="create-foodmart-db"
+            description="create foodmart db">
+        <runSQL jdbcUrl="${admin.jdbcUrl}" print="true" onerror="abort">
+            ${foodmart.create}
+        </runSQL>
+    </target>
+
+    <target name="drop-sugarcrm-db"
+            description="drop sugarcrm db">
+        <runSQL jdbcUrl="${admin.jdbcUrl}" print="true" onerror="abort">
+            ${sugarcrm.drop}
+        </runSQL>
+    </target>
+
+    <target name="create-sugarcrm-db"
+            description="create sugarcrm db">
+        <runSQL jdbcUrl="${admin.jdbcUrl}" print="true" onerror="abort">
+            ${sugarcrm.create}
+        </runSQL>
+    </target>
+
+    <target name="init-js-db-pro"
+            description="run ddl on pro jasperserver db">
+        <if>
+            <isset property="stopIfError" />
+            <then>
+                <var name="runSqlOnError" value="abort" />
+            </then>
+            <else>
+                <var name="runSqlOnError" value="${runSqlDefaultOnError}" />
+            </else>
+        </if>
+
+        <runSQL jdbcUrl="${js.jdbcUrl}" print="true" onerror="${runSqlOnError}">
+            <fileset dir="${currentSqlDir}">
+                <include name="js-pro-create.ddl"/>
+                <include name="quartz.ddl"/>
+            </fileset>
+        </runSQL>
+    </target>
+
+
+    <target name="init-js-db-ce"
+            description="run ddl on ce jasperserver db">
+        <if>
+            <isset property="stopIfError" />
+            <then>
+                <var name="runSqlOnError" value="abort" />
+            </then>
+            <else>
+                <var name="runSqlOnError" value="${runSqlDefaultOnError}" />
+            </else>
+        </if>
+
+        <runSQL jdbcUrl="${js.jdbcUrl}" print="true" onerror="${runSqlOnError}">
+            <fileset dir="${currentSqlDir}">
+                <include name="js-create.ddl"/>
+                <include name="quartz.ddl"/>
+            </fileset>
+        </runSQL>
+    </target>
+
+    <target name="init-quartz"
+            description="run ddl for js db">
+        <runSQL jdbcUrl="${js.jdbcUrl}" print="true">
+            <fileset dir="${currentSqlDir}">
+                <include name="quartz.ddl"/>
+            </fileset>
+        </runSQL>
+    </target>
+
+
+    <!-- bug 28757: SQL Server upgrade needs fix to exactly match correct 4.7.0 --> 
+    <!-- todo: should be able to remove this now                                -->
+    <target name="upgrade-fix-sqlserver"
+            description="run script for 4.7.1 sqlserver fix">
+        <echo> </echo>
+        <echo> currentSqlDir = ${currentSqlDir} </echo>
+        <echo> dbType = ${dbType} </echo>
+        <echo> sqlFile = upgrade-sqlserver-4.7.0-4.7.1-pro.sql </echo>
+        <runSQL jdbcUrl="${js.jdbcUrl}" print="true">
+          <fileset dir="${currentSqlDir}">
+              <include name="upgrade-sqlserver-4.7.0-4.7.1-pro.sql"/>
+          </fileset>
+        </runSQL>
+    </target>
+
+    <target name="upgrade-5.2-5.5-pro"
+            description="upgrade from 5.2 to 5.5">
+
+        <echo> </echo>
+        <echo> currentSqlDir = ${currentSqlDir} </echo>
+        <echo> dbType = ${dbType} </echo>
+        <echo> </echo>
+
+        <if>
+            <not>
+		<or>
+                  <available file="${currentSqlDir}/upgrade-${dbType}-5.2.0-5.5.0-pro.sql"/>
+                  <available file="${currentSqlDir}/upgrade-${dbType}-5.2.0-5.5.0-pro.plsql"/>
+                </or>
+            </not>
+            <then>
+                <echo> </echo>
+                <echo>======================================================================</echo>
+                <echo> Error: The upgrade script: upgrade-${dbType}-5.2.0-5.5.0-pro.sql     </echo>
+                <echo> Errpr: or the script upgrade-${dbType}-5.2.0-5.5.0-pro.plsql         </echo>
+                <echo> Error: are not currently available.                                  </echo>
+                <echo> Error: Check release notes for availability on your database type    </echo>
+                <echo>======================================================================</echo>
+                <echo> </echo>
+                <fail>Error: The upgrade script: upgrade-${dbType}-5.2.0-5.5.0-pro.sql 
+                      or upgrade-${dbType}-5.2.0-5.5.0-pro.plsql was not found</fail>
+            </then>
+        </if>
+
+        <if>
+          <available file="${currentSqlDir}/upgrade-${dbType}-5.2.0-5.5.0-pro.plsql"/>
+          <then>
+             <echo>run script: ${currentSqlDir}/upgrade-${dbType}-5.2.0-5.5.0-pro.plsql </echo>
+             <runPLSQL jdbcUrl="${js.jdbcUrl}" print="true">
+                <fileset dir="${currentSqlDir}">
+                    <include name="upgrade-${dbType}-5.2.0-5.5.0-pro.plsql"/>
+                </fileset>
+             </runPLSQL>
+          </then>
+        </if>
+
+        <if>
+          <available file="${currentSqlDir}/upgrade-${dbType}-5.2.0-5.5.0-pro.sql"/>
+          <then>
+            <echo>run script: ${currentSqlDir}/upgrade-${dbType}-5.2.0-5.5.0-pro.sql </echo>
+            <runSQL jdbcUrl="${js.jdbcUrl}" print="true">
+              <fileset dir="${currentSqlDir}">
+                  <include name="upgrade-${dbType}-5.2.0-5.5.0-pro.sql"/>
+              </fileset>
+            </runSQL>
+          </then>
+        </if>
+    </target>
+
+    <target name="upgrade-5.5-5.6-pro"
+            description="upgrade from 5.5 to 5.6">
+
+        <echo> </echo>
+        <echo> currentSqlDir = ${currentSqlDir} </echo>
+        <echo> dbType = ${dbType} </echo>
+        <echo> </echo>
+
+        <if>
+            <not>
+		<or>
+                  <available file="${currentSqlDir}/upgrade-${dbType}-5.5.0-5.6.0-pro.sql"/>
+                  <available file="${currentSqlDir}/upgrade-${dbType}-5.5.0-5.6.0-pro.plsql"/>
+                </or>
+            </not>
+            <then>
+                <echo> </echo>
+                <echo>======================================================================</echo>
+                <echo> Error: The upgrade script: upgrade-${dbType}-5.5.0-5.6.0-pro.sql     </echo>
+                <echo> Errpr: or the script upgrade-${dbType}-5.5.0-5.6.0-pro.plsql         </echo>
+                <echo> Error: are not currently available.                                  </echo>
+                <echo> Error: Check release notes for availability on your database type    </echo>
+                <echo>======================================================================</echo>
+                <echo> </echo>
+                <fail>Error: The upgrade script: upgrade-${dbType}-5.5.0-5.6.0-pro.sql 
+                      or upgrade-${dbType}-5.5.0-5.6.0-pro.plsql was not found</fail>
+            </then>
+        </if>
+
+        <if>
+          <available file="${currentSqlDir}/upgrade-${dbType}-5.5.0-5.6.0-pro.plsql"/>
+          <then>
+             <echo>run script: ${currentSqlDir}/upgrade-${dbType}-5.5.0-5.6.0-pro.plsql </echo>
+             <runPLSQL jdbcUrl="${js.jdbcUrl}" print="true">
+                <fileset dir="${currentSqlDir}">
+                    <include name="upgrade-${dbType}-5.5.0-5.6.0-pro.plsql"/>
+                </fileset>
+             </runPLSQL>
+          </then>
+        </if>
+
+        <if>
+          <available file="${currentSqlDir}/upgrade-${dbType}-5.5.0-5.6.0-pro.sql"/>
+          <then>
+            <echo>run script: ${currentSqlDir}/upgrade-${dbType}-5.5.0-5.6.0-pro.sql </echo>
+            <runSQL jdbcUrl="${js.jdbcUrl}" print="true">
+              <fileset dir="${currentSqlDir}">
+                  <include name="upgrade-${dbType}-5.5.0-5.6.0-pro.sql"/>
+              </fileset>
+            </runSQL>
+          </then>
+        </if>
+    </target>
+
+    <target name="upgrade-5.6-6.0-pro"
+            description="upgrade from 5.6 to 6.0">
+
+        <echo> </echo>
+        <echo> currentSqlDir = ${currentSqlDir} </echo>
+        <echo> dbType = ${dbType} </echo>
+        <echo> </echo>
+
+        <if>
+            <not>
+                <or>
+                    <available file="${currentSqlDir}/upgrade-${dbType}-5.6.0-6.0.0-pro.sql"/>
+                    <available file="${currentSqlDir}/upgrade-${dbType}-5.6.0-6.0.0-pro.plsql"/>
+                </or>
+            </not>
+            <then>
+                <echo> </echo>
+                <echo>======================================================================</echo>
+                <echo> Error: The upgrade script: upgrade-${dbType}-5.6.0-6.0.0-pro.sql     </echo>
+                <echo> Errpr: or the script upgrade-${dbType}-5.6.0-6.0.0-pro.plsql         </echo>
+                <echo> Error: are not currently available.                                  </echo>
+                <echo> Error: Check release notes for availability on your database type    </echo>
+                <echo>======================================================================</echo>
+                <echo> </echo>
+                <fail>Error: The upgrade script: upgrade-${dbType}-5.6.0-6.0.0-pro.sql
+                    or upgrade-${dbType}-5.6.0-6.0.0-pro.plsql was not found</fail>
+            </then>
+        </if>
+
+        <if>
+            <available file="${currentSqlDir}/upgrade-${dbType}-5.6.0-6.0.0-pro.plsql"/>
+            <then>
+                <echo>run script: ${currentSqlDir}/upgrade-${dbType}-5.6.0-6.0.0-pro.plsql </echo>
+                <runPLSQL jdbcUrl="${js.jdbcUrl}" print="true">
+                    <fileset dir="${currentSqlDir}">
+                        <include name="upgrade-${dbType}-5.6.0-6.0.0-pro.plsql"/>
+                    </fileset>
+                </runPLSQL>
+            </then>
+        </if>
+
+        <if>
+            <available file="${currentSqlDir}/upgrade-${dbType}-5.6.0-6.0.0-pro.sql"/>
+            <then>
+                <echo>run script: ${currentSqlDir}/upgrade-${dbType}-5.6.0-6.0.0-pro.sql </echo>
+                <runSQL jdbcUrl="${js.jdbcUrl}" print="true">
+                    <fileset dir="${currentSqlDir}">
+                        <include name="upgrade-${dbType}-5.6.0-6.0.0-pro.sql"/>
+                    </fileset>
+                </runSQL>
+            </then>
+        </if>
+    </target>
+
+    <target name="upgrade-6.0-6.1-pro"
+            description="upgrade from 6.0 to 6.1">
+
+        <echo> </echo>
+        <echo> currentSqlDir = ${currentSqlDir} </echo>
+        <echo> dbType = ${dbType} </echo>
+        <echo> </echo>
+
+        <if>
+            <not>
+                <or>
+                    <available file="${currentSqlDir}/upgrade-${dbType}-6.0.0-6.1.0-pro.sql"/>
+                    <available file="${currentSqlDir}/upgrade-${dbType}-6.0.0-6.1.0-pro.plsql"/>
+                </or>
+            </not>
+            <then>
+                <echo> </echo>
+                <echo>======================================================================</echo>
+                <echo> Error: The upgrade script: upgrade-${dbType}-6.0.0-6.1.0-pro.sql     </echo>
+                <echo> Error: or the script upgrade-${dbType}-6.0.0-6.1.0-pro.plsql         </echo>
+                <echo> Error: are not currently available.                                  </echo>
+                <echo> Error: Check release notes for availability on your database type    </echo>
+                <echo>======================================================================</echo>
+                <echo> </echo>
+                <fail>Error: The upgrade script: upgrade-${dbType}-6.0.0-6.1.0-pro.sql
+                    or upgrade-${dbType}-6.0.0-6.1.0-pro.plsql was not found</fail>
+            </then>
+        </if>
+
+        <if>
+            <available file="${currentSqlDir}/upgrade-${dbType}-6.0.0-6.1.0-pro.plsql"/>
+            <then>
+                <echo>run script: ${currentSqlDir}/upgrade-${dbType}-6.0.0-6.1.0-pro.plsql </echo>
+                <runPLSQL jdbcUrl="${js.jdbcUrl}" print="true">
+                    <fileset dir="${currentSqlDir}">
+                        <include name="upgrade-${dbType}-6.0.0-6.1.0-pro.plsql"/>
+                    </fileset>
+                </runPLSQL>
+            </then>
+        </if>
+
+        <if>
+            <available file="${currentSqlDir}/upgrade-${dbType}-6.0.0-6.1.0-pro.sql"/>
+            <then>
+                <echo>run script: ${currentSqlDir}/upgrade-${dbType}-6.0.0-6.1.0-pro.sql </echo>
+                <runSQL jdbcUrl="${js.jdbcUrl}" print="true">
+                    <fileset dir="${currentSqlDir}">
+                        <include name="upgrade-${dbType}-6.0.0-6.1.0-pro.sql"/>
+                    </fileset>
+                </runSQL>
+            </then>
+        </if>
+    </target>
+
+    <target name="upgrade-6.1-6.2-pro"
+            description="upgrade from 6.1 to 6.2">
+
+        <echo> </echo>
+        <echo> currentSqlDir = ${currentSqlDir} </echo>
+        <echo> dbType = ${dbType} </echo>
+        <echo> </echo>
+
+        <if>
+            <not>
+                <or>
+                    <available file="${currentSqlDir}/upgrade-${dbType}-6.1.0-6.2.0-pro.sql"/>
+                    <available file="${currentSqlDir}/upgrade-${dbType}-6.1.0-6.2.0-pro.plsql"/>
+                </or>
+            </not>
+            <then>
+                <echo> </echo>
+                <echo>======================================================================</echo>
+                <echo> Error: The upgrade script: upgrade-${dbType}-6.1.0-6.2.0-pro.sql     </echo>
+                <echo> Error: or the script upgrade-${dbType}-6.1.0-6.2.0-pro.plsql         </echo>
+                <echo> Error: are not currently available.                                  </echo>
+                <echo> Error: Check release notes for availability on your database type    </echo>
+                <echo>======================================================================</echo>
+                <echo> </echo>
+                <fail>Error: The upgrade script: upgrade-${dbType}-6.1.0-6.2.0-pro.sql
+                    or upgrade-${dbType}-6.1.0-6.2.0-pro.plsql was not found</fail>
+            </then>
+        </if>
+
+        <if>
+            <available file="${currentSqlDir}/upgrade-${dbType}-6.1.0-6.2.0-pro.plsql"/>
+            <then>
+                <echo>run script: ${currentSqlDir}/upgrade-${dbType}-6.1.0-6.2.0-pro.plsql </echo>
+                <runPLSQL jdbcUrl="${js.jdbcUrl}" print="true">
+                    <fileset dir="${currentSqlDir}">
+                        <include name="upgrade-${dbType}-6.1.0-6.2.0-pro.plsql"/>
+                    </fileset>
+                </runPLSQL>
+            </then>
+        </if>
+
+        <if>
+            <available file="${currentSqlDir}/upgrade-${dbType}-6.1.0-6.2.0-pro.sql"/>
+            <then>
+                <echo>run script: ${currentSqlDir}/upgrade-${dbType}-6.1.0-6.2.0-pro.sql </echo>
+                <runSQL jdbcUrl="${js.jdbcUrl}" print="true">
+                    <fileset dir="${currentSqlDir}">
+                        <include name="upgrade-${dbType}-6.1.0-6.2.0-pro.sql"/>
+                    </fileset>
+                </runSQL>
+            </then>
+        </if>
+    </target>
+
+    <target name="upgrade-6.2-6.3-pro"
+            description="upgrade from 6.2 to 6.3">
+
+        <echo> </echo>
+        <echo> currentSqlDir = ${currentSqlDir} </echo>
+        <echo> dbType = ${dbType} </echo>
+        <echo> </echo>
+
+        <if>
+            <not>
+                <or>
+                    <available file="${currentSqlDir}/upgrade-${dbType}-6.2.0-6.3.0-pro.sql"/>
+                    <available file="${currentSqlDir}/upgrade-${dbType}-6.2.0-6.3.0-pro.plsql"/>
+                </or>
+            </not>
+            <then>
+                <echo> </echo>
+                <echo>======================================================================</echo>
+                <echo> Error: The upgrade script: upgrade-${dbType}-6.2.0-6.3.0-pro.sql     </echo>
+                <echo> Error: or the script upgrade-${dbType}-6.2.0-6.3.0-pro.plsql         </echo>
+                <echo> Error: are not currently available.                                  </echo>
+                <echo> Error: Check release notes for availability on your database type    </echo>
+                <echo>======================================================================</echo>
+                <echo> </echo>
+                <fail>Error: The upgrade script: upgrade-${dbType}-6.2.0-6.3.0-pro.sql
+                    or upgrade-${dbType}-6.2.0-6.3.0-pro.plsql was not found</fail>
+            </then>
+        </if>
+
+        <if>
+            <available file="${currentSqlDir}/upgrade-${dbType}-6.2.0-6.3.0-pro.plsql"/>
+            <then>
+                <echo>run script: ${currentSqlDir}/upgrade-${dbType}-6.2.0-6.3.0-pro.plsql </echo>
+                <runPLSQL jdbcUrl="${js.jdbcUrl}" print="true">
+                    <fileset dir="${currentSqlDir}">
+                        <include name="upgrade-${dbType}-6.2.0-6.3.0-pro.plsql"/>
+                    </fileset>
+                </runPLSQL>
+            </then>
+        </if>
+
+        <if>
+            <available file="${currentSqlDir}/upgrade-${dbType}-6.2.0-6.3.0-pro.sql"/>
+            <then>
+                <echo>run script: ${currentSqlDir}/upgrade-${dbType}-6.2.0-6.3.0-pro.sql </echo>
+                <runSQL jdbcUrl="${js.jdbcUrl}" print="true">
+                    <fileset dir="${currentSqlDir}">
+                        <include name="upgrade-${dbType}-6.2.0-6.3.0-pro.sql"/>
+                    </fileset>
+                </runSQL>
+            </then>
+        </if>
+    </target>
+
+   <target name="upgrade-6.4-7.1-pro"
+            description="upgrade from 6.4 to 7.1">
+
+        <echo> </echo>
+        <echo> currentSqlDir = ${currentSqlDir} </echo>
+        <echo> dbType = ${dbType} </echo>
+        <echo> </echo>
+
+        <if>
+            <not>
+                <or>
+                    <available file="${currentSqlDir}/upgrade-${dbType}-6.4.0-7.1.0-pro.sql"/>
+                    <available file="${currentSqlDir}/upgrade-${dbType}-6.4.0-7.1.0-pro.plsql"/>
+                </or>
+            </not>
+            <then>
+                <echo> </echo>
+                <echo>======================================================================</echo>
+                <echo> Error: The upgrade script: upgrade-${dbType}-6.4.0-7.1.0-pro.sql     </echo>
+                <echo> Error: or the script upgrade-${dbType}-6.4.0-7.1.0-pro.plsql         </echo>
+                <echo> Error: are not currently available.                                  </echo>
+                <echo> Error: Check release notes for availability on your database type    </echo>
+                <echo>======================================================================</echo>
+                <echo> </echo>
+                <fail>Error: The upgrade script: upgrade-${dbType}-6.4.0-7.1.0-pro.sql
+                    or upgrade-${dbType}-6.4.0-7.1.0-pro.plsql was not found</fail>
+            </then>
+        </if>
+
+        <if>
+            <available file="${currentSqlDir}/upgrade-${dbType}-6.4.0-7.1.0-pro.plsql"/>
+            <then>
+                <echo>run script: ${currentSqlDir}/upgrade-${dbType}-6.4.0-7.1.0-pro.plsql </echo>
+                <runPLSQL jdbcUrl="${js.jdbcUrl}" print="true">
+                    <fileset dir="${currentSqlDir}">
+                        <include name="upgrade-${dbType}-6.4.0-7.1.0-pro.plsql"/>
+                    </fileset>
+                </runPLSQL>
+            </then>
+        </if>
+
+        <if>
+            <available file="${currentSqlDir}/upgrade-${dbType}-6.4.0-7.1.0-pro.sql"/>
+            <then>
+                <echo>run script: ${currentSqlDir}/upgrade-${dbType}-6.4.0-7.1.0-pro.sql </echo>
+                <runSQL jdbcUrl="${js.jdbcUrl}" print="true">
+                    <fileset dir="${currentSqlDir}">
+                        <include name="upgrade-${dbType}-6.4.0-7.1.0-pro.sql"/>
+                    </fileset>
+                </runSQL>
+            </then>
+        </if>
+   </target>
+
+   <target name="upgrade-6.3-6.4-pro"
+            description="upgrade from 6.3 to 6.4">
+
+        <echo> </echo>
+        <echo> currentSqlDir = ${currentSqlDir} </echo>
+        <echo> dbType = ${dbType} </echo>
+        <echo> </echo>
+
+        <if>
+            <not>
+                <or>
+                    <available file="${currentSqlDir}/upgrade-${dbType}-6.3.0-6.4.0-pro.sql"/>
+                    <available file="${currentSqlDir}/upgrade-${dbType}-6.3.0-6.4.0-pro.plsql"/>
+                </or>
+            </not>
+            <then>
+                <echo> </echo>
+                <echo>======================================================================</echo>
+                <echo> Error: The upgrade script: upgrade-${dbType}-6.3.0-6.4.0-pro.sql     </echo>
+                <echo> Error: or the script upgrade-${dbType}-6.3.0-6.4.0-pro.plsql         </echo>
+                <echo> Error: are not currently available.                                  </echo>
+                <echo> Error: Check release notes for availability on your database type    </echo>
+                <echo>======================================================================</echo>
+                <echo> </echo>
+                <fail>Error: The upgrade script: upgrade-${dbType}-6.3.0-6.4.0-pro.sql
+                    or upgrade-${dbType}-6.3.0-6.4.0-pro.plsql was not found</fail>
+            </then>
+        </if>
+
+        <if>
+            <available file="${currentSqlDir}/upgrade-${dbType}-6.3.0-6.4.0-pro.plsql"/>
+            <then>
+                <echo>run script: ${currentSqlDir}/upgrade-${dbType}-6.3.0-6.4.0-pro.plsql </echo>
+                <runPLSQL jdbcUrl="${js.jdbcUrl}" print="true">
+                    <fileset dir="${currentSqlDir}">
+                        <include name="upgrade-${dbType}-6.3.0-6.4.0-pro.plsql"/>
+                    </fileset>
+                </runPLSQL>
+            </then>
+        </if>
+
+        <if>
+            <available file="${currentSqlDir}/upgrade-${dbType}-6.3.0-6.4.0-pro.sql"/>
+            <then>
+                <echo>run script: ${currentSqlDir}/upgrade-${dbType}-6.3.0-6.4.0-pro.sql </echo>
+                <runSQL jdbcUrl="${js.jdbcUrl}" print="true">
+                    <fileset dir="${currentSqlDir}">
+                        <include name="upgrade-${dbType}-6.3.0-6.4.0-pro.sql"/>
+                    </fileset>
+                </runSQL>
+            </then>
+        </if>
+    </target>
+
+    <target name="upgrade-5.2-5.5-ce"
+            description="upgrade from 5.2 to 5.5">
+
+        <echo> </echo>
+        <echo> currentSqlDir = ${currentSqlDir} </echo>
+        <echo> dbType = ${dbType} </echo>
+        <echo> </echo>
+
+        <if>
+            <not>
+                <available file="${currentSqlDir}/upgrade-${dbType}-5.2.0-5.5.0-ce.sql"/>
+            </not>
+            <then>
+                <echo> </echo>
+                <echo>======================================================================</echo>
+                <echo> Error: The upgrade script: upgrade-${dbType}-5.2.0-5.5.0-ce.sql      </echo>
+                <echo> Error: is not currently available.                                   </echo>
+                <echo> Error: Check release notes for availability on your database type    </echo>
+                <echo>======================================================================</echo>
+                <echo> </echo>
+                <fail>Error: The upgrade script: upgrade-${dbType}-5.2.0-5.5.0-ce.sql was not found</fail>
+            </then>
+        </if>
+
+        <echo>run script: ${currentSqlDir}/upgrade-${dbType}-5.2.0-5.5.0-ce.sql </echo>
+        <runSQL jdbcUrl="${js.jdbcUrl}" print="true">
+            <fileset dir="${currentSqlDir}">
+                <include name="upgrade-${dbType}-5.2.0-5.5.0-ce.sql"/>
+            </fileset>
+        </runSQL>
+    </target>
+
+    <target name="upgrade-5.5-5.6-ce"
+            description="upgrade from 5.5 to 5.6">
+
+        <echo> </echo>
+        <echo> currentSqlDir = ${currentSqlDir} </echo>
+        <echo> dbType = ${dbType} </echo>
+        <echo> </echo>
+
+        <if>
+            <not>
+                <available file="${currentSqlDir}/upgrade-${dbType}-5.5.0-5.6.0-ce.sql"/>
+            </not>
+            <then>
+                <echo> </echo>
+                <echo>======================================================================</echo>
+                <echo> Error: The upgrade script: upgrade-${dbType}-5.5.0-5.6.0-ce.sql      </echo>
+                <echo> Error: is not currently available.                                   </echo>
+                <echo> Error: Check release notes for availability on your database type    </echo>
+                <echo>======================================================================</echo>
+                <echo> </echo>
+                <fail>Error: The upgrade script: upgrade-${dbType}-5.5.0-5.6.0-ce.sql was not found</fail>
+            </then>
+        </if>
+
+        <echo>run script: ${currentSqlDir}/upgrade-${dbType}-5.5.0-5.6.0-ce.sql </echo>
+        <runSQL jdbcUrl="${js.jdbcUrl}" print="true">
+            <fileset dir="${currentSqlDir}">
+                <include name="upgrade-${dbType}-5.5.0-5.6.0-ce.sql"/>
+            </fileset>
+        </runSQL>
+    </target>
+
+    <target name="upgrade-5.6-6.0-ce"
+            description="upgrade from 5.6 to 6.0">
+
+        <echo> </echo>
+        <echo> currentSqlDir = ${currentSqlDir} </echo>
+        <echo> dbType = ${dbType} </echo>
+        <echo> </echo>
+
+        <if>
+            <not>
+                <available file="${currentSqlDir}/upgrade-${dbType}-5.6.0-6.0.0-ce.sql"/>
+            </not>
+            <then>
+                <echo> </echo>
+                <echo>======================================================================</echo>
+                <echo> Error: The upgrade script: upgrade-${dbType}-5.6.0-6.0.0-ce.sql      </echo>
+                <echo> Error: is not currently available.                                   </echo>
+                <echo> Error: Check release notes for availability on your database type    </echo>
+                <echo>======================================================================</echo>
+                <echo> </echo>
+                <fail>Error: The upgrade script: upgrade-${dbType}-5.6.0-6.0.0-ce.sql was not found</fail>
+            </then>
+        </if>
+
+        <echo>run script: ${currentSqlDir}/upgrade-${dbType}-5.6.0-6.0.0-ce.sql </echo>
+        <runSQL jdbcUrl="${js.jdbcUrl}" print="true">
+            <fileset dir="${currentSqlDir}">
+                <include name="upgrade-${dbType}-5.6.0-6.0.0-ce.sql"/>
+            </fileset>
+        </runSQL>
+    </target>
+
+    <target name="upgrade-6.0-6.1-ce"
+            description="upgrade from 6.0 to 6.1">
+
+        <echo> </echo>
+        <echo> currentSqlDir = ${currentSqlDir} </echo>
+        <echo> dbType = ${dbType} </echo>
+        <echo> </echo>
+
+        <if>
+            <not>
+                <available file="${currentSqlDir}/upgrade-${dbType}-6.0.0-6.1.0-ce.sql"/>
+            </not>
+            <then>
+                <echo> </echo>
+                <echo>======================================================================</echo>
+                <echo> Error: The upgrade script: upgrade-${dbType}-6.0.0-6.1.0-ce.sql      </echo>
+                <echo> Error: is not currently available.                                   </echo>
+                <echo> Error: Check release notes for availability on your database type    </echo>
+                <echo>======================================================================</echo>
+                <echo> </echo>
+                <fail>Error: The upgrade script: upgrade-${dbType}-6.0.0-6.1.0-ce.sql was not found</fail>
+            </then>
+        </if>
+
+        <echo>run script: ${currentSqlDir}/upgrade-${dbType}-6.0.0-6.1.0-ce.sql </echo>
+        <runSQL jdbcUrl="${js.jdbcUrl}" print="true">
+            <fileset dir="${currentSqlDir}">
+                <include name="upgrade-${dbType}-6.0.0-6.1.0-ce.sql"/>
+            </fileset>
+        </runSQL>
+    </target>
+
+    <target name="upgrade-6.1-6.2-ce"
+            description="upgrade from 6.1 to 6.2">
+
+        <echo> </echo>
+        <echo> currentSqlDir = ${currentSqlDir} </echo>
+        <echo> dbType = ${dbType} </echo>
+        <echo> </echo>
+
+        <if>
+            <not>
+                <available file="${currentSqlDir}/upgrade-${dbType}-6.1.0-6.2.0-ce.sql"/>
+            </not>
+            <then>
+                <echo> </echo>
+                <echo>======================================================================</echo>
+                <echo> Error: The upgrade script: upgrade-${dbType}-6.1.0-6.2.0-ce.sql      </echo>
+                <echo> Error: is not currently available.                                   </echo>
+                <echo> Error: Check release notes for availability on your database type    </echo>
+                <echo>======================================================================</echo>
+                <echo> </echo>
+                <fail>Error: The upgrade script: upgrade-${dbType}-6.1.0-6.2.0-ce.sql was not found</fail>
+            </then>
+        </if>
+
+        <echo>run script: ${currentSqlDir}/upgrade-${dbType}-6.1.0-6.2.0-ce.sql </echo>
+        <runSQL jdbcUrl="${js.jdbcUrl}" print="true">
+            <fileset dir="${currentSqlDir}">
+                <include name="upgrade-${dbType}-6.1.0-6.2.0-ce.sql"/>
+            </fileset>
+        </runSQL>
+    </target>
+
+    <target name="upgrade-6.2-6.3-ce"
+            description="upgrade from 6.2 to 6.3">
+
+        <echo> </echo>
+        <echo> currentSqlDir = ${currentSqlDir} </echo>
+        <echo> dbType = ${dbType} </echo>
+        <echo> </echo>
+
+        <if>
+            <not>
+                <available file="${currentSqlDir}/upgrade-${dbType}-6.2.0-6.3.0-ce.sql"/>
+            </not>
+            <then>
+                <echo> </echo>
+                <echo>======================================================================</echo>
+                <echo> Error: The upgrade script: upgrade-${dbType}-6.2.0-6.3.0-ce.sql      </echo>
+                <echo> Error: is not currently available.                                   </echo>
+                <echo> Error: Check release notes for availability on your database type    </echo>
+                <echo>======================================================================</echo>
+                <echo> </echo>
+                <fail>Error: The upgrade script: upgrade-${dbType}-6.2.0-6.3.0-ce.sql was not found</fail>
+            </then>
+        </if>
+
+        <echo>run script: ${currentSqlDir}/upgrade-${dbType}-6.2.0-6.3.0-ce.sql </echo>
+        <runSQL jdbcUrl="${js.jdbcUrl}" print="true">
+            <fileset dir="${currentSqlDir}">
+                <include name="upgrade-${dbType}-6.2.0-6.3.0-ce.sql"/>
+            </fileset>
+        </runSQL>
+    </target>
+
+    <target name="upgrade-6.3-6.4-ce"
+            description="upgrade from 6.3 to 6.4">
+
+        <echo> </echo>
+        <echo> currentSqlDir = ${currentSqlDir} </echo>
+        <echo> dbType = ${dbType} </echo>
+        <echo> </echo>
+
+        <if>
+            <not>
+                <available file="${currentSqlDir}/upgrade-${dbType}-6.3.0-6.4.0-ce.sql"/>
+            </not>
+            <then>
+                <echo> </echo>
+                <echo>======================================================================</echo>
+                <echo> Error: The upgrade script: upgrade-${dbType}-6.3.0-6.4.0-ce.sql      </echo>
+                <echo> Error: is not currently available.                                   </echo>
+                <echo> Error: Check release notes for availability on your database type    </echo>
+                <echo>======================================================================</echo>
+                <echo> </echo>
+                <fail>Error: The upgrade script: upgrade-${dbType}-6.3.0-6.4.0-ce.sql was not found</fail>
+            </then>
+        </if>
+
+        <echo>run script: ${currentSqlDir}/upgrade-${dbType}-6.3.0-6.4.0-ce.sql </echo>
+        <runSQL jdbcUrl="${js.jdbcUrl}" print="true">
+            <fileset dir="${currentSqlDir}">
+                <include name="upgrade-${dbType}-6.3.0-6.4.0-ce.sql"/>
+            </fileset>
+        </runSQL>
+    </target>
+
+    <target name="upgrade-6.4-7.1-ce"
+            description="upgrade from 6.4 to 7.1">
+
+        <echo> </echo>
+        <echo> currentSqlDir = ${currentSqlDir} </echo>
+        <echo> dbType = ${dbType} </echo>
+        <echo> </echo>
+
+        <if>
+            <not>
+                <available file="${currentSqlDir}/upgrade-${dbType}-6.4.0-7.1.0-ce.sql"/>
+            </not>
+            <then>
+                <echo> </echo>
+                <echo>======================================================================</echo>
+                <echo> Error: The upgrade script: upgrade-${dbType}-6.4.0-7.1.0-ce.sql      </echo>
+                <echo> Error: is not currently available.                                   </echo>
+                <echo> Error: Check release notes for availability on your database type    </echo>
+                <echo>======================================================================</echo>
+                <echo> </echo>
+                <fail>Error: The upgrade script: upgrade-${dbType}-6.4.0-7.1.0-ce.sql was not found</fail>
+            </then>
+        </if>
+
+        <echo>run script: ${currentSqlDir}/upgrade-${dbType}-6.4.0-7.1.0-ce.sql </echo>
+        <runSQL jdbcUrl="${js.jdbcUrl}" print="true">
+            <fileset dir="${currentSqlDir}">
+                <include name="upgrade-${dbType}-6.4.0-7.1.0-ce.sql"/>
+            </fileset>
+        </runSQL>
+    </target>
+
+    <target name="upgrade-for-overlay-pro"
+            description="internal upgrade task used by overlay install">
+
+        <property name="fromVersion" value=""/>
+        <property name="toVersion" value=""/>
+
+        <echo> </echo>
+        <echo> currentSqlDir = ${currentSqlDir} </echo>
+        <echo> dbType = ${dbType} </echo>
+        <echo> </echo>
+
+        <if>
+            <not>
+                <or>
+                    <available file="${currentSqlDir}/upgrade-${dbType}-${fromVersion}-${toVersion}-pro.sql"/>
+                    <available file="${currentSqlDir}/upgrade-${dbType}-${fromVersion}-${toVersion}-pro.plsql"/>
+                </or>
+            </not>
+            <then>
+                <echo> </echo>
+                <echo>=================================================================================</echo>
+                <echo> Error: The upgrade script: upgrade-${dbType}-${fromVersion}-${toVersion}-pro.sql</echo>
+                <echo> Error: or the script upgrade-${dbType}-${fromVersion}-${toVersion}-pro.plsql    </echo>
+                <echo> Error: are not currently available.                                             </echo>
+                <echo> Error: Check release notes for availability on your database type               </echo>
+                <echo>=================================================================================</echo>
+                <echo> </echo>
+                <fail>Error: The upgrade script: upgrade-${dbType}-${fromVersion}-${toVersion}-pro.sql or upgrade-${dbType}-${fromVersion}-${toVersion}-pro.plsql was not found</fail>
+            </then>
+        </if>
+
+        <if>
+            <available file="${currentSqlDir}/upgrade-${dbType}-${fromVersion}-${toVersion}-pro.plsql"/>
+            <then>
+                <echo>run script: ${currentSqlDir}/upgrade-${dbType}-${fromVersion}-${toVersion}-pro.plsql </echo>
+                <runPLSQL jdbcUrl="${js.jdbcUrl}" print="true">
+                    <fileset dir="${currentSqlDir}">
+                        <include name="upgrade-${dbType}-${fromVersion}-${toVersion}-pro.plsql"/>
+                    </fileset>
+                </runPLSQL>
+            </then>
+        </if>
+
+        <if>
+            <available file="${currentSqlDir}/upgrade-${dbType}-${fromVersion}-${toVersion}-pro.sql"/>
+            <then>
+                <echo>run script: ${currentSqlDir}/upgrade-${dbType}-${fromVersion}-${toVersion}-pro.sql </echo>
+                <runSQL jdbcUrl="${js.jdbcUrl}" print="true">
+                    <fileset dir="${currentSqlDir}">
+                        <include name="upgrade-${dbType}-${fromVersion}-${toVersion}-pro.sql"/>
+                    </fileset>
+                </runSQL>
+            </then>
+        </if>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- load-foodbart-db                                                    -->
+    <!--   Runs the java program MondrianFoodMartLoader.java. Source found   -->
+    <!--   under the buildomatic/src folder. The classes for this program    -->
+    <!--   are packaged into a jar: buildomatic/target/buildomatic.jar       -->
+    <!--   Database neutral data is provided as input using the the file     -->
+    <!--   buildomatic/install_resources/sql/FoodMartCreateData.zip          -->
+    <!-- =================================================================== -->
+
+    <target name="load-foodmart-db"
+            description="load the foodmart database using the Mondrian loader">
+        <echo message=" "/>
+        <echo message="Jars loaded from property foodJarsDir: ${foodJarsDir}"/>
+        <echo message="foodMartData: ${foodMartData}"/>
+        <echo message="jdbcJar: ${jdbcJar}" />
+        <echo message="Using jdbc Jar: ${currentDbJDBCDir}/${jdbcJar}" />
+        <echo message=" "/>
+
+        <java classname="com.jaspersoft.buildomatic.loader.MondrianFoodMartLoader" failonerror="true" fork="true" inputstring="">
+            <arg value="-tables"/>
+            <arg value="-data"/>
+            <arg value="-indexes"/>
+            <arg value="-jdbcDrivers=${jdbcDriverClass}"/>
+            <arg value="-inputFile=${foodMartData}"/>
+            <arg value="-outputJdbcURL=${foodmart.jdbcUrl}"/>
+            <arg value="-outputJdbcUser=${foodmart.dbUsername}"/>
+            <arg value="-outputJdbcPassword=${foodmart.dbPassword}"/>
+            <arg value="-outputInitFile=${currentDbDir}/supermart-update.sql"/>
+
+            <classpath>
+                <fileset dir="${basedir}/target" includes="*.jar"/>
+                <fileset dir="${currentDbJDBCDir}" includes="${jdbcJar}"/>
+                <fileset dir="${foodJarsDir}" includes="*.jar"/>
+            </classpath>
+         </java>
+
+     </target>
+ 
+    <!-- This target is normally not necessary because the load-foodmart-db target also  -->
+    <!-- runs the supermart-update.sql script after populating the foodmart database     -->
+    <target name="update-foodmart-db"
+            description="update foodmart for supermart additions">
+        <runSQL jdbcUrl="${foodmart.jdbcUrl}" print="true">
+            <fileset dir="${currentSqlDir}">
+                <include name="supermart-update.sql"/>
+            </fileset>
+        </runSQL>
+    </target>
+
+    <target name="load-sugarcrm-db"
+            description="load sugarcrm database">
+
+        <runSQL jdbcUrl="${sugarcrm.jdbcUrl}">
+            <zipentry zipfile="${currentSqlDir}/sugarcrm.zip" name="sugarcrm.sql"/>
+        </runSQL>
+    </target>
+
+    <target name="build-js-ddl-ce"
+            depends="init-source-paths"
+            description="generate hibernate ddl for os">
+        <property name="build-db" value="${js-path}/jasperserver-repository-hibernate/build-db"/>
+        <runmaven dir="${build-db}">
+            <arg value="clean"/>
+            <arg value="install"/>
+        </runmaven>
+
+        <!-- copy to resources, with backward compatibility for ji*.ddl -->
+        <if>
+            <available file="${build-db}/target/sql/ji-drop.ddl"/>
+            <then>
+                <copy file="${build-db}/target/sql/ji-drop.ddl" toFile="${currentSqlDir}/js-drop.ddl"/>
+                <copy file="${build-db}/target/sql/ji-create.ddl" toFile="${currentSqlDir}/js-create.ddl"/>
+            </then>
+        <else>
+            <copy file="${build-db}/target/sql/js-drop.ddl" toFile="${currentSqlDir}/js-drop.ddl"/>
+            <copy file="${build-db}/target/sql/js-create.ddl" toFile="${currentSqlDir}/js-create.ddl"/>
+        </else>
+        </if>
+    </target>
+
+    <target name="build-js-ddl-pro"
+            depends="init-source-paths"
+            description="generate hibernate ddl">
+        <property name="build-db" value="${js-pro-path}/repository-hibernate/build-db"/>
+        <runmaven dir="${build-db}">
+            <arg value="clean"/>
+            <arg value="install"/>
+        </runmaven>
+
+        <!-- copy to resources, with backward compatibility for ji*.ddl -->
+        <if>
+            <available file="${build-db}/target/sql/ji-create.ddl"/>
+            <then>
+                <copy file="${build-db}/target/sql/ji-drop.ddl" toFile="${currentSqlDir}/js-pro-drop.ddl"/>
+                <copy file="${build-db}/target/sql/ji-create.ddl" toFile="${currentSqlDir}/js-pro-create.ddl"/>
+            </then>
+        <else>
+            <copy file="${build-db}/target/sql/js-pro-drop.ddl" toFile="${currentSqlDir}/js-pro-drop.ddl"/>
+            <copy file="${build-db}/target/sql/js-pro-create.ddl" toFile="${currentSqlDir}/js-pro-create.ddl"/>
+        </else>
+        </if>
+    </target>
+
+    <target name="upgrade-minimal-ce"
+            description="Performs minimal upgrade of JasperServer CE (no sample data)"
+            depends="set-minimal-mode, gen-config, pre-upgrade-test-ce, upgrade-js-ce-db-minimal, deploy-webapp-ce-if-needed">
+        <echo>Upgrade successfully completed!</echo>
+    </target>
+
+    <target name="upgrade-minimal-pro"
+            description="Performs minimal upgrade of JasperServer Pro (no sample data)"
+            depends="set-minimal-mode, gen-config, pre-upgrade-test-pro, upgrade-js-pro-db-minimal, deploy-webapp-pro-if-needed">
+        <echo>Upgrade successfully completed!</echo>
+    </target>
+
+    <target name="upgrade-normal-ce"
+            description="Performs normal upgrade of JasperServer CE (with sample data)"
+            depends="gen-config, pre-upgrade-test-ce, upgrade-js-ce-db-normal, deploy-webapp-ce-if-needed">
+        <echo>Upgrade successfully completed!</echo>
+    </target>
+
+    <target name="upgrade-normal-pro"
+            description="Performs normal upgrade of JasperServer Pro (with sample data)"
+            depends="gen-config, pre-upgrade-test-pro, upgrade-js-pro-db-normal, deploy-webapp-pro-if-needed">
+        <echo>Upgrade successfully completed!</echo>
+    </target>
+
+    <property name="strategy" value="inDatabase" />
+
+    <target name="upgrade-js-ce-db-minimal"
+            description="Upgrade JasperServer CE database">
+        <upgradeJSDB strategy="${strategy}" />
+    </target>
+
+    <target name="upgrade-js-pro-db-minimal"
+            description="Upgrade JasperServer Pro database">
+        <upgradeJSDB edition="pro" strategy="${strategy}" />
+    </target>
+
+    <target name="upgrade-js-ce-db-normal"
+            description="Upgrade JasperServer CE database">
+        <upgradeJSDB strategy="${strategy}" loadSampleData="true" />
+    </target>
+
+    <target name="upgrade-js-pro-db-normal"
+            description="Upgrade JasperServer Pro database">
+        <upgradeJSDB edition="pro" strategy="${strategy}" loadSampleData="true" />
+    </target>
+
+
+    <macrodef name="upgradeJSDB">
+        <attribute name="strategy" default="inDatabase" />
+        <attribute name="edition" default="ce" />
+        <attribute name="from" default="${defaultUpgradeFromVersion}" />
+        <attribute name="to" default="${defaultUpgradeToVersion}" />
+        <attribute name="loadSampleData" default="false" />
+
+        <sequential>
+            <if>
+                <equals arg1="@{strategy}" arg2="standard" />
+                <then>
+                    <recreateDB systemName="js" prompt="false" />
+                    <antcall target="init-js-db-@{edition}">
+                        <param name="stopIfError" value="true" />
+                    </antcall>
+                    <if>
+                        <equals arg1="@{edition}" arg2="ce" />
+                        <then>
+                            <runtarget target="import-minimal-ce" />
+                            <runtarget target="import-upgrade-ce" />
+                        </then>
+                        <elseif>
+                            <equals arg1="@{edition}" arg2="pro" />
+                            <then>
+                                <runtarget target="import-minimal-pro" />
+                                <runtarget target="import-upgrade" />
+                            </then>
+                        </elseif>
+                    </if>
+                </then>
+                <elseif>
+                    <equals arg1="@{strategy}" arg2="inDatabase" />
+                    <then>
+                        <runtarget target="upgrade-@{from}-@{to}-@{edition}" />
+                        <runtarget target="import-minimal-for-upgrade-@{edition}" />
+                    </then>
+                </elseif>
+            </if>
+            <if>
+                <istrue value="@{loadSampleData}" />
+                <then>
+                    <runtarget target="import-sample-data-upgrade-@{edition}" />
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <target name="db-dump-create"
+            depends="init-source-paths"
+            description="creates a database backup for use by QA">
+
+        <if>
+            <not>
+                <isset property="appServerType" />
+            </not>
+            <then>
+                <fail>Error: The appServerType property needs to be set to a value</fail>
+            </then>
+        </if>
+        <if>
+            <not>
+                <available file="${fixedAppServerDir}" />
+            </not>
+            <then>
+                <fail>Error: App server root directory ${fixedAppServerDir} not found!</fail>
+            </then>
+        </if>
+        <if>
+            <equals arg1="${appServerType}" arg2="tomcat" />
+            <then>
+                <property name="targetDir" value="${fixedAppServerDir}/webapps/js-qa-deploy" />
+            </then>
+
+            <elseif>
+                <equals arg1="${appServerType}" arg2="glassfish" />
+            <then>
+                <property name="targetDir" value="${fixedAppServerDir}/glassfish/domains/${glassfishDomain}/autodeploy/js-qa-deploy" />
+            </then>
+            </elseif>
+            <else>
+                <fail>Error: Unable to determine type of app server from ${appServerType}!</fail>
+            </else>
+        </if>
+
+        <if>
+            <not>
+                <available file="${targetDir}" type="dir" />
+            </not>
+            <then>
+                <mkdir dir="${targetDir}" />
+                <mkdir dir="${targetDir}/${confName}" />
+            </then>
+            <else>
+                <delete includeEmptyDirs="true" failOnError="false">
+                    <fileset dir="${targetDir}" />
+                </delete>
+                <mkdir dir="${targetDir}" />
+                <mkdir dir="${targetDir}/${confName}" />
+            </else>
+        </if>
+
+        <runmaven dir="${js-pro-path}/db-dump">
+            <arg value="clean" />
+            <arg value="assembly:assembly" />
+            <arg value="install" />
+            <arg value="-D" />
+            <arg value="metadata.jdbc.database=${js.dbName}" />
+            <arg value="-D" />
+            <arg value="js-qa-deploy=${targetDir}/${confName}" />
+        </runmaven>
+    </target>
+
+    <!-- ==================================================================== -->
+    <!--                                                                      -->
+    <!-- Database recreation                                                  -->
+    <!--                                                                      -->
+    <!-- ==================================================================== -->
+
+    <property name="admin.db.displayName" value="administrative" />
+    <property name="js.db.displayName" value="JasperServer" />
+    <property name="foodmart.db.displayName" value="FoodMart" />
+    <property name="sugarcrm.db.displayName" value="SugarCRM" />
+
+    <target name="recreate-js-db" description="Recreates JasperServer database">
+      <recreateDB systemName="js" />
+    </target>
+
+    <target name="recreate-foodmart-db" description="Recreates FoodMart database">
+      <recreateDB systemName="foodmart" />
+    </target>
+
+    <target name="recreate-sugarcrm-db" description="Recreates SugarCRM database">
+      <recreateDB systemName="sugarcrm" />
+    </target>
+
+    <macrodef name="recreateDB">
+        <attribute name="systemName" />
+        <attribute name="prompt" default="true" />
+
+        <sequential>
+            <var name="displayNameOfDBToRecreate" value="${@{systemName}.db.displayName}" />
+            <var name="nameOfDBForDBMSToRecreate" value="${@{systemName}.dbName}" />
+
+            <validateDB systemName="@{systemName}" phase="before" />
+            <if>
+                <istrue value="${dbExists}" />
+                <then>
+                    <if>
+                        <istrue value="@{prompt}" />
+                        <then>
+                            <input message="Database [${nameOfDBForDBMSToRecreate}] already exists. Drop it and create new? WARNING: All existing data will be lost! This operation may not be rolled back. Enter 'y' to recreate or 'n' to skip this step. Default is 'n'"
+                                 validargs="y,n" defaultvalue="n" addproperty="recreate@{systemName}DB" />
+                        </then>
+                    </if>
+                    <if>
+                        <or>
+                            <equals arg1="${recreate@{systemName}DB}" arg2="y" />
+                            <equals arg1="@{prompt}" arg2="false" />
+                        </or>
+                        <then>
+                            <drop-db systemName="@{systemName}" />
+                            <create-db-set-flag systemName="@{systemName}" />
+                        </then>
+                        <else>
+                            <echo>Database recreation skipped. Leaving database intact</echo>
+                        </else>
+                    </if>
+                </then>
+                <elseif>
+                    <isfalse value="${dbExists}" />
+                    <then>
+                        <create-db-set-flag systemName="@{systemName}" />
+                    </then>
+                </elseif>
+            </if>
+            <if>
+                <istrue value="${@{systemName}DBCreated}" />
+                <then>
+                    <validateDB systemName="@{systemName}" phase="after" failOnDBNotExists="true"
+                        failOnUnrecoverableConnectionError="true" />
+                    <if>
+                        <isfalse value="${dbExists}" />
+                        <then>
+                            <fail>Post-creation check for ${displayNameOfDBToRecreate} database failed: [${nameOfDBForDBMSToRecreate}] database doesn't exist</fail>
+                        </then>
+                    </if>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="create-db-set-flag">
+        <attribute name="systemName" />
+
+        <sequential>
+            <antcall target="create-@{systemName}-db" />
+            <if>
+              <equals arg1="${dbType}" arg2="db2" />
+              <then>
+                <wait-for-db2-manual-operation systemName="@{systemName}" dbOperation="create" />
+              </then>
+            </if>
+            <var name="@{systemName}DBCreated" value="true" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="drop-db">
+        <attribute name="systemName" />
+
+        <sequential>
+            <antcall target="drop-@{systemName}-db" />
+            <if>
+              <equals arg1="${dbType}" arg2="db2" />
+              <then>
+                <wait-for-db2-manual-operation systemName="@{systemName}" dbOperation="drop" />
+              </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="wait-for-db2-manual-operation">
+        <attribute name="systemName" />
+        <attribute name="dbOperation" />
+        <sequential>
+          <input message="Press Enter key once you manually @{dbOperation} database [${@{systemName}.dbName}]"
+              addproperty="@{systemName}@{dbOperation}" />
+        </sequential>
+    </macrodef>
+
+    <!-- ==================================================================== -->
+    <!--                                                                      -->
+    <!-- Database preparation (recreation + DDL + data loading)               -->
+    <!--                                                                      -->
+    <!-- ==================================================================== -->
+
+    <target name="prepare-all-ce-dbs-normal"
+            depends="prepare-js-ce-db-normal, prepare-foodmart-db, prepare-sugarcrm-db"
+            description="Recreates and fills/loads JasperServer CE, FoodMart and SugarCRM databases" />
+  
+    <target name="prepare-all-pro-dbs-normal"
+            depends="prepare-js-pro-db-normal, prepare-foodmart-db, prepare-sugarcrm-db"
+            description="Recreates and fills/loads JasperServer Pro, FoodMart and SugarCRM databases" />
+
+    <target name="prepare-js-ce-db-minimal"
+            depends="recreate-js-db, fill-js-ce-db-minimal"
+            description="Recreates and fills/loads JasperServer CE (no sample data) database" />
+
+    <target name="prepare-js-pro-db-minimal"
+            depends="recreate-js-db, fill-js-pro-db-minimal"
+            description="Recreates and fills/loads JasperServer Pro (no sample data) database" />
+
+    <target name="prepare-js-ce-db-normal"
+            depends="recreate-js-db, fill-js-ce-db-normal"
+            description="Recreates and fills/loads JasperServer CE database" />
+
+    <target name="prepare-js-pro-db-normal"
+            depends="recreate-js-db, fill-js-pro-db-normal"
+            description="Recreates and fills/loads JasperServer Pro database" />
+
+    <target name="prepare-foodmart-db"
+            depends="recreate-foodmart-db, fill-foodmart-db"
+            description="Recreates and fills/loads FoodMart database" />
+
+    <target name="prepare-sugarcrm-db"
+            depends="recreate-sugarcrm-db, fill-sugarcrm-db"
+            description="Recreates and fills/loads SugarCRM database" />
+
+    <!-- ==================================================================== -->
+    <!--                                                                      -->
+    <!-- Database preparation (using nicer target names for end users)        -->
+    <!--                                                                      -->
+    <!-- ==================================================================== -->
+
+    <target name="create-load-all-dbs-ce"
+            depends="prepare-all-ce-dbs-normal"
+            description="Recreates and fills/loads JasperServer CE, FoodMart and SugarCRM databases" />
+
+    <target name="create-load-all-dbs-pro"
+            depends="prepare-all-pro-dbs-normal"
+            description="Recreates and fills/loads JasperServer Pro, FoodMart and SugarCRM databases" />
+
+    <target name="create-load-js-db-ce"
+            depends="prepare-js-ce-db-minimal"
+            description="Recreates and fills/loads JasperServer CE (no sample data) database" />
+
+    <target name="create-load-js-db-pro"
+            depends="prepare-js-pro-db-minimal"
+            description="Recreates and fills/loads JasperServer Pro (no sample data) database" />
+
+    <!-- ==================================================================== -->
+    <!--                                                                      -->
+    <!-- Data definition (DDL) creation and database data loading             -->
+    <!--                                                                      -->
+    <!-- ==================================================================== -->
+
+    <target name="fill-js-ce-db-minimal"
+            description="Creates data definition for JasperServer CE database and loads minimal data into the database">
+        <if>
+            <istrue value="${jsDBCreated}" />
+            <then>
+                <antcall target="init-js-db-ce">
+                    <param name="stopIfError" value="true" />
+                </antcall>
+                <antcall target="import-minimal-ce" />
+            </then>
+        </if>
+    </target>
+
+    <target name="fill-js-pro-db-minimal"
+            description="Creates data definition for JasperServer Pro database and loads minimal data into the database">
+        <if>
+            <istrue value="${jsDBCreated}" />
+            <then>
+                <antcall target="init-js-db-pro">
+                    <param name="stopIfError" value="true" />
+                </antcall>
+                <antcall target="import-minimal-pro" />
+            </then>
+        </if>
+    </target>
+
+    <target name="fill-js-ce-db-normal"
+            description="Creates data definition for JasperServer CE database and loads sample data into the database"
+            depends="fill-js-ce-db-minimal">
+        <if>
+            <istrue value="${jsDBCreated}" />
+            <then>
+                <antcall target="import-sample-data-ce" />
+            </then>
+        </if>
+    </target>
+
+    <target name="fill-js-pro-db-normal"
+            description="Creates data definition for JasperServer Pro database and loads sample data into the database"
+            depends="fill-js-pro-db-minimal">
+        <if>
+            <istrue value="${jsDBCreated}" />
+            <then>
+                <antcall target="import-sample-data-pro" />
+            </then>
+        </if>
+    </target>
+    <target name="disable-users"
+            description="drop jasperserver repository db">
+        <echo message="Disabling users in js.dbName = ${js.dbName}"/>
+        <runSQL jdbcUrl="${js.jdbcUrl}" print="true" onerror="continue">
+            ${js.disable-users}
+        </runSQL>
+    </target>
+    <target name="expire-users-passwords"
+            description="Expiring users passwords in repository db">
+        <echo message="Expiring users passwords in js.dbName = ${js.dbName}"/>
+        <runSQL jdbcUrl="${js.jdbcUrl}" print="true" onerror="continue">
+            ${js.set-users-password-expire}
+        </runSQL>
+    </target>
+    <target name="fill-foodmart-db"
+            description="Creates data definition for FoodMart database and loads sample data into the database">
+        <if>
+            <istrue value="${foodmartDBCreated}" />
+            <then>
+                <antcall target="load-foodmart-db" />
+                <antcall target="update-foodmart-db" />
+            </then>
+        </if>
+    </target>
+
+    <target name="fill-sugarcrm-db"
+            description="Creates data definition for SugarCRM database and loads sample data into the database">
+        <if>
+            <istrue value="${sugarcrmDBCreated}" />
+            <then>
+                <antcall target="load-sugarcrm-db" />
+            </then>
+        </if>
+    </target>
+
+</project>

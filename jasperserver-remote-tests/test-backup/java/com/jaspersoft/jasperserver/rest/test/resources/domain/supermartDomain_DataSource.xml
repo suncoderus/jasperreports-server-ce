@@ -1,0 +1,156 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<resourceDescriptor name="supermartDomain" wsType="domain"
+	uriString="/JUNIT_NEW_FOLDER/supermartDomain" isNew="false">
+	<label>Supermart Domain</label>
+	<description>Comprehensive example of Domain (pre-joined table sets for
+		complex reporting, custom query based dataset, column and row
+		security, I18n bundles)</description>
+	<creationDate>1321051084320</creationDate>
+	<resourceProperty name="PROP_RESOURCE_TYPE">
+		<value>com.jaspersoft.commons.semantic.datasource.SemanticLayerDataSource
+		</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_PARENT_FOLDER">
+		<value>/Domains</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_VERSION">
+		<value>1</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_HAS_DATA">
+		<value>false</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_IS_REFERENCE">
+		<value>false</value>
+	</resourceProperty>
+	<resourceDescriptor name="supermartDomain_domain_schema"
+		wsType="xml"
+		uriString="/JUNIT_NEW_FOLDER/supermartDomain_files/supermartDomain_domain_schema"
+		isNew="false">
+		<label>supermartDomain_domain_schema</label>
+		<creationDate>1321051084320</creationDate>
+		<resourceProperty name="PROP_RESOURCE_TYPE">
+			<value>com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource
+			</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_PARENT_FOLDER">
+			<value>/JUNIT_NEW_FOLDER/supermartDomain_files</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_VERSION">
+			<value>0</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_IS_REFERENCE">
+			<value>false</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_HAS_DATA">
+			<value>true</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_ATTACHMENT_ID">
+			<value>attachment</value>
+		</resourceProperty>
+	</resourceDescriptor>
+	<resourceDescriptor name="supermart_domain.properties"
+		wsType="prop"
+		uriString="/JUNIT_NEW_FOLDER/supermartDomain_files/supermart_domain.properties"
+		isNew="false">
+		<label>supermart_domain.properties</label>
+		<creationDate>1321051084455</creationDate>
+		<resourceProperty name="PROP_RESOURCE_TYPE">
+			<value>com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource
+			</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_PARENT_FOLDER">
+			<value>/JUNIT_NEW_FOLDER/supermartDomain_files</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_VERSION">
+			<value>0</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_IS_REFERENCE">
+			<value>false</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_HAS_DATA">
+			<value>true</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_ATTACHMENT_ID">
+			<value>attachment</value>
+		</resourceProperty>
+	</resourceDescriptor>
+	<resourceDescriptor name="supermart_domain_en_US.properties"
+		wsType="prop"
+		uriString="/JUNIT_NEW_FOLDER/supermartDomain_files/supermart_domain_en_US.properties"
+		isNew="false">
+		<label>supermart_domain_en_US.properties</label>
+		<creationDate>1321051084455</creationDate>
+		<resourceProperty name="PROP_RESOURCE_TYPE">
+			<value>com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource
+			</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_PARENT_FOLDER">
+			<value>/JUNIT_NEW_FOLDER/supermartDomain_files</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_VERSION">
+			<value>0</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_IS_REFERENCE">
+			<value>false</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_HAS_DATA">
+			<value>true</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_ATTACHMENT_ID">
+			<value>attachment</value>
+		</resourceProperty>
+	</resourceDescriptor>
+	<resourceDescriptor name="supermartDomain_domain_security"
+		wsType="xml"
+		uriString="/JUNIT_NEW_FOLDER/supermartDomain_files/supermartDomain_domain_security"
+		isNew="false">
+		<label>supermartDomain_domain_security</label>
+		<creationDate>1321051084320</creationDate>
+		<resourceProperty name="PROP_RESOURCE_TYPE">
+			<value>com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource
+			</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_PARENT_FOLDER">
+			<value>/JUNIT_NEW_FOLDER/supermartDomain_files</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_VERSION">
+			<value>0</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_IS_REFERENCE">
+			<value>false</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_HAS_DATA">
+			<value>true</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_ATTACHMENT_ID">
+			<value>attachment</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_SECURITY_BUNDLE">
+			<value>true</value>
+		</resourceProperty>
+	</resourceDescriptor>
+	<resourceDescriptor name="dsFoodMart" wsType="reference"
+		referenceType="jndi" uriString="/analysis/datasources/FoodmartDataSourceJNDI"
+		isNew="false">
+		<resourceProperty name="PROP_REFERENCE_URI">
+			<value>/analysis/datasources/FoodmartDataSourceJNDI</value>
+		</resourceProperty>
+	</resourceDescriptor>
+</resourceDescriptor>

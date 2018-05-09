@@ -1,0 +1,52 @@
+<div class="column decorated primary showingToolBar">
+    <div class="content hasFooter">
+        <div class="header">
+            <div class="title">
+                {{ if (isEditMode) { }}
+                    {{- i18n['resource.dataSource.title.edit'] }}
+                {{ } else { }}
+                    {{- i18n['resource.dataSource.title.new'] }}
+                {{ } }}
+            </div>
+        </div>
+        <div class="body {{ if (supportsTouch) { }}swipeScroll{{ } }}">
+            <div id="flowControls"></div>
+
+            <div id="stepDisplay">
+
+                <fieldset class="row instructions">
+                    <legend class="offLeft"><span>{{- i18n["resource.dataSource.instructions"] }}</span></legend>
+                    <h2 class="textAccent02">{{- i18n["resource.dataSource.instructions1"] }}</h2>
+                    <h4>{{- i18n["resource.dataSource.instructions2"] }}</h4>
+                </fieldset>
+
+                <fieldset class="row inputs oneColumn">
+                    <legend class="offLeft"><span>{{- i18n["resource.dataSource.inputs"] }}</span></legend>
+                    <div class="column primary">
+                        <div class="content">
+                            <div class="header">
+                                <div class="title">{{- i18n["resource.dataSource.type"] }}</div>
+                                <label class="control select inline" title="{{- i18n['resource.dataSource.dsType'] }}">
+                                    <span class="wrap offLeft">{{- i18n['resource.dataSource.dsType'] }}</span>
+                                    <select name="dataSourceType" {{ if (isEditMode) { }}disabled="disabled"{{ } }}>
+                                        {{ _.each(dataSourceTypeOptions, function(option) { }}
+                                        <option value="{{- option.value }}">{{- option.label }}</option>
+                                        {{ }); }}
+                                    </select>
+                                    <span class="message warning"></span>
+                                </label>
+                            </div>
+                            <div class="body dataSourceBody"></div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div class="footer ">
+            <fieldset id="wizardNav">
+                <button class="button primary action up" id="saveBtn"><span class="wrap">{{- i18n['resource.datasource.saveDialog.save'] }}</span><span class="icon"></span></button>
+                <button class="button up action" id="cancelBtn"><span class="wrap">{{- i18n['resource.datasource.saveDialog.cancel'] }}</span><span class="icon"></span></button>
+            </fieldset>
+        </div>
+    </div>
+</div>

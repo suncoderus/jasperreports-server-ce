@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN" "http://castor.org/mapping.dtd">
+
+<mapping>
+
+	<class name="com.jaspersoft.jasperserver.export.modules.repository.beans.ResourceBean" verify-constructable="false">
+		<field name="folder" type="string">
+			<bind-xml name="folder" node="element"/>
+		</field>
+		<field name="name" type="string">
+			<bind-xml name="name" node="element"/>
+		</field>
+		<field name="version" type="integer">
+			<bind-xml name="version" node="element"/>
+		</field>
+		<field name="label" type="string">
+			<bind-xml name="label" node="element"/>
+		</field>
+		<field name="description" type="string">
+			<bind-xml name="description" node="element"/>
+		</field>
+		<field name="creationDate" type="date">
+			<bind-xml name="creationDate" node="element"/>
+		</field>
+		<field name="updateDate" type="date">
+			<bind-xml name="updateDate" node="element"/>
+		</field>
+		<field name="permissions" type="com.jaspersoft.jasperserver.export.modules.repository.beans.RepositoryObjectPermissionBean" collection="array">
+			<bind-xml name="permission" node="element"/>
+		</field>
+        <field name="exportedWithPermissions" type="boolean">
+			<bind-xml name="exportedWithPermissions" node="attribute"/>
+		</field>
+	</class>
+	
+	<class name="com.jaspersoft.jasperserver.export.modules.repository.beans.ResourceReferenceBean">
+		<field name="externalURI" type="string">
+			<bind-xml name="uri" node="element"/>
+		</field>
+		<field name="localResource" type="com.jaspersoft.jasperserver.export.modules.repository.beans.ResourceBean">
+			<bind-xml name="localResource" node="element"/>
+		</field>
+	</class>
+	
+</mapping>

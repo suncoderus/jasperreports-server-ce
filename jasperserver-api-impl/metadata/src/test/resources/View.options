@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.7.0_79" class="java.beans.XMLDecoder">
+ <object class="java.util.HashMap">
+
+  <void method="put">
+   <string>tryArrayOfPrimitiveIntegers</string>
+   <array class="int" length="4">
+    <void index="0">
+     <int>1</int>
+    </void>
+    <void index="1">
+     <int>1</int>
+    </void>
+    <void index="2">
+     <int>2</int>
+    </void>
+    <void index="3">
+     <int>2</int>
+    </void>
+   </array>
+  </void>
+
+  <void method="put">
+   <string>tryPrimitiveTypes</string>
+   <object class="java.util.HashMap">
+    <void method="put">
+     <string>null</string>
+     <null/>
+    </void>
+    <void method="put">
+     <string>string</string>
+     <string>string value</string>
+    </void>
+    <void method="put">
+     <string>char</string>
+     <char>R</char>
+    </void>
+    <void method="put">
+     <string>byte</string>
+     <byte>111</byte>
+    </void>
+    <void method="put">
+     <string>short</string>
+     <short>1111</short>
+    </void>
+    <void method="put">
+     <string>int</string>
+     <int>11111</int>
+    </void>
+    <void method="put">
+     <string>long</string>
+     <long>1111111</long>
+    </void>
+    <void method="put">
+     <string>float</string>
+     <float>11.1111</float>
+    </void>
+    <void method="put">
+     <string>double</string>
+     <double>1111.1111</double>
+    </void>
+    <void method="put">
+     <string>boolean</string>
+     <boolean>true</boolean>
+    </void>
+   </object>
+  </void>
+
+  <void method="put">
+   <string>tryStaticMethod</string>
+   <object class="com.jaspersoft.jasperserver.api.metadata.olap.util.XMLDecoderHandlerTest$TestClass">
+    <object class="java.lang.Boolean" method="parseBoolean">
+     <string>true</string>
+    </object>
+    <object class="java.lang.Math" method="max">
+     <int>11</int>
+     <int>22</int>
+    </object>
+   </object>
+  </void>
+
+  <void method="put">
+   <string>tryStaticFactoryMethod</string>
+   <object
+     class="com.jaspersoft.jasperserver.api.metadata.olap.util.XMLDecoderHandlerTest$TestClassWithPrivateConstructor"
+     method="newInstance"/>
+  </void>
+
+  <void method="put">
+    <string>tryConstructorWithSingleArgument</string>
+    <object class="com.jaspersoft.jasperserver.api.metadata.olap.util.XMLDecoderHandlerTest$TestClass" method="new">
+     <string>argument value</string>
+    </object>
+  </void>
+
+  <void method="put">
+   <string>tryPutValueToMethod</string>
+   <object class="com.jaspersoft.jasperserver.api.metadata.olap.util.XMLDecoderHandlerTest$TestClass">
+    <void method="setStringField2">
+     <string>New value</string>
+    </void>
+   </object>
+  </void>
+
+  <void method="put">
+   <string>tryPutNullValueToMethod</string>
+   <object class="com.jaspersoft.jasperserver.api.metadata.olap.util.XMLDecoderHandlerTest$TestClass">
+    <void method="setStringField2">
+     <null/>
+    </void>
+   </object>
+  </void>
+
+  <void method="put">
+    <string>tryConstructorWithNullArgument</string>
+    <object class="com.jaspersoft.jasperserver.api.metadata.olap.util.XMLDecoderHandlerTest$TestClass" method="new">
+     <null/>
+    </object>
+  </void>
+
+  <void method="put">
+   <string>tryPutVarargValueToMethod</string>
+   <object class="com.jaspersoft.jasperserver.api.metadata.olap.util.XMLDecoderHandlerTest$TestClass">
+    <void method="setBoolInt">
+     <boolean>true</boolean>
+     <int>111</int>
+    </void>
+    <void method="addStringToList">
+     <string>string value 1</string>
+    </void>
+    <void method="addStringToList">
+     <string>string value 2</string>
+    </void>
+    <void method="addStringToList">
+     <string>string value 3</string>
+    </void>
+   </object>
+  </void>
+
+  <void method="put">
+    <string>tryConstructorWithseparateArguments</string>
+    <object class="com.jaspersoft.jasperserver.api.metadata.olap.util.XMLDecoderHandlerTest$TestClass" method="new">
+     <boolean>true</boolean>
+     <int>111</int>
+     <void property="stringField1">
+      <string>string value 4</string>
+     </void>
+    </object>
+  </void>
+
+  <void method="put">
+    <string>tryArrayListWithEvenObjects</string>
+    <object class="java.util.ArrayList">
+     <void method="add">
+      <object class="com.jaspersoft.jasperserver.api.metadata.olap.util.XMLDecoderHandlerTest$TestClass" id="id0">
+       <void property="stringField1">
+        <string>text value 1</string>
+       </void>
+      </object>
+     </void>
+     <void method="add">
+      <object idref="id0"/>
+     </void>
+     <void method="add">
+      <object idref="id0"/>
+     </void>
+    </object>
+  </void>
+
+  <void method="put">
+    <string>tryArrayWithEvenObjects</string>
+    <array class="java.lang.Object" length="3">
+     <void index="0">
+      <object class="com.jaspersoft.jasperserver.api.metadata.olap.util.XMLDecoderHandlerTest$TestClass" id="id0">
+       <void property="stringField1">
+        <string>text value 1</string>
+       </void>
+      </object>
+     </void>
+     <void index="1">
+      <object idref="id0"/>
+     </void>
+     <void index="2">
+      <object idref="id0"/>
+     </void>
+    </array>
+  </void>
+
+  <void method="put">
+    <string>tryArrayWithOddObjectsAndNull</string>
+    <array class="java.lang.Object" length="3">
+     <void index="0">
+      <object class="com.jaspersoft.jasperserver.api.metadata.olap.util.XMLDecoderHandlerTest$TestClass">
+       <string>text value 1</string>
+      </object>
+     </void>
+     <void index="2">
+      <object class="com.jaspersoft.jasperserver.api.metadata.olap.util.XMLDecoderHandlerTest$TestClass">
+       <void property="stringField1">
+        <string>text value 2</string>
+       </void>
+      </object>
+     </void>
+    </array>
+  </void>
+
+  <void method="put">
+   <string>/organizations/organization_1/supermart/revenueAndProfit/RevenueByStoreView/printform</string>
+   <object class="java.util.HashMap">
+    <void method="put">
+     <string>paperType</string>
+     <string>A4</string>
+    </void>
+    <void method="put">
+     <string>paperTypeCustom</string>
+     <boolean>false</boolean>
+    </void>
+    <void method="put">
+     <string>pageHeight</string>
+     <double>29.7</double>
+    </void>
+   </object>
+  </void>
+
+  <void method="put">
+   <string>/organizations/organization_1/supermart/revenueAndProfit/RevenueByStoreView/table</string>
+   <object class="java.util.HashMap">
+    <void method="put">
+     <string>slicerBuilder</string>
+     <null/>
+    </void>
+    <void method="put">
+     <string>rowAxisBuilder</string>
+     <object class="com.jaspersoft.jasperserver.api.metadata.olap.util.XMLDecoderHandlerTest$TestClass"/>
+    </void>
+    <void method="put">
+     <string>axisStyle</string>
+     <object class="com.jaspersoft.jasperserver.api.metadata.olap.util.XMLDecoderHandlerTest$TestClass">
+      <void property="booleanField1">
+       <boolean>true</boolean>
+      </void>
+      <void method="setBoolTrue"/>
+     </object>
+    </void>
+   </object>
+  </void>
+
+  <void method="put">
+   <string>/organizations/organization_1/supermart/revenueAndProfit/RevenueByStoreView/displayform</string>
+   <object class="java.util.HashMap">
+    <void method="put">
+     <string>extensions(sortRank).topBottomCount</string>
+     <int>10</int>
+    </void>
+   </object>
+  </void>
+
+  <void method="put">
+   <string>/organizations/organization_1/supermart/revenueAndProfit/RevenueByStoreView/toolbar</string>
+   <object class="java.util.HashMap">
+    <void method="put">
+     <null/>
+     <boolean>true</boolean>
+    </void>
+   </object>
+  </void>
+
+  <void method="put">
+   <string>drillThruSQL</string>
+   <string>    </string>
+  </void>
+
+ </object>
+</java>

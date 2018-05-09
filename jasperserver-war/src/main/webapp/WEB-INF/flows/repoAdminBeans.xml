@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <!-- Backing action for repository admin flow -->
+    <bean id="repoAdminAction" class="com.jaspersoft.jasperserver.war.action.RepoAdminAction">
+        <property name="repository">
+            <ref bean="${bean.repositoryService}"/>
+        </property>
+        <property name="repositoryServiceSecurityChecker">
+            <ref bean="${bean.repositoryServiceSecurityChecker}"/>
+        </property>
+		<property name="resourceTypes">
+			<map>
+			  <!-- NOTE: attribute "key" represents the key found in the jasperserver_messages.properties file -->
+              <entry key="resourceTypes.folder" value="folder"/>
+              <entry key="resourceTypes.jasperserver.report" value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.ReportUnit"/>
+              <entry key="resourceTypes.data.source" value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JndiJdbcReportDataSource"/>
+              <entry key="resourceTypes.input.control" value="com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl"/>
+              <entry key="resourceTypes.data.type" value="com.jaspersoft.jasperserver.api.metadata.common.domain.DataType"/>
+              <entry key="resourceTypes.list.of.values" value="com.jaspersoft.jasperserver.api.metadata.common.domain.ListOfValues"/>
+			  <entry key="resourceTypes.query" value="com.jaspersoft.jasperserver.api.metadata.common.domain.Query"/>
+			  <entry key="resourceTypes.jrxml" value="com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource"/>
+              <entry key="resourceTypes.olap.view" value="com.jaspersoft.jasperserver.api.metadata.olap.domain.OlapUnit"/>
+              <entry key="resourceTypes.olap.client.connection" value="com.jaspersoft.jasperserver.api.metadata.olap.domain.OlapClientConnection"/>
+              <entry key="resourceTypes.olap.schema" value="com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource"/>
+              <entry key="resourceTypes.mondrian.xmla.source" value="com.jaspersoft.jasperserver.api.metadata.olap.domain.MondrianXMLADefinition"/>
+              <entry key="resourceTypes.image" value="com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource"/>
+              <entry key="resourceTypes.font" value="com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource"/>
+              <entry key="resourceTypes.jar" value="com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource"/>
+              <entry key="resourceTypes.resource.bundle" value="com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource"/>
+              <entry key="resourceTypes.style.template" value="com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource"/>
+			</map>
+		</property>
+        <property name="flowAttributeFolder" value="repositoryFolder"/>
+		<property name="messages">
+			<ref bean="messageSource"/>
+		</property>
+		<property name="configuration">
+			<ref bean="configurationBean"/>
+		</property>
+    </bean>
+
+</beans>

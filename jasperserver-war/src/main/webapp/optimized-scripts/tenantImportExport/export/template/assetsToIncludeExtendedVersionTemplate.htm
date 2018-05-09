@@ -1,0 +1,87 @@
+<div class="section resources tenant-options">
+    <p class="title">{{- i18n["export.dialog.resources"] }}</p>
+
+    <div class="group">
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.dialog.resources.data.sources"] }}</label>
+            <input class="includeDataSources" name="includeDataSources" type="checkbox"
+                   data-bind="checked:includeDataSources, disabled:everything">
+        </div>
+        {{ if(!isServerCe) { }}
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.dialog.resources.domains"] }}</label>
+            <input class="includeDomains" name="includeDomains" type="checkbox"
+                   data-bind="checked:includeDomains, disabled:everything">
+        </div>
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.dialog.resources.ad.hoc.views"] }}</label>
+            <input class="includeAdHocViews" name="includeAdHocViews" type="checkbox"
+                   data-bind="checked:includeAdHocViews, disabled:everything">
+        </div>
+        {{ } }}
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.dialog.resources.reports"] }}</label>
+            <input class="includeReports" name="includeReports" type="checkbox"
+                   data-bind="checked:includeReports, disabled:everything">
+        </div>
+        {{ if(!isServerCe) { }}
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.dialog.resources.dashboards"] }}</label>
+            <input class="includeDashboards" name="includeDashboards" type="checkbox"
+                   data-bind="checked:includeDashboards, disabled:everything">
+        </div>
+        {{ } }}
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.dialog.resources.scheduled.report.jobs"] }}</label>
+            <input class="includeScheduledReportJobs" name="includeScheduledReportJobs" type="checkbox"
+                   data-bind="checked:includeScheduledReportJobs, enabled:enableReportJobs">
+        </div>
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.dialog.resources.other.resources"] }}</label>
+            <input class="includeOtherResourceFiles" name="includeOtherResourceFiles" type="checkbox"
+                   data-bind="checked:includeOtherResourceFiles, disabled:everything">
+        </div>
+    </div>
+</div>
+
+<div class="section assets tenant-options">
+    <p class="title">{{- i18n["export.dialog.assets"] }}</p>
+
+    <div class="group">
+        {{ if(!isServerCe) { }}
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.dialog.assets.sub.organizations"] }}</label>
+            <input class="includeSubOrganizations" name="includeSubOrganizations" type="checkbox"
+                   data-bind="checked:includeSubOrganizations, disabled:everything">
+        </div>
+        {{ } }}
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.dialog.assets.dependent.objects"] }}</label>
+            <input class="includeDependentObjects" name="includeDependentObjects" type="checkbox"
+                   data-bind="checked:includeDependentObjects, enabled:someResourceIsChecked">
+        </div>
+
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.dialog.assets.repository.permissions"] }}</label>
+            <input class="includeRepositoryPermissions" name="includeRepositoryPermissions" type="checkbox"
+                   data-bind="checked:includeRepositoryPermissions, enabled:someResourceIsChecked">
+        </div>
+        {{ if (isServerOrRootType) { }}
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.dialog.assets.server.settings"] }}</label>
+            <input class="includeServerSettings" name="includeServerSettings" type="checkbox"
+                   data-bind="checked:includeServerSettings, disabled:everything">
+        </div>
+        {{ } }}
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.dialog.assets.attributes"] }}</label>
+            <input class="includeAttributes" name="includeAttributes" type="checkbox"
+                   data-bind="checked:includeAttributes, disabled:everything">
+        </div>
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.dialog.assets.attribute.values"] }}</label>
+            <input class="includeAttributeValues" name="includeAttributeValues" type="checkbox"
+                   data-bind="checked:includeAttributeValues, enabled:enableAttributesValues">
+        </div>
+    </div>
+</div>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<actions>
+    <!--Toolbar menus-->
+    <context name="toolbar_save">
+        <simpleAction clientTest="canSaveDashboard" labelKey="ADH_733_DASHBOARD_MENU_SAVE_DASHBOARD" action="designerBase.handleSave"/>
+        <simpleAction clientTest="canSaveDashboard" labelKey="ADH_734_DASHBOARD_MENU_SAVE_DASHBOARD_AS" action="designerBase.handleSaveAs"/>
+    </context>
+
+    <!--menu for toolbar options-->
+    <context name="toolbar_options">
+        <simpleAction labelKey="ADH_020_MENU_ADD_TITLE" clientTest="!dashboardHasTitle" clientTestArgs="true" action="editDashboardTitle"/>
+        <simpleAction labelKey="ADH_021_MENU_EDIT_TITLE" clientTest="dashboardHasTitle" clientTestArgs="false" action="editDashboardTitle"/>
+        <simpleAction labelKey="ADH_022_MENU_REMOVE_TITLE" clientTest="dashboardHasTitle" clientTestArgs="false" action="removeDashboardTitle"/>
+
+        <selectAction className="flyout" labelKey="ADH_740b_LAYOUT_SIZE" clientTest="isInFixedSizeMode">
+            <generatedOptions id="layoutSize_${optionId}" function="getLayoutSizeOptions" labelExpression="${optionValue}" action="requestSizeGuideChange" isSelectedTest="checkLayoutSize"/>
+        </selectAction>
+
+        <separator />
+
+        <selectAction labelKey="ADH_024_MENU_PAGE_PROPERTIES">
+            <option labelKey="ADH_747b_USE_ABSOLUTE_FRAME_SIZING" isSelectedTest="isInFixedSizeMode"  action="notifyServerConvertToFixedMode"/>
+            <option labelKey="ADH_747a_USE_PROPORTIONAL_FRAME_SIZING" isSelectedTest="isInProportionalSizeMode"  action="notifyServerConvertToProportionalMode"/>
+        </selectAction>
+    </context>
+
+
+    <!-- This section is for the menu presented when a user clicks on a dashboard frame -->
+    <context name="dashboardContentFrameLevel">
+        <simpleAction labelKey="ADH_748_SIZE_TO_CONTENT" clientTest="!isNonContentFrameSelected" action="sizeSelectedFrameToContent"/>
+        <simpleAction labelKey="ADH_739a_DASHBOARD_HIDE_SCROLLBARS" clientTest="canHideScrollBars" action="toggleSelectedFrameScrollBars"/>
+        <simpleAction labelKey="ADH_739b_DASHBOARD_SHOW_SCROLLBARS"  clientTest="canShowScrollBars" action="toggleSelectedFrameScrollBars"/>
+        <simpleAction labelKey="ADH_739c_DASHBOARD_HIDE_ALL_SCROLLBARS"  action="toggleAllSelectedFrameScrollBars" actionArgs="false" clientTest="canHideAllScrollBars"/>
+        <simpleAction labelKey="ADH_739d_DASHBOARD_SHOW_ALL_SCROLLBARS"  action="toggleAllSelectedFrameScrollBars" actionArgs="true" clientTest="canShowAllScrollBars"/>
+
+        <selectAction className="flyout"  labelKey="ADH_740_AUTO_REFRESH_INTERVAL" clientTest="canShowRefreshOptions">
+            <option labelKey="ADH_741_MANUAL_ONLY" action="setAutoRefresh" actionArgs="0" isSelectedTest="isCurrentRefreshOption" isSelectedTestArgs="0"/>
+            <generatedOptions id="autoRefresh_${optionId}" function="getAutoRefreshOptions" isSelectedTest="isCurrentRefreshOption" isSelectedTestArgs="${optionValue}" labelExpression="${optionValue} $R{ADH_742b_MINUTES}" action="setAutoRefresh"/>
+        </selectAction>
+        <separator />
+        <simpleAction labelKey="ADH_746_EDIT_CUSTOM_URL"  action="editCustomURLFrame" clientTest="canEditCustomFrame"/>
+        <simpleAction clientTest="singleFrameSelected" labelKey="ADH_738d_DASHBOARD_MENU_DELETE_ITEM"  action="deleteSelectedFrames"/>
+        <simpleAction clientTest="multipleFramesSelected" labelKey="ADH_738c_DASHBOARD_MENU_DELETE_ITEMS"  action="deleteSelectedFrames"/>
+    </context>
+
+    <!-- This section is for the menu presented when a user clicks on a dashboard control frame -->
+    <context name="dashboardControlFrameLevel">
+        <simpleAction clientTest="singleFrameSelected" labelKey="ADH_738d_DASHBOARD_MENU_DELETE_ITEM"  action="deleteSelectedFrames"/>
+        <simpleAction clientTest="multipleFramesSelected" labelKey="ADH_738c_DASHBOARD_MENU_DELETE_ITEMS"  action="deleteSelectedFrames"/>
+    </context>
+
+    <!-- This section is for the menu presented when a user clicks on a dashboard text frame -->
+    <context name="dashboardTextFrameLevel">
+        <simpleAction labelKey="ADH_744_DASHBOARD_MENU_EDIT_LABEL" clientTest="singleOverlaySelected"  action="setTextFrameAsEditable"/>
+        <separator/>
+        <simpleAction clientTest="singleFrameSelected" labelKey="ADH_738d_DASHBOARD_MENU_DELETE_ITEM" action="deleteSelectedFrames"/>
+        <simpleAction clientTest="multipleFramesSelected" labelKey="ADH_738c_DASHBOARD_MENU_DELETE_ITEMS" action="deleteSelectedFrames"/>
+    </context>
+
+    <!-- This section is for the menu presented when a user clicks on any dashboard clickable frame -->
+    <context name="dashboardClickableFrameLevel">
+        <simpleAction clientTest="singleFrameSelected" labelKey="ADH_738d_DASHBOARD_MENU_DELETE_ITEM" action="deleteSelectedFrames"/>
+        <simpleAction clientTest="multipleFramesSelected" labelKey="ADH_738c_DASHBOARD_MENU_DELETE_ITEMS" action="deleteSelectedFrames"/>
+    </context>
+
+    <!-- This section is for the menu presented when a user clicks on a dashboard repo tree leaf -->
+    <context name="dashboardRepoTreeLeafLevel">
+        <simpleAction labelKey="ADH_745_DASHBOARD_MENU_ADD_TO_DASHBOARD" action="addContentFrame" actionArgs="${event}"/>
+    </context>
+
+    <!-- This section is for the menu presented when a user clicks on a dashboard control tree leaf -->
+    <context name="dashboardSpecialContentTreeLeafLevel">
+        <simpleAction labelKey="ADH_745_DASHBOARD_MENU_ADD_TO_DASHBOARD"  action="quickAddOfFrameObjectByEvent" actionArgs="${event}"/>
+    </context>
+
+</actions>
+

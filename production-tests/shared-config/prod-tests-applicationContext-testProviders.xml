@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!--
+    Document   : aplicationContext-testProviders.xml.xml
+    Created on : May 19, 2008, 9:54 AM
+    Author     : swood
+    Description:
+        Spring configuration for authentication tests.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+       	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+       	http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+       
+    <!-- ======================== FILTER CHAIN =======================  -->
+
+    <bean id="authenticationAuthoirizationFilterChainProxy" class="org.springframework.security.web.FilterChainProxy">
+        <security:filter-chain-map path-type="ant">
+            <security:filter-chain pattern="/**" filters="authenticationProcessingFilter,JSAuthenticationSynchronizer"/>
+        </security:filter-chain-map>
+    </bean>
+
+    <bean id="authenticationProcessingFilter"
+          class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="authenticationFailureHandler" ref="failureHandler" />
+        <property name="authenticationSuccessHandler" ref="successHandler" />
+        <property name="filterProcessesUrl" value="/j_spring_security_check"/>
+        <property name="allowSessionCreation" value="true" />
+        <property name="sessionAuthenticationStrategy" ref="sas"/>
+    </bean>
+
+    <bean id="successHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler" >
+        <property name="defaultTargetUrl" value="/loginsuccess.html" />
+    </bean>
+    <bean id="failureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler" >
+        <property name="defaultFailureUrl" value="/login.html?error=1" />
+    </bean>
+    <bean id="sas" class="org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy">
+        <property name="migrateSessionAttributes" value="false" />
+    </bean>
+    
+    <!--TODO class=com.jaspersoft.jasperserver.api.security.externalAuth.BaseAuthenticationProcessingFilter-->
+    <!--<bean id="authenticationProcessingFilter" class="org.springframework.security.ui.webapp.AuthenticationProcessingFilter">-->
+        <!--<property name="authenticationManager"><ref local="authenticationManager"/></property>-->
+        <!--<property name="authenticationFailureUrl"><value>/login.html?error=1</value></property>-->
+        <!--<property name="defaultTargetUrl"><value>/loginsuccess.html</value></property>-->
+        <!--<property name="filterProcessesUrl"><value>/j_acegi_security_check</value></property>-->
+    <!--</bean>-->
+
+    <!-- ======================== AUTHENTICATION ======================= -->
+    <bean id="authenticationManager" class="org.springframework.security.authentication.ProviderManager">
+        <property name="providers">
+            <list>
+                <!-- not on by default <ref local="ldapAuthenticationProvider"/>  -->
+                <ref local="staticPrincipalAuthenticationProvider"/>
+                <ref local="jasperServerAuthenticationProvider"/>
+                <!--ref local="jaasAuthenticationProvider"/-->
+            </list>
+        </property>
+    </bean>
+	
+    <bean id="jasperServerAuthenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+        <property name="userDetailsService"><ref bean="${bean.internalUserAuthorityService}"/></property>
+    </bean>
+    
+    <!-- returns a UserDetails object that is not a MetadataUserDetails -->
+    <bean id="staticPrincipalAuthenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+        <property name="userDetailsService"><ref bean="inMemoryDaoImpl"/></property>
+    </bean>
+
+    <bean id="inMemoryDaoImpl" class="org.springframework.security.core.userdetails.memory.InMemoryDaoImpl">
+        <property name="userMap">
+            <!-- tomcat/tomcat -->
+            <value>
+                tomcat=tomcat,ROLE_TestExternalRole0
+                springlive=living,ROLE_TestExternalRole1
+            </value>
+        </property>
+    </bean>
+   
+    <bean id="JSAuthenticationSynchronizer" class="com.jaspersoft.jasperserver.api.metadata.user.service.impl.MetadataAuthenticationProcessingFilter">
+       <property name="externalUserService"><ref bean="userAuthorityService"/></property>
+    </bean>
+    
+    <!--
+    
+    The rest of this file is other authentication services - ignored
+    ================================================================
+    <bean id="jaasAuthenticationProvider" class="org.springframework.security.providers.jaas.JaasAuthenticationProvider">
+        <property name="loginConfig">
+            <value>/WEB-INF/login.conf</value>
+        </property>
+        <property name="loginContextName">
+            <value>FileLogin</value>
+        </property>
+        <property name="callbackHandlers">
+            <list>
+                <bean class="org.springframework.security.providers.jaas.JaasNameCallbackHandler"/>
+                <bean class="org.springframework.security.providers.jaas.JaasPasswordCallbackHandler"/>
+            </list>
+        </property>
+        <property name="authorityGranters">
+            <list>
+                <bean class="org.appfuse.web.JaasAuthorityGranter"/>
+            </list>
+        </property>
+    </bean>
+    -->
+    
+     <!--
+
+   For LDAP authentication
+   
+   <bean id="initialDirContextFactory" class="org.springframework.security.ldap.DefaultInitialDirContextFactory">
+     <constructor-arg value="ldap://scopeserv1:389/dc=panscopic,dc=com"/>
+     -->
+     <!--
+     You may not need the next properties
+     <property name="managerDn"><value>cn=manager,dc=acegisecurity,dc=org</value></property>
+     <property name="managerPassword"><value>acegisecurity</value></property>
+     -->
+     <!--
+   </bean>
+     -->
+   
+   <!-- 
+   For LDAP authentication
+   This bean is not used by default
+   
+   <bean id="userSearch"
+            class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
+     <constructor-arg index="0">
+       <value></value>
+     </constructor-arg>
+     <constructor-arg index="1">
+       <value>(uid={0})</value>
+     </constructor-arg>
+     <constructor-arg index="2">
+       <ref local="initialDirContextFactory" />
+     </constructor-arg>            
+     <property name="searchSubtree">
+       <value>true</value>
+     </property>            
+   </bean>            
+   
+   -->
+   
+   <!--
+   For LDAP authentication
+   
+   <bean id="ldapAuthenticationProvider" class="org.springframework.security.providers.ldap.LdapAuthenticationProvider">
+     <constructor-arg>
+       <bean class="org.springframework.security.providers.ldap.authenticator.BindAuthenticator">
+          <constructor-arg><ref local="initialDirContextFactory"/></constructor-arg>
+          <property name="userDnPatterns"><list><value>uid={0}</value></list></property>
+       </bean>
+     </constructor-arg>
+     <constructor-arg>
+       <bean class="org.springframework.security.providers.ldap.populator.DefaultLdapAuthoritiesPopulator">
+          <constructor-arg index="0"><ref local="initialDirContextFactory"/></constructor-arg>
+          <constructor-arg index="1"><value></value></constructor-arg>
+          <property name="groupRoleAttribute"><value>cn</value></property>
+          <property name="groupSearchFilter"><value>(&amp;(uniqueMember={0})(objectclass=groupofuniquenames))</value></property>
+       </bean>
+     </constructor-arg>
+   </bean>
+   -->
+
+</beans>

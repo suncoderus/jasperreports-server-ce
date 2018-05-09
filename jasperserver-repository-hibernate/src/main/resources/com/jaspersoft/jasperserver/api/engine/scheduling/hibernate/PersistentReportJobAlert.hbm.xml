@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class table="JIReportJobAlert" name="com.jaspersoft.jasperserver.api.engine.scheduling.hibernate.PersistentReportJobAlert">
+        <id name="id" type="long" >
+            <generator class="native"/>
+        </id>
+        <version column="version" unsaved-value="negative" name="version"/>
+        <property name="recipient" type="byte" column="recipient" not-null="true"/>
+        <list name="toAddresses" table="JIReportAlertToAddress" fetch="subselect">
+            <key column="alert_id"/>
+            <list-index column="to_address_idx"/>
+            <element column="to_address" type="string" length="100" not-null="true"/>
+        </list>
+        <property name="subject" column="subject" type="string" length="100" not-null="false"/>
+        <property name="messageText" column="message_text" type="string" length="2000" not-null="false"/>
+        <property name="messageTextWhenJobFails" column="message_text_when_job_fails" type="string" length="2000" not-null="false"/>
+        <property name="jobState" column="job_state" type="byte" not-null="true"/>
+        <property name="includingStackTrace" column="including_stack_trace" type="boolean" not-null="true"/>
+        <property name="includingReportJobInfo" column="including_report_job_info" type="boolean" not-null="true"/>
+	</class>
+
+<!-- create index JIReportAlertToAddress_alert_id_index on JIReportAlertToAddress (alert_id); -->
+<!-- replacing JIReportAlertToAddress_alert_id_index with idx24_alert_id_idx -->
+<database-object>
+	<create>create index idx24_alert_id_idx on JIReportAlertToAddress (alert_id)</create>
+	<drop>DROP INDEX idx24_alert_id_idx ON JIReportAlertToAddress</drop>
+</database-object>
+
+</hibernate-mapping>

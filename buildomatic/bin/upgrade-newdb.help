@@ -1,0 +1,52 @@
+
+Usage:  js-upgrade-newdb.(sh/bat)  [option]  <path>/js-<ver>-export.zip
+
+Description:
+
+This "newdb" upgrade shell script expects at least one argument which specifies
+the path and file name of the export zip file created from the previous JasperServer
+instance (ie the instance you are upgrading from). This argument should be the path 
+to the export file and the export file name. The path can be full qualified path
+or a relative path. If the export file resides in the current folder then just 
+the file name can be specified.
+
+This script will carry out the following general steps:
+
+  - Validate property settings
+  - Validate database connection
+  - Delete the existing, older jasperserver database
+  - Create and initialize the new jasperserver database
+  - Import new jasperserver resources into the database 
+  - Import the export zip file specified on the command line
+  - Delete the existing, older jasperserver war file
+  - Deploy the new jasperserver war file 
+
+An additional, optional argument can be given as described below:
+
+  Options               Description
+
+  <none>                Do standard, default upgrade operations as described above. 
+
+  with-samples          Do standard, default upgrade operations. Also, import sample resources
+                        from the new JasperServer version.  
+
+  include-access-events Do standard, default upgrade operations. Also include any access event
+                        resources (if present) from older JasperServer version. 
+
+  regen-config          If you edited your configuration, this will recreate your Buildomatic configuration
+
+  test                  Run all validation steps and report on any problems. Existing instances and 
+                        resources will not be modified.
+
+  help                  Display this help information.
+
+Examples:
+
+  ./js-upgrade-newdb.sh  ../../prev-jasperserver/buildomatic/js-<ver>-export.zip 
+  
+  js-upgrade-newdb.bat   ..\..\prev-jasperserver/buildomatic/js-<ver>-export.zip 
+
+  ./js-upgrade-newdb.sh  with-samples  js-<ver>-export.zip 
+  
+  js-upgrade-newdb.bat   test 
+

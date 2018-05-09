@@ -1,0 +1,168 @@
+<%--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  --%>
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="/spring" prefix="spring"%>
+
+<html>
+<head>
+<!-- ${sessionScope.XSS_NONCE} do not remove -->
+
+  <title><spring:message code="jsp.editQueryForm.title"/></title>
+  <meta name="pageHeading" content="<spring:message code="jsp.editQueryForm.pageHeading"/>"/>
+<script>
+function jumpTo(pageTo){
+    document.forms['fmDataType'].jumpToPage.value=pageTo;
+    document.forms['fmDataType'].jumpButton.click();
+}
+</script>
+</head>
+
+<body>
+
+<form name="fmDataType" method="post" action="">
+<table width="100%" border="0" cellpadding="20" cellspacing="0">
+  <tr valign="top">
+<c:if test='${masterFlow == "reportUnit"}'>
+<c:choose>
+<c:when test='${parentFlow == "reportUnit"}'>
+    <td width="1">
+<table width="100%" border="0" cellpading="0" cellspacing="0">
+  <tr><td nowrap="true"><a class="wizard_menu" href="javascript:jumpTo('reportNaming');"><spring:message code="jsp.reportWizard.naming"/></a></td></tr>
+  <tr><td nowrap="true"><a class="wizard_menu" href="javascript:jumpTo('jrxmlUpload');"><spring:message code="jsp.reportWizard.jrxml"/></a></td></tr>
+  <tr><td nowrap="true"><a class="wizard_menu" href="javascript:jumpTo('resources');"><spring:message code="jsp.reportWizard.resources"/></a></td></tr>
+  <tr><td nowrap="true"><a class="wizard_menu" href="javascript:jumpTo('dataSource');"><spring:message code="jsp.reportWizard.dataSource"/></a></td></tr>
+  <tr><td nowrap="true"><a class="wizard_menu_current" href="javascript:jumpTo('query');"><spring:message code="jsp.reportWizard.query"/></a></td></tr>
+  <tr><td nowrap="true"><a class="wizard_menu" href="javascript:jumpTo('customization');"><spring:message code="jsp.reportWizard.customization"/></a></td></tr>
+</table>
+    </td>
+</c:when>
+<c:otherwise>
+    <td width="1">
+<table width="100%" border="0" cellpading="0" cellspacing="0">
+  <tr><td nowrap="true"><span class="wizard_menu_disabled"><spring:message code="jsp.reportWizard.naming"/></span></td></tr>
+  <tr><td nowrap="true"><span class="wizard_menu_disabled"><spring:message code="jsp.reportWizard.jrxml"/></span></td></tr>
+  <tr><td nowrap="true">
+  <c:choose>
+  <c:when test='${masterFlowStep == "resources"}'>
+    <a class="wizard_menu_current" href="javascript:document.forms['fmDataType']._eventId_Cancel.click();"><spring:message code="jsp.reportWizard.resources"/></a>  
+  </c:when>
+  <c:otherwise>
+    <span class="wizard_menu_disabled"><spring:message code="jsp.reportWizard.resources"/></span>  
+  </c:otherwise>
+  </c:choose>
+  </td></tr>
+  <tr><td nowrap="true"><span class="wizard_menu_disabled"><spring:message code="jsp.reportWizard.dataSource"/></span></td></tr>
+  <tr><td nowrap="true">
+  <c:choose>
+  <c:when test='${masterFlowStep == "query"}'>
+    <a class="wizard_menu_current" href="javascript:document.forms['fmDataType']._eventId_cancel.click();"><spring:message code="jsp.reportWizard.query"/></a>  
+  </c:when>
+  <c:otherwise>
+    <span class="wizard_menu_disabled"><spring:message code="jsp.reportWizard.query"/></span>  
+  </c:otherwise>
+  </c:choose>
+  </td></tr>
+  <tr><td nowrap="true"><span class="wizard_menu_disabled"><spring:message code="jsp.reportWizard.customization"/></span></td></tr>
+</table>
+    </td>
+</c:otherwise>
+</c:choose>
+</c:if>
+    <td>
+<table border="0" cellpadding="1" cellspacing="0" align="center">
+<input type="hidden" name="jumpToPage">
+<input type="submit" class="fnormal" style="visibility:hidden;" value="" name="_eventId_Jump" id="jumpButton">   
+<input type="hidden" name="_flowExecutionKey" value="${flowExecutionKey}"/>
+  <tr>
+    <td>&nbsp;</td>
+    <td><span class="fsection"><spring:message code="jsp.editQueryForm.title"/></span></td>
+  </tr>
+  <tr>
+    <td colspan="2">&nbsp;</td>
+  </tr>
+<spring:bind path="query.query.name">
+  <tr>
+    <td align="right">* <spring:message code="label.name"/>&nbsp;</td>
+    <td><input type="text" name="${status.expression}" value="${status.value}" size="40" class="fnormal" <c:if test='${query.editMode}'>readonly="true"</c:if>/></td>
+  </tr>
+  <c:if test="${status.error}">
+    <c:forEach items="${status.errorMessages}" var="error">
+  <tr>
+    <td>&nbsp;</td>
+    <td><span class="ferror">${error}</span></td>
+  </tr>
+    </c:forEach>
+  </c:if>
+</spring:bind>
+
+<spring:bind path="query.query.label">
+  <tr>
+    <td align="right">* <spring:message code="label.label"/>&nbsp;</td>
+    <td><input type="text" name="${status.expression}" value="${status.value}" size="40" class="fnormal"/></td>
+  </tr>
+  <c:if test="${status.error}">
+    <c:forEach items="${status.errorMessages}" var="error">
+  <tr>
+    <td>&nbsp;</td>
+    <td><span class="ferror">${error}</span></td>
+  </tr>
+    </c:forEach>
+  </c:if>
+</spring:bind>
+
+<spring:bind path="query.query.description">
+	<tr>
+		<td align="right" valign="top"><spring:message code="label.description"/>&nbsp;</td>
+		<td align="left"><textarea name="${status.expression}" rows="5" cols="28" class="fnormal">${status.value}</textarea></td>
+	</tr>
+	<c:if test="${status.error}">
+	<tr>
+		<td>&nbsp;</td>
+		<td><span class="ferror">${status.errorMessage}</span></td>
+	</tr>
+	</c:if>
+</spring:bind>
+
+
+  <tr>
+    <td colspan="2">&nbsp;</td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td>
+      <c:if test='${masterFlow == "reportUnit"}'>
+       <input type="submit" name="_eventId_cancel" value="<spring:message code="button.cancel"/>" class="fnormal" />
+      </c:if>	 
+      <c:if test='${masterFlow != "reportUnit"}'>
+        <input type="button" name="_eventId_cancel" value="<spring:message code="button.cancel"/>" class="fnormal" OnClick='javascript:gotoDefaultLocation()'/>
+      </c:if>
+      <input type="submit" name="_eventId_back" value="<spring:message code="button.back"/>" class="fnormal"/>
+	  <input type="submit" name="_eventId_next" value="<spring:message code="button.next"/>" class="fnormal"/>
+	  <c:if test='${parentFlow == "reportUnit"}'><input type="submit" name="_eventId_finish" value="<spring:message code="button.finish"/>" class="fnormal"/></c:if>
+	</td>
+  </tr>
+</table>
+    </td>
+  </tr>
+</table>
+</form>
+
+</body>
+
+</html>

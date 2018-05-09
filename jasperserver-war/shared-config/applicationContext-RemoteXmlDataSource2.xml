@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+	<bean class="example.cdspro.RemoteXmlDataSourceDefinition">
+		<property name="factory" ref="customDataSourceServiceFactory" />
+		<property name="name" value="remoteXmlDataSource2" />
+		<property name="rowCountForMetadataDiscovery" value="10" />
+        <property name="enableMetadataCache" value="true"/>
+		<property name="hiddenPropertySet">
+			<set>
+				<value>dataFile</value>
+				<value>datePattern</value>
+				<value>name</value>
+				<value>namespaceAware</value>
+				<value>numberPattern</value>
+				<value>useConnection</value>
+			</set>
+		</property>
+		<property name="queryExecuterMap">
+			<map>
+				<entry key="RemoteXml" value="net.sf.jasperreports.engine.query.JaxenXPathQueryExecuterFactory" />
+			</map>
+		</property>
+		<!-- this property must be set last -->
+		<property name="dataAdapterClassName" value="net.sf.jasperreports.data.xml.RemoteXmlDataAdapterImpl" />
+		<property name="customFactory" ref="customJDBCReportDataSourceServiceFactory"/>
+        <property name="validator">
+            <bean class="com.jaspersoft.jasperserver.api.engine.jasperreports.util.RemoteXmlDataSourceValidator"/>
+        </property>
+	</bean>
+
+	<bean class="com.jaspersoft.jasperserver.api.common.util.spring.GenericBeanUpdater">
+		<property name="definition" ref="addMessageCatalog" />
+		<property name="value">
+			<list>
+				<value>WEB-INF/bundles/remotexmlds</value>
+			</list>
+		</property>
+		<property name="valueType" value="stringList" />
+	</bean>
+</beans>

@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<project name="production-tests" default="list_theme_files" basedir=".">
+    <description>Lists all theme file to be used by production tests. Files get into the JS repository</description>
+
+    <property name="name" value="production-tests"/>
+
+    <target name="list_theme_files">
+        <pathconvert targetos="unix" property="theme_files" pathsep="${line.separator}">
+            <path>
+                <fileset dir="${base_folder}">
+                    <filename name="themes/**" />
+                    <exclude name="**/reset.css"/>
+                </fileset>
+            </path>
+            <map from="${base_folder}${file.separator}" to="" />
+        </pathconvert>
+        <echo file="${output_folder}/theme_files_list.txt" message="${theme_files}" />
+        <echo message="Theme file list is stored in ${output_folder}/theme_files_list.txt" />
+    </target>
+
+</project>
+

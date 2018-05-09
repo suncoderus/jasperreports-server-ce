@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN"
+"http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
+<taglib>
+    <tlibversion>1.0</tlibversion>
+    <jspversion>1.1</jspversion>
+    <shortname>JS</shortname>
+    <uri>/WEB-INF/jasperserver.tld</uri>
+    <info>Jasper Server Tag library</info>
+    <tag>
+        <name>listreports</name>
+        <tagclass>com.jaspersoft.jasperserver.war.tags.ListReportsTag</tagclass>
+        <bodycontent>empty</bodycontent>
+        <info>This is a tag for displaying a Jasper Reports List</info>
+    </tag>
+    <tag>
+        <name>jasperviewer</name>
+        <tagclass>com.jaspersoft.jasperserver.war.tags.JasperViewerTag</tagclass>
+        <bodycontent>empty</bodycontent>
+        <info>This is a tag for displaying a Jasper Report</info>
+        <attribute>
+            <name>imageServlet</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>resourceServlet</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>page</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>renderJsp</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>innerPagination</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>ignorePageMargins</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>jasperPrintAttribute</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>reportContext</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <!--
+        Future enhancement
+         
+        <attribute>
+            <name>exporterClassName</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>exporterParameters</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+         -->
+    </tag>
+
+    <tag>
+        <name>parametersForm</name>
+        <tagclass>com.jaspersoft.jasperserver.war.tags.ParametersFormTag</tagclass>
+        <bodycontent>empty</bodycontent>
+        <info>This is a tag for displaying a Jasper Report parameter collector form</info>
+        <attribute>
+            <name>renderJsp</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>formAction</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>reportName</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>onInputChange</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>inputNamePrefix</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>readOnly</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
+	<tag>
+		<name>paginator</name>
+		<tagclass>com.jaspersoft.jasperserver.war.tags.PaginatorTag</tagclass>
+		<bodycontent>JSP</bodycontent>
+		<attribute>
+			<name>items</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>page</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>itemsPerPage</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>pagesRange</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>formName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+    
+	<tag>
+		<name>paginatorLinks</name>
+		<tagclass>com.jaspersoft.jasperserver.war.tags.PaginatorLinksTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<attribute>
+			<name>renderJsp</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+    
+    <tag>
+    	<name>formatDate</name>
+    	<tagclass>com.jaspersoft.jasperserver.war.tags.FormatDateTag</tagclass>
+    	<bodycontent>empty</bodycontent>
+    	<info>A tag that formats date values according to the context locale and timezone</info>
+    	<attribute>
+    		<name>value</name>
+    		<required>true</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+    	<attribute>
+    		<name>time</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+    	<attribute>
+    		<name>pattern</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+    	<attribute>
+    		<name>patternMessage</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+    </tag>
+    
+    <tag>
+    	<name>calendarInput</name>
+    	<tagclass>com.jaspersoft.jasperserver.war.tags.CalendarInputTag</tagclass>
+    	<bodycontent>empty</bodycontent>
+    	<info>A tag that outputs a calendar input</info>
+    	<attribute>
+    		<name>date</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+        <attribute>
+    		<name>time</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+    	<attribute>
+    		<name>formatPattern</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+        <attribute>
+    		<name>timeFormatPattern</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+        <attribute>
+    		<name>datetimeSeparator</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+    	<attribute>
+    		<name>name</name>
+    		<required>true</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+    	<attribute>
+    		<name>value</name>
+    		<required>true</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+    	<attribute>
+    		<name>timezoneOffset</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+    	<attribute>
+    		<name>readOnly</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+    	<attribute>
+    		<name>onchange</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+    	<attribute>
+    		<name>imageSrc</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+    	<attribute>
+    		<name>imageTipMessage</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+    	<attribute>
+    		<name>calendarInputJsp</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+        <attribute>
+            <name>showSecond</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
+    <tag>
+        <name>label</name>
+        <tagclass>com.jaspersoft.jasperserver.war.tags.LabelTag</tagclass>
+        <bodycontent>empty</bodycontent>
+        <info>This is a tag for displaying an input control label</info>
+        <attribute>
+            <name>key</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>labelJsp</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>messageSource</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
+    <tag>
+        <name>authorize</name>
+        <tagclass>com.jaspersoft.jasperserver.war.tags.TenantAwareAuthorizeTag</tagclass>
+        <info>
+            An extended tag to the Spring's AuthorizeTag which handles tenant-specific logic.
+            It resolves the |* expression used in authorization tags. Example: "ROLE_NAME|*"
+            expression is being resolved as root ROLE_NAME role and as all of the organizations
+            roles: ROLE_NAME|org_1, ROLE_NAME|org_2, etc.
+        </info>
+        <attribute>
+            <name>ifNotGranted</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+            <!--
+                A comma separated list of roles which the user must not have
+                for the body to be output.
+            -->
+        </attribute>
+        <attribute>
+            <name>ifAllGranted</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+            <!--
+                A comma separated list of roles which the user must all
+                possess for the body to be output.
+            -->
+        </attribute>
+        <attribute>
+            <name>ifAnyGranted</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+            <!--
+                A comma separated list of roles, one of which the user must
+                possess for the body to be output.
+            -->
+        </attribute>
+    </tag>
+
+
+    <tag>
+        <name>out</name>
+        <info>Tag surrounds JSP code in which EL expressions should not be XML-escaped.</info>
+        <tagclass>com.jaspersoft.jasperserver.war.tags.JasperOutTag</tagclass>
+        <bodycontent>JSP</bodycontent>
+        <attribute>
+            <!--
+                Determines whether characters &lt; &gt; ( ) ; ' " in EL expression values
+                will be converted to their corresponding character entity codes.
+                Default value is false.
+            -->
+            <name>escapeScript</name>
+            <required>false</required>
+        </attribute>
+        <attribute>
+            <!--
+                When true, escapes the contents with UTF-8 versus entity codes
+                Default value is false.
+            -->
+            <name>javaScriptEscape</name>
+            <required>false</required>
+        </attribute>
+    </tag>
+</taglib>

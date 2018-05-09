@@ -1,0 +1,353 @@
+/*
+.overrides_custom css
+
+Place styles for simple UI customization in this file
+
+*/
+
+/* themes.css */
+
+#logo {
+	margin-top: 5px;
+}
+
+#metaLinks {
+    height: 30px;
+}
+
+#metaLinks li.subfocus:not(select),
+#metaLinks li.over {
+  background-color: #89bd0d;
+}
+
+.palette08, 
+.button.action.primary.disabled, 
+.button.action.primary[disabled],  
+.tabSet.buttons.vertical [disabled]  {
+	color:#86a64e;
+}
+
+.palette08_bkgd { 
+	background-color:#a2c664; 
+}
+
+.palette10_bkgd { 
+	background-color: #559502; 
+}
+
+.content .header>.title,
+.column.decorated.minimized .vtitle {
+    color: #666666;
+}
+
+.tabSet.vertical.buttons .button.over,
+.tabSet.vertical.buttons .button.pressed,
+.tabSet.vertical.buttons > .tab.selected > .button {
+	color: #333;
+}
+
+.palette14_bkgd,
+.palette15_bkgd,
+.palette16_bkgd {
+	background-color: transparent;
+}
+
+
+.selected:focus .resourcePath {
+	color:#68A4E1;
+}
+
+.selected .resourcePath {
+	color:#aaa;
+}
+
+.palette15, .button.capsule.down {
+	color:#004400;
+}
+
+.palette16, 
+.button.capsule.down.disabled, 
+.button.capsule.down[disabled], 
+.resourcePath {
+	color:#306F04;
+}
+
+.sky_bkgd {
+	background-color:#4698be;
+}
+
+.button.capsule.up.over, 
+.button.capsule.up.pressed, 
+.button.capsule.down, 
+.button.capsule.down.over, 
+.button.capsule.down.pressed,
+.authorityPicker .selected,
+.authorityPicker .highlighted.selected {
+	background-color: #1388d8;
+}
+
+.royal,
+.textAccent02,
+.resourceName,
+.tabSet .selected .button,
+.list.filters>li.selected>.wrap,
+.list.stepIndicator .selected>.wrap,
+.panel.info.system .message,
+.data.table .label,
+.control.path .step.pressed,
+a:focus, a:hover, a:active,
+a#about:hover, 
+a#about:active,
+#scheduler_editor #stepDisplay > fieldset > legend,
+.resourceBlock a:link,
+#systemMessage,
+.workflow-title,
+#needHelp,
+.tabSet.horizontal.buttons .selected > .button > .wrap,
+.tabSet.horizontal.buttons .button.over,
+.tabSet.text .selected.tab > .wrap,
+.launcher,
+.list.settings .panel.pane.settings .header > .title {
+	color:#217EB5;
+}
+
+.royal_bkgd,
+.menu.vertical li>.wrap.over,
+.menu.vertical li > .wrap.pressed,
+.list.responsive>li>.wrap.pressed,
+.list.responsive>li.selected:focus>.wrap,
+.list.responsive>li.selected:focus>.wrap.over,
+div:focus li.selected>.wrap {
+	background-color:#0099ff;
+}
+
+.cerulean {
+	color: #134F91;
+}
+
+.cerulean_bkgd {
+	background-color: #134f91;
+}
+
+.list.responsive > li > .wrap.pressed,
+.tabSet.vertical.buttons .selected .button, 
+.tabSet.vertical.buttons .selected .button.over, 
+.tabSet.vertical.buttons .selected .button.pressed, 
+.tabSet.vertical.buttons .button.over, 
+.tabSet.vertical.buttons .button.pressed, 
+.tabSet.vertical.buttons .button.over {
+	background-color: #3bafff;
+}
+
+.button.action.jumbo {
+	color:#44c6f1;
+}
+
+#frame>.content>.header {
+	height:37px;
+	-moz-border-radius: 10px 10px 0px 0px;
+	-webkit-border-radius: 10px 10px 0px 0px;
+	border-radius: 10px 10px 0px 0px;
+	background: -webkit-gradient(linear, left top, left bottom, from(#e1edba), to(#8fbd04));
+	background: -moz-linear-gradient(top,#e1edba,#8fbd04);
+	border:1px solid f2f7e1;
+	border-bottom:1px solid #4eae00;
+}
+
+a#about, 
+a#about:hover, 
+a#about:active, 
+#frameFooter {
+	color: #e4f4c9;
+}
+
+.workflow-buttonContainer .button {
+	color:#467a02;
+}
+
+
+/* containers.css */
+
+.banner {
+    background-color: #6aa707;
+    border-top: 2px solid #0099ff;
+}
+
+.menu.primaryNav .wrap {
+	height: 29px;
+	line-height: 30px;
+}
+
+.menu.primaryNav .node > .wrap > .icon {
+	background-position:0 -719px;
+}
+
+.menu.primaryNav .node > .wrap.over > .icon {
+	background-position:0 -79px;
+}
+
+/* Chrome + Safari hack */
+/*
+body:nth-of-type(1) .menu.primaryNav .node > .wrap > .icon {
+    background-position: 0 -719px;  
+}
+*/ /* DELETE */
+
+body:nth-of-type(1) .menu.primaryNav .node > .wrap.over > .icon {
+    background-position: 0 -79px;  /* Chrome + Safari hack */
+}
+
+.menu.primaryNav #main_home .wrap.over > .icon, 
+.menu.primaryNav #main_home .wrap.pressed > .icon {
+	background-position:left -121px;
+}
+
+/* Chrome + Safari hack */
+/*
+body:nth-of-type(1) .menu.primaryNav #main_home .wrap.over > .icon,
+body:nth-of-type(1) .menu.primaryNav #main_home .wrap.pressed > .icon {
+	background-position: left -121px; 
+}
+*/ /* DELETE */
+
+.menu.primaryNav .wrap.over,
+.menu.primaryNav .wrap.pressed {
+	background-image: url(images/menu_primaryNav_sprite.png)\9;  /* for all ie browsers */	
+	background-position: center top\9;                           /* for all ie browsers */	
+}
+
+.menu.primaryNav .wrap.over,
+.menu.primaryNav .wrap.pressed {
+	/* gradient end values are from #94c011 to #439000 */
+	background-image: none;
+	background-color: #89bd0d;
+}
+
+.menu.vertical {
+	border:none \9; /* for all ie browsers */	
+}
+
+#frameFooter {
+	background-image: none;
+	background-color: #6aa707;
+    border-bottom: 2px solid #0099ff;
+}
+
+/* repository */
+
+#repoBrowse .column.primary > .content > .body {
+    margin-top: 29px;
+}
+
+
+/* buttons.css */
+
+.action {
+	*height:29px; /* prevents misalignment of footer buttons in IE7 */
+}
+
+.action.jumbo {
+	*height:auto;
+}
+
+.action.jumbo.up.over {   
+	color:#8FBD04;
+	border:1px solid #8FBD04;
+}
+
+.action.jumbo.up.pressed {   
+	color:#439000;
+	border:1px solid #439000;
+}
+
+.action.jumbo.pressed {
+	background-color: #6db000;  
+	-moz-box-shadow: 0px 0px 0px;
+	-webkit-box-shadow: 0px 0px 0px ;
+	box-shadow: 0px 0px 0px;
+}
+
+.action.jumbo>.wrap {
+	left:-5px;
+}
+
+.action.primary {
+	background: #99cc00;
+	*height:29px;
+}
+
+.action.primary.over {
+	background-color: #6aa707;
+}
+
+.action.primary.pressed {
+	background-color:#109600;
+}
+
+.button.capsule.up.over {
+	*background-color:#98cb00; /* prevents orange outline from appearing in IE7 */
+}
+
+
+/* pages.css */
+
+.twoColumn > .primary.column, .body.twoColumn > .primary.column, .row.twoColumn > .primary.column {
+    display: block;
+    left: 200px;
+    right: 0;
+}
+
+.threeColumn > .primary.column, .body.threeColumn > .primary.column, .row.threeColumn > .primary.column {
+    display: block;
+    left: 200px;
+    margin-left: 1px;
+    margin-right: 1px;
+    right: 200px;
+}
+
+
+/* controls.css */
+
+#globalSearch.searchLockup {
+    margin-top: 3px;
+}
+
+#globalSearch.searchLockup > .wrap {
+    border: 1px solid #559502;
+    padding-left: 0;
+    padding-right: 22px;
+}
+
+#globalSearch .button.search {
+    border-left: 2px solid #559502;
+}
+
+
+/* pageSpecific.css */
+
+#manage_users .twoColumn.manager > .primary.column,
+#manage_roles .twoColumn.manager > .primary.column {
+	left:0;
+	margin-left:5px;
+	margin-right:15px;
+}
+
+.resourceBlock-title {
+    color: #666;
+    display: inline;
+    line-height: inherit;
+}
+
+
+/* samples.css */
+
+#menus .horizontalNav .header {
+	position: relative;
+	height:35px;
+	line-height: 35px;
+	-moz-border-top-left-radius: 10px;
+	-webkit-border-top-left-radius: 10px;
+	border-top-left-radius: 10px;
+	background: -webkit-gradient(linear, left top, left bottom, from(#e1edba), to(#8fdb04));
+	background: -moz-linear-gradient(top,#e1edba,#8fdb04);
+}

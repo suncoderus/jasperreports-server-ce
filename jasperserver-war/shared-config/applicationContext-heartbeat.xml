@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <alias name="${bean.heartbeatBean}" alias="concreteHeartbeatBean"/>
+
+    <bean id="heartbeatBean" class="com.jaspersoft.jasperserver.war.common.HeartbeatBean" init-method="init">
+        <property name="enabled" value="${heartbeat.enabled}"/>
+        <property name="askForPermission" value="${heartbeat.askForPermission.enabled}"/>
+        <property name="permissionGranted" value="${heartbeat.permissionGranted.enabled}"/>
+        <property name="tenantService" ref="${bean.hibernateTenantService}"/>
+        <property name="repositoryService" ref="unsecureRepositoryService"/>
+        <property name="engineService" ref="engineService"/>
+        <property name="localesList" ref="userLocalesList"/>
+        <property name="maxCacheSize" value="100"/>
+        <property name="cacheSaveInterval" value="600000"/><!-- ten minutes -->
+        <property name="dataSource" ref="dataSource"/>
+        <property name="url" value="https://www.jaspersoft.com/heartbeat/heartbeat.php"/>
+        <property name="productName" value="${property.productName}"/>
+        <property name="productVersion" value="${property.productVersion}"/>
+        <property name="contributor" ref="${bean.heartbeatContributor}"/>
+        <property name="awsEc2Contributor" ref="heartbeatAwsEc2Contributor"/>
+        <property name="customDSClassPatterns">
+            <list>
+                <value>com.jaspersoft.%</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="heartbeatAwsEc2Contributor" class="com.jaspersoft.jasperserver.war.common.HeartbeatAwsEc2Contributor">
+        <property name="awsEc2MetadataClient" ref="awsEc2MetadataClient"/>
+        <property name="instanceProductTypeResolver" ref="${bean.instanceProductTypeResolver}"/>
+    </bean>
+
+    <bean id="heartbeatJob" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.JSMethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="concreteHeartbeatBean"/>
+        <property name="targetMethod" value="call"/>
+        <property name="scheduler" ref="quartzScheduler"/>
+    </bean>
+
+    <!--
+    <bean id="heartbeatJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="heartbeatBean"/>
+        <property name="targetMethod" value="call"/>
+    </bean>
+    -->
+
+    <bean id="heartbeatTrigger" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.JSSimpleTriggerBean">
+        <property name="jobDetail" ref="heartbeatJob"/>
+        <!-- run on startup just after 10 sec -->
+        <property name="startDelay" value="10000"/>
+        <!-- once a week -->
+        <property name="repeatInterval" value="604800000"/>
+        <!-- once a day --><!--
+        <property name="repeatInterval" value="86400000"/> -->
+        <!-- once every hour --><!--
+        <property name="repeatInterval" value="3600000"/> -->
+        <!-- once a minute --><!--
+        <property name="repeatInterval" value="60000"/> -->
+        <!-- once a second --><!--
+        <property name="repeatInterval" value="1000"/> -->
+    </bean>
+
+    <!--
+     <bean id="heartbeatTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+       stuff from JSSimpleTriggerBean  heartbeatTrigger
+    </bean>
+    -->
+</beans>

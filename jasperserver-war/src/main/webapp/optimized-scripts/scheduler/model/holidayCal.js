@@ -1,0 +1,1 @@
+define(["require","backbone","jrs.configs"],function(e){"use strict";var n=e("backbone"),r=e("jrs.configs");return n.Model.extend({urlRoot:r.contextPath+"/rest_v2/jobs/calendars"})});

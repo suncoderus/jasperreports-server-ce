@@ -1,0 +1,63 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<job>
+    <baseOutputFilename>AllAccounts</baseOutputFilename>
+    <description>testing different formats</description>
+    <label>formats</label>
+    <mailNotification>
+        <id>9963</id>
+        <messageText></messageText>
+        <resultSendType>
+            <value>SEND</value>
+        </resultSendType>
+        <skipEmptyReports>false</skipEmptyReports>
+        <subject>he you</subject>
+        <toAddresses>spam@gmail.com</toAddresses>
+        <version>2</version>
+    </mailNotification>
+    <outputFormats>PDF</outputFormats>
+    <outputFormats>HTML</outputFormats>
+    <outputFormats>XLS</outputFormats>
+    <outputFormats>RTF</outputFormats>
+    <outputFormats>CSV</outputFormats>
+    <outputFormats>ODT</outputFormats>
+    <outputFormats>DOCX</outputFormats>
+    <outputFormats>ODS</outputFormats>
+    <outputFormats>XLSX</outputFormats>
+    <outputFormats>XLS_NOPAG</outputFormats>
+    <outputFormats>PPTX</outputFormats>
+    <outputLocale></outputLocale>
+    <reportUnitURI>/reports/samples/AllAccounts</reportUnitURI>
+    <repositoryDestination>
+        <folderURI>/reports/samples</folderURI>
+        <id>9962</id>
+        <outputDescription></outputDescription>
+        <overwriteFiles>false</overwriteFiles>
+        <sequentialFilenames>false</sequentialFilenames>
+        <version>0</version>
+    </repositoryDestination>
+    <simpleTrigger>
+        <id>9961</id>
+        <startDate>2022-11-30T17:41:00-08:00</startDate>
+        <timezone>America/Los_Angeles</timezone>
+        <version>0</version>
+        <occurrenceCount>1</occurrenceCount>
+    </simpleTrigger>
+    <version>0</version>
+</job>

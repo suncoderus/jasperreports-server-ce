@@ -1,0 +1,716 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+    <!-- Repository search configurations. -->
+    <bean id="defaultRepositorySearchConfiguration" class="com.jaspersoft.jasperserver.search.common.RepositorySearchConfiguration">
+        <aop:scoped-proxy/>
+        <property name="customSorters" ref="customSorters"/>
+        <property name="customFilters" ref="customFilters"/>
+        <property name="itemsPerPage" value="40"/>
+        <property name="maxItemsPerQuery" value="1000"/>
+        <property name="searchSecurityResolver" ref="${bean.searchSecurityResolver}"/>
+        <property name="systemFilters" ref="systemFilters"/>
+        <property name="resourceLabelMaxLength" value="100"/>
+        <property name="resourceNameMaxLength" value="100"/>
+        <property name="resourceDescriptionMaxLength" value="250"/>
+        <property name="customFiltersMap" ref="defaultCustomFiltersMap"/>
+    </bean>
+
+    <!-- NOTE: create a separate bean instead of alias if mode specific configuration is required. -->
+    <alias name="defaultRepositorySearchConfiguration" alias="searchModeRepositorySearchConfiguration"/>
+    <alias name="defaultRepositorySearchConfiguration" alias="browseModeRepositorySearchConfiguration"/>
+
+    <bean id="libraryModeRepositorySearchConfiguration" class="com.jaspersoft.jasperserver.search.common.RepositorySearchConfiguration">
+        <aop:scoped-proxy/>
+        <property name="customSorters" ref="customSorters"/>
+        <property name="customFilters" ref="libraryFilters"/>
+        <property name="itemsPerPage" value="40"/>
+        <property name="searchSecurityResolver" ref="${bean.searchSecurityResolver}"/>
+        <property name="systemFilters" ref="systemFilters"/>
+        <property name="resourceLabelMaxLength" value="100"/>
+        <property name="resourceNameMaxLength" value="100"/>
+        <property name="resourceDescriptionMaxLength" value="250"/>
+        <property name="customFiltersMap" ref="libraryCustomFiltersMap"/>
+    </bean>
+
+
+    <!-- Initial states resolvers. -->
+    <bean id="defaultInitialStateResolver" class="com.jaspersoft.jasperserver.search.state.impl.StateImpl">
+        <property name="text" value=""/>
+        <property name="sortBy" value="name"/>
+        <property name="folderUri" value="/"/>
+        <property name="customFiltersMap" ref="defaultCustomFiltersMap"/>
+        <property name="resultIndex" value="0"/>
+        <property name="resultsCount" value="10"/>
+    </bean>
+
+    <!-- NOTE: create a separate bean instead of alias if mode specific initial state resolver is required. -->
+    <alias name="defaultInitialStateResolver" alias="searchInitialStateResolver"/>
+    <alias name="defaultInitialStateResolver" alias="browseInitialStateResolver"/>
+
+    <bean id="libraryInitialStateResolver" class="com.jaspersoft.jasperserver.search.state.impl.StateImpl">
+        <property name="text" value=""/>
+        <property name="sortBy" value="name"/>
+        <property name="folderUri" value="/"/>
+        <property name="customFiltersMap" ref="libraryCustomFiltersMap"/>
+        <property name="resultIndex" value="0"/>
+        <property name="resultsCount" value="10"/>
+    </bean>
+
+    <util:map id="libraryCustomFiltersMap">
+        <entry key="resourceTypeFilter" value="resourceTypeFilter-reports"/>
+    </util:map>
+
+    <util:map id="defaultCustomFiltersMap">
+        <entry key="accessTypeFilter" value="accessTypeFilter-all"/>
+        <entry key="timeFilter" value="timeFilter-anyTime"/>
+        <entry key="scheduleFilter" value="scheduleFilter-anySchedule"/>
+        <entry key="resourceTypeFilter" value="resourceTypeFilter-all"/>
+    </util:map>
+
+
+    <!-- JSON converters. -->
+    <bean id="searchModeJsonConverter" class="com.jaspersoft.jasperserver.search.util.JSONConverter">
+        <property name="repositorySearchConfiguration" ref="searchModeRepositorySearchConfiguration"/>
+        <property name="configurationBean" ref="configurationBean"/>
+    </bean>
+
+    <bean id="browseModeJsonConverter" class="com.jaspersoft.jasperserver.search.util.JSONConverter">
+        <property name="repositorySearchConfiguration" ref="browseModeRepositorySearchConfiguration"/>
+        <property name="configurationBean" ref="configurationBean"/>
+    </bean>
+
+    <bean id="libraryModeJsonConverter" class="com.jaspersoft.jasperserver.search.util.JSONConverter">
+        <property name="repositorySearchConfiguration" ref="libraryModeRepositorySearchConfiguration"/>
+        <property name="configurationBean" ref="configurationBean"/>
+    </bean>
+
+    <bean id="permissionsJsonConverter" class="com.jaspersoft.jasperserver.search.util.JSONConverter">
+        <property name="repositorySearchConfiguration" ref="browseModeRepositorySearchConfiguration"/>
+        <property name="configurationBean" ref="configurationBean"/>
+    </bean>
+
+
+    <!-- Search mode settings. -->
+    <bean id="searchSearchModeSettings" class="com.jaspersoft.jasperserver.search.mode.SearchModeSettings">
+        <property name="initialStateResolver" ref="searchInitialStateResolver"/>
+        <property name="jsonConverter" ref="searchModeJsonConverter"/>
+        <property name="repositorySearchConfiguration" ref="searchModeRepositorySearchConfiguration"/>
+    </bean>
+
+    <bean id="browseSearchModeSettings" class="com.jaspersoft.jasperserver.search.mode.SearchModeSettings">
+        <property name="initialStateResolver" ref="browseInitialStateResolver"/>
+        <property name="jsonConverter" ref="browseModeJsonConverter"/>
+        <property name="repositorySearchConfiguration" ref="browseModeRepositorySearchConfiguration"/>
+    </bean>
+
+    <bean id="librarySearchModeSettings" class="com.jaspersoft.jasperserver.search.mode.SearchModeSettings">
+        <property name="initialStateResolver" ref="libraryInitialStateResolver"/>
+        <property name="jsonConverter" ref="libraryModeJsonConverter"/>
+        <property name="repositorySearchConfiguration" ref="libraryModeRepositorySearchConfiguration"/>
+    </bean>
+
+
+    <bean id="searchModeSettingsResolver" class="com.jaspersoft.jasperserver.search.mode.impl.SearchModeSettingsResolverImpl">
+        <property name="settingsMap">
+            <map>
+                <entry key="BROWSE" value-ref="browseSearchModeSettings"/>
+                <entry key="SEARCH" value-ref="searchSearchModeSettings"/>
+                <entry key="LIBRARY" value-ref="librarySearchModeSettings"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="searchSecurityResolver" class="com.jaspersoft.jasperserver.search.service.impl.SearchSecurityResolverImpl">
+    </bean>
+
+    <util:list id="systemFilters">
+        <ref bean="${bean.search.sorterFilter}"/>
+        <ref bean="${bean.search.folderFilter}"/>
+        <ref bean="${bean.search.textFilter}"/>
+        <ref bean="${bean.excludeFolderFilter}"/>
+        <ref bean="hiddenFilter"/>
+        <ref bean="${bean.search.resourceContainerTypeFilter}"/>
+    </util:list>
+
+    <bean id="searchCriteriaFactory" class="com.jaspersoft.jasperserver.search.filter.ResourceTypeSearchCriteriaFactory">
+        <property name="persistentClassMappings" ref="persistentMappings"/>
+        <property name="typeSpecificFilters" ref="${bean.search.typeSpecificFilters}"/>
+    </bean>
+
+    <util:list id="roleAccessListDefault">
+        <bean class="com.jaspersoft.jasperserver.search.common.RoleAccess">
+            <property name="roleName" value="ROLE_ADMINISTRATOR"/>
+        </bean>
+        <bean class="com.jaspersoft.jasperserver.search.common.RoleAccess">
+            <property name="roleName" value="ROLE_USER"/>
+        </bean>
+    </util:list>
+
+    <!-- Custom sorters -->
+    <util:list id="customSorters">
+        <bean class="com.jaspersoft.jasperserver.search.common.CustomSorter">
+            <property name="id" value="name"/>
+            <property name="default" value="true"/>
+            <property name="labelId" value="SEARCH_SORT_BY_NAME"/>
+            <property name="searchSorter">
+                <bean class="com.jaspersoft.jasperserver.search.sorter.ByLabelSorter"/>
+            </property>
+            <property name="roleAccessList" ref="${bean.byNameSorter.RoleAccessList}"/>
+            <property name="exposed"><value type="boolean">true</value></property>
+        </bean>
+        <bean class="com.jaspersoft.jasperserver.search.common.CustomSorter">
+            <property name="id" value="date"/>
+            <property name="labelId" value="SEARCH_SORT_BY_DATE"/>
+            <property name="searchSorter">
+                <bean class="com.jaspersoft.jasperserver.search.sorter.ByDateSorter"/>
+            </property>
+            <property name="roleAccessList" ref="${bean.byDateSorter.RoleAccessList}"/>
+            <property name="exposed"><value type="boolean">true</value></property>
+        </bean>
+        <bean class="com.jaspersoft.jasperserver.search.common.CustomSorter">
+            <property name="id" value="updateDate"/>
+            <property name="labelId" value="SEARCH_SORT_BY_UPDATE_DATE"/>
+            <property name="searchSorter">
+                <bean class="com.jaspersoft.jasperserver.search.sorter.ByDateSorter"/>
+            </property>
+            <property name="roleAccessList" ref="${bean.byDateSorter.RoleAccessList}"/>
+        </bean>
+        <bean class="com.jaspersoft.jasperserver.search.common.CustomSorter">
+            <property name="id" value="creationDate"/>
+            <property name="labelId" value="SEARCH_SORT_BY_CREATION_DATE"/>
+            <property name="searchSorter">
+                <bean class="com.jaspersoft.jasperserver.search.sorter.ByCreationDateSorter"/>
+            </property>
+            <property name="roleAccessList" ref="${bean.byDateSorter.RoleAccessList}"/>
+        </bean>
+        <bean class="com.jaspersoft.jasperserver.search.common.CustomSorter">
+            <property name="id" value="description"/>
+            <property name="labelId" value="SEARCH_SORT_BY_DESCRIPTION"/>
+            <property name="searchSorter">
+                <bean class="com.jaspersoft.jasperserver.search.sorter.ByDescriptionSorter"/>
+            </property>
+            <property name="roleAccessList" ref="${bean.byDateSorter.RoleAccessList}"/>
+        </bean>
+        <bean class="com.jaspersoft.jasperserver.search.common.CustomSorter">
+            <property name="id" value="type"/>
+            <property name="labelId" value="SEARCH_SORT_BY_TYPE"/>
+            <property name="searchSorter">
+                <bean class="com.jaspersoft.jasperserver.search.sorter.ByTypeSorter"/>
+            </property>
+            <property name="roleAccessList" ref="${bean.byDateSorter.RoleAccessList}"/>
+        </bean>
+        <bean class="com.jaspersoft.jasperserver.search.common.CustomSorter">
+            <property name="id" value="uri"/>
+            <property name="labelId" value="SEARCH_SORT_BY_URI"/>
+            <property name="searchSorter">
+                <bean class="com.jaspersoft.jasperserver.search.sorter.ByUriSorter"/>
+            </property>
+            <property name="roleAccessList" ref="${bean.byDateSorter.RoleAccessList}"/>
+        </bean>
+        <bean class="com.jaspersoft.jasperserver.search.common.CustomSorter">
+            <property name="id" value="popularity"/>
+            <property name="labelId" value="SEARCH_SORT_BY_POPULARITY"/>
+            <property name="searchSorter">
+                <bean class="com.jaspersoft.jasperserver.search.sorter.ByPopularitySorter"/>
+            </property>
+            <property name="roleAccessList" ref="${bean.byDateSorter.RoleAccessList}"/>
+        </bean>
+        <bean class="com.jaspersoft.jasperserver.search.common.CustomSorter">
+            <property name="id" value="accessTime"/>
+            <property name="labelId" value="SEARCH_SORT_BY_ACCESS_TIME"/>
+            <property name="searchSorter">
+                <bean class="com.jaspersoft.jasperserver.search.sorter.ByAccessTimeSorter"/>
+            </property>
+            <property name="roleAccessList" ref="${bean.byDateSorter.RoleAccessList}"/>
+        </bean>
+    </util:list>
+
+    <!-- Custom filters -->
+    <util:list id="customFilters">
+        <bean class="com.jaspersoft.jasperserver.search.common.CustomFilter">
+            <property name="searchSecurityResolver" ref="${bean.searchSecurityResolver}"/>
+            <property name="id" value="accessTypeFilter"/>
+            <property name="filter">
+                <bean class="com.jaspersoft.jasperserver.search.filter.AccessTypeFilter" parent="baseSearchFilter" />
+            </property>
+            <property name="defaultOption" value="accessTypeFilter-all"/>
+            <property name="roleAccessList" ref="${bean.accessTypeFilter.RoleAccessList}"/>
+            <property name="options">
+                <list>
+                    <bean class="com.jaspersoft.jasperserver.search.common.Option">
+                        <property name="id" value="accessTypeFilter-all"/>
+                        <property name="labelId" value="SEARCH_ACCESS_TYPE_ALL"/>
+                        <property name="roleAccessList" ref="${bean.accessTypeFilter.All.RoleAccessList}"/>
+                    </bean>
+                    <bean class="com.jaspersoft.jasperserver.search.common.Option">
+                        <property name="id" value="accessTypeFilter-changedByMe"/>
+                        <property name="labelId" value="SEARCH_ACCESS_TYPE_CHANGED_BY_ME"/>
+                        <property name="roleAccessList" ref="${bean.accessTypeFilter.ChangedByMe.RoleAccessList}"/>
+                    </bean>
+                    <bean class="com.jaspersoft.jasperserver.search.common.Option">
+                        <property name="id" value="accessTypeFilter-viewedByMe"/>
+                        <property name="labelId" value="SEARCH_ACCESS_TYPE_VIEWED_BY_ME"/>
+                        <property name="roleAccessList" ref="${bean.accessTypeFilter.ViewedByMe.RoleAccessList}"/>
+                    </bean>
+                </list>
+            </property>
+            <property name="showCount" value="-1"/>
+        </bean>
+        <bean class="com.jaspersoft.jasperserver.search.common.CustomFilter">
+            <property name="searchSecurityResolver" ref="${bean.searchSecurityResolver}"/>
+            <property name="id" value="resourceTypeFilter"/>
+            <property name="filter" ref="${bean.search.resourceTypeFilter}"/>
+            <property name="defaultOption" value="resourceTypeFilter-all"/>
+            <property name="roleAccessList" ref="${bean.resourceTypeFilter.RoleAccessList}"/>
+            <property name="options" ref="${bean.resourceTypeFilterOptions}"/>
+            <property name="showCount" value="4"/>
+        </bean>
+        <bean class="com.jaspersoft.jasperserver.search.common.CustomFilter">
+            <property name="searchSecurityResolver" ref="${bean.searchSecurityResolver}"/>
+            <property name="id" value="timeFilter"/>
+            <property name="filter">
+                <bean class="com.jaspersoft.jasperserver.search.filter.TimeFilter" parent="baseSearchFilter" />
+            </property>
+            <property name="defaultOption" value="timeFilter-anyTime"/>
+            <property name="roleAccessList" ref="${bean.timeFilter.RoleAccessList}"/>
+            <property name="options">
+                <list>
+                    <bean class="com.jaspersoft.jasperserver.search.common.Option">
+                        <property name="id" value="timeFilter-anyTime"/>
+                        <property name="labelId" value="SEARCH_TIME_ANY_TIME"/>
+                        <property name="roleAccessList" ref="${bean.timeFilter.AnyTime.RoleAccessList}"/>
+                    </bean>
+                    <bean class="com.jaspersoft.jasperserver.search.common.Option">
+                        <property name="id" value="timeFilter-today"/>
+                        <property name="labelId" value="SEARCH_TIME_TODAY"/>
+                        <property name="roleAccessList" ref="${bean.timeFilter.Today.RoleAccessList}"/>
+                    </bean>
+                    <bean class="com.jaspersoft.jasperserver.search.common.Option">
+                        <property name="id" value="timeFilter-yesterday"/>
+                        <property name="labelId" value="SEARCH_TIME_YESTERDAY"/>
+                        <property name="roleAccessList" ref="${bean.timeFilter.Yesterday.RoleAccessList}"/>
+                    </bean>
+                    <bean class="com.jaspersoft.jasperserver.search.common.Option">
+                        <property name="id" value="timeFilter-pastWeek"/>
+                        <property name="labelId" value="SEARCH_TIME_PAST_WEEK"/>
+                        <property name="roleAccessList" ref="${bean.timeFilter.PastWeek.RoleAccessList}"/>
+                    </bean>
+                    <bean class="com.jaspersoft.jasperserver.search.common.Option">
+                        <property name="id" value="timeFilter-pastMonth"/>
+                        <property name="labelId" value="SEARCH_TIME_PAST_MONTH"/>
+                        <property name="roleAccessList" ref="${bean.timeFilter.PastMonth.RoleAccessList}"/>
+                    </bean>
+                </list>
+            </property>
+            <property name="showCount" value="-1"/>
+        </bean>
+        <bean class="com.jaspersoft.jasperserver.search.common.CustomFilter">
+            <property name="searchSecurityResolver" ref="${bean.searchSecurityResolver}"/>
+            <property name="id" value="scheduleFilter"/>
+            <property name="filter" ref="${bean.search.scheduleFilter}"/>
+            <property name="defaultOption" value="scheduleFilter-anySchedule"/>
+            <property name="roleAccessList" ref="${bean.scheduleFilter.RoleAccessList}"/>
+            <property name="options">
+                <list>
+                    <bean class="com.jaspersoft.jasperserver.search.common.Option">
+                        <property name="id" value="scheduleFilter-anySchedule"/>
+                        <property name="labelId" value="SEARCH_SCHEDULE_ANY_SCHEDULE"/>
+                        <property name="roleAccessList" ref="${bean.scheduleFilter.Any.RoleAccessList}"/>
+                    </bean>
+                    <bean class="com.jaspersoft.jasperserver.search.common.Option">
+                        <property name="id" value="scheduleFilter-scheduled"/>
+                        <property name="labelId" value="SEARCH_SCHEDULE_SCHEDULED"/>
+                        <property name="roleAccessList" ref="${bean.scheduleFilter.Scheduled.RoleAccessList}"/>
+                    </bean>
+                    <bean class="com.jaspersoft.jasperserver.search.common.Option">
+                        <property name="id" value="scheduleFilter-scheduledByMe"/>
+                        <property name="labelId" value="SEARCH_SCHEDULE_SCHEDULED_BY_ME"/>
+                        <property name="roleAccessList" ref="${bean.scheduleFilter.ScheduledByMe.RoleAccessList}"/>
+                    </bean>
+                    <bean class="com.jaspersoft.jasperserver.search.common.Option">
+                        <property name="id" value="scheduleFilter-notScheduled"/>
+                        <property name="labelId" value="SEARCH_SCHEDULE_NOT_SCHEDULED"/>
+                        <property name="roleAccessList" ref="${bean.scheduleFilter.NotScheduled.RoleAccessList}"/>
+                    </bean>
+                </list>
+            </property>
+            <property name="showCount" value="-1"/>
+        </bean>
+    </util:list>
+
+    <util:list id="libraryFilters">
+        <bean class="com.jaspersoft.jasperserver.search.common.CustomFilter">
+            <property name="searchSecurityResolver" ref="${bean.searchSecurityResolver}"/>
+            <property name="id" value="resourceTypeFilter"/>
+            <property name="filter" ref="${bean.search.resourceTypeFilter}"/>
+            <property name="defaultOption" value="${bean.libraryResourceTypeFilterDefaultOption}"/>
+            <property name="roleAccessList" ref="${bean.resourceTypeFilter.RoleAccessList}"/>
+            <property name="options" ref="${bean.libraryResourceTypeFilterOptions}"/>
+            <property name="showCount" value="4"/>
+        </bean>
+    </util:list>
+
+    <util:list id="libraryResourceTypeFilterOptions">
+        <ref bean="${bean.resourceTypeFilter.option.reports}"/>
+    </util:list>
+
+
+    <util:list id="resourceTypeFilterOptions">
+        <ref bean="${bean.resourceTypeFilter.option.all}"/>
+        <ref bean="${bean.resourceTypeFilter.option.reports}"/>
+        <ref bean="${bean.resourceTypeFilter.option.reportOutput}"/>
+        <ref bean="${bean.resourceTypeFilter.option.view}"/>
+        <ref bean="${bean.resourceTypeFilter.option.dataSources}"/>
+    </util:list>
+
+    <bean id="resourceTypeFilter.all" class="com.jaspersoft.jasperserver.search.common.Option">
+        <property name="id" value="resourceTypeFilter-all"/>
+        <property name="labelId" value="SEARCH_TYPE_ALL"/>
+        <property name="roleAccessList" ref="${bean.resourceTypeFilter.All.RoleAccessList}"/>
+    </bean>
+    <bean id="resourceTypeFilter.reports" class="com.jaspersoft.jasperserver.search.common.Option">
+        <property name="id" value="resourceTypeFilter-reports"/>
+        <property name="labelId" value="SEARCH_TYPE_REPORTS"/>
+        <property name="roleAccessList" ref="${bean.resourceTypeFilter.Reports.RoleAccessList}"/>
+    </bean>
+    <bean id="resourceTypeFilter.reportOutput" class="com.jaspersoft.jasperserver.search.common.Option">
+        <property name="id" value="resourceTypeFilter-reportOutput"/>
+        <property name="labelId" value="SEARCH_TYPE_REPORT_OUTPUT"/>
+        <property name="roleAccessList" ref="${bean.resourceTypeFilter.ReportOutput.RoleAccessList}"/>
+    </bean>
+    <bean id="resourceTypeFilter.view" class="com.jaspersoft.jasperserver.search.common.Option">
+        <property name="id" value="resourceTypeFilter-view"/>
+        <property name="labelId" value="SEARCH_TYPE_VIEW"/>
+        <property name="roleAccessList" ref="${bean.resourceTypeFilter.View.RoleAccessList}"/>
+    </bean>
+    <bean id="resourceTypeFilter.dataSources" class="com.jaspersoft.jasperserver.search.common.Option">
+        <property name="id" value="resourceTypeFilter-dataSources"/>
+        <property name="labelId" value="SEARCH_TYPE_DATASOURCES"/>
+        <property name="roleAccessList" ref="${bean.resourceTypeFilter.DataSources.RoleAccessList}"/>
+    </bean>
+
+    <bean id="searchActionModel" class="com.jaspersoft.jasperserver.search.model.SearchActionModelSupport">
+        <property name="proVersion" value="${isProVersion}"/>
+    </bean>
+
+    <util:list id="sorters">
+        <bean class="com.jaspersoft.jasperserver.search.sorter.ByLabelSorter">
+        </bean>
+        <bean class="com.jaspersoft.jasperserver.search.sorter.ByDateSorter">
+        </bean>
+    </util:list>
+
+    <util:list id="supportedTypes">
+        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.ReportUnit</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.OlapUnit</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.Query</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JdbcReportDataSource</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JndiJdbcReportDataSource</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.VirtualReportDataSource</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.BeanReportDataSource</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.CustomReportDataSource</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.OlapDataSource</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.OlapClientConnection</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.ContentResource</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.ListOfValues</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.ListOfValuesItem</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.DataType</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.MondrianXMLADefinition</value>
+    </util:list>
+
+    <util:map id="typeSpecificFilters" key-type="java.lang.String" value-type="com.jaspersoft.jasperserver.api.search.SearchFilter">
+    </util:map>
+
+    <util:list id="deleteOrder">
+        <value>com.jaspersoft.commons.semantic.DataDefinerUnit</value>
+        <value>com.jaspersoft.ji.adhoc.DashboardResource</value>
+        <value>com.jaspersoft.ji.adhoc.AdhocReportUnit</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.ReportUnit</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.OlapUnit</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.ListOfValues</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.ListOfValuesItem</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.DataType</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.Query</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.ContentResource</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.MondrianXMLADefinition</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JdbcReportDataSource</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JndiJdbcReportDataSource</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.VirtualReportDataSource</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.BeanReportDataSource</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.CustomReportDataSource</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.OlapDataSource</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.OlapClientConnection</value>
+        <value>com.jaspersoft.ji.ja.security.domain.SecureMondrianConnection</value>
+        <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.XMLAConnection</value>
+        <value>com.jaspersoft.commons.semantic.datasource.SemanticLayerDataSource</value>
+    </util:list>
+
+    <bean id="resourceTypeFilter" class="com.jaspersoft.jasperserver.search.filter.ResourceTypeFilter" parent="baseSearchFilter">
+        <property name="filterOptionToResourceTypes" ref="${bean.filterOptionToResourceTypes}"/>
+        <property name="persistentClassMappings" ref="persistentMappings"/>
+    </bean>
+
+    <util:map id="filterOptionToResourceTypes">
+        <entry key="resourceTypeFilter-all">
+            <null/> <!-- No resources to be limited to for this option. -->
+        </entry>
+        <entry key="resourceTypeFilter-reports">
+            <list>
+                <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.ReportUnit</value>
+            </list>
+        </entry>
+        <entry key="resourceTypeFilter-reportOutput">
+            <list>
+                <value>com.jaspersoft.jasperserver.api.metadata.common.domain.ContentResource</value>
+            </list>
+        </entry>
+        <entry key="resourceTypeFilter-view">
+            <list>
+                <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.OlapUnit</value>
+            </list>
+        </entry>
+        <entry key="resourceTypeFilter-dataSources">
+            <list>
+                <value>com.jaspersoft.jasperserver.api.metadata.common.domain.DataSource</value>
+                <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.ReportDataSource</value>
+                <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.BeanReportDataSource</value>
+                <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.CustomReportDataSource</value>
+                <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JdbcReportDataSource</value>
+                <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JndiJdbcReportDataSource</value>
+                <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.VirtualReportDataSource</value>
+                <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.AwsReportDataSource</value>
+                <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.MondrianConnection</value>
+                <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.JndiJdbcOlapDataSource</value>
+                <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.JdbcOlapDataSource</value>
+                <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.OlapDataSource</value>
+                <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.XMLAConnection</value>
+                <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.XMLAConnection</value>
+                <value>com.jaspersoft.ji.adhoc.AdhocDataView</value>
+            </list>
+        </entry>
+    </util:map>
+
+
+    <!--<util:map id="clientResourceToResourceTypes">-->
+    <bean id="clientResourceTypeToServerResourceTypes" class="java.util.HashMap">
+        <constructor-arg index="0" type="java.util.Map">
+            <map>
+                <entry key="awsDataSource">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.AwsReportDataSource</value>
+                    </set>
+                </entry>
+                <entry key="beanDataSource">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.BeanReportDataSource</value>
+                    </set>
+                </entry>
+                <entry key="customDataSource">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.CustomReportDataSource</value>
+                    </set>
+                </entry>
+                <entry key="dataType">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.DataType</value>
+                    </set>
+                </entry>
+                <entry key="file">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.ContentResource</value>
+                        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource</value>
+                    </set>
+                </entry>
+                <entry key="secureFile">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource</value>
+                    </set>
+                </entry>
+                <entry key="folder">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.Folder</value>
+                    </set>
+                </entry>
+                <entry key="inputControl">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl</value>
+                    </set>
+                </entry>
+                <entry key="jdbcDataSource">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JdbcReportDataSource</value>
+                    </set>
+                </entry>
+                <entry key="jndiJdbcDataSource">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JndiJdbcReportDataSource</value>
+                    </set>
+                </entry>
+                <entry key="listOfValues">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.ListOfValues</value>
+                    </set>
+                </entry>
+                <entry key="mondrianConnection">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.MondrianConnection</value>
+                    </set>
+                </entry>
+                <entry key="mondrianXmlaDefinition">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.MondrianXMLADefinition</value>
+                    </set>
+                </entry>
+                <entry key="olapUnit">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.OlapUnit</value>
+                    </set>
+                </entry>
+                <entry key="query">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.Query</value>
+                    </set>
+                </entry>
+                <entry key="reportUnit">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.ReportUnit</value>
+                    </set>
+                </entry>
+                <entry key="resourceLookup">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.ResourceLookup</value>
+                    </set>
+                </entry>
+                <entry key="virtualDataSource">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.VirtualReportDataSource</value>
+                    </set>
+                </entry>
+                <entry key="xmlaConnection">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.XMLAConnection</value>
+                    </set>
+                </entry>
+            </map>
+       </constructor-arg>
+    </bean>
+
+    <bean id="folderFilter" class="com.jaspersoft.jasperserver.search.filter.FolderFilter" parent="baseSearchFilter">
+        <property name="roleAccessUrisResolver" ref="${bean.roleAccessUrisResolver}"/>
+    </bean>
+
+    <bean id="sorterFilter" class="com.jaspersoft.jasperserver.search.filter.SorterFilter" parent="baseSearchFilter">
+    </bean>
+
+    <bean id="hiddenFilter" class="com.jaspersoft.jasperserver.search.filter.HiddenFilter" parent="baseSearchFilter">
+    </bean>
+
+    <bean id="resourceContainerTypeFilter" class="com.jaspersoft.jasperserver.search.filter.ResourceContainerTypeFilter" parent="baseSearchFilter">
+    </bean>
+
+    <bean id="ceExcludeFolderFilter" class="com.jaspersoft.jasperserver.search.filter.ExcludeFolderFilter">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <bean id="textFilter" class="com.jaspersoft.jasperserver.search.filter.TextFilter" parent="baseSearchFilter">
+        <property name="databaseCharactersEscapeResolver" ref="databaseCharactersEscapeResolver"/>   
+    </bean>
+
+    <bean id="accessTypeFilter" class="com.jaspersoft.jasperserver.search.filter.AccessTypeFilter" parent="baseSearchFilter"/>
+
+    <bean id="baseSearchFilter" abstract="true" class="com.jaspersoft.jasperserver.search.filter.BaseSearchFilter">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <bean id="scheduleFilter" class="com.jaspersoft.jasperserver.search.filter.ScheduleFilter" parent="baseSearchFilter">
+        <property name="jobsService" ref="reportJobsPersistenceHibernateService" />
+        <property name="tenantService" ref="tenantService"/>
+    </bean>
+
+    <util:map id="childrenLoaders">
+    </util:map>
+
+    <bean id="schedulingChecker" class="com.jaspersoft.jasperserver.search.common.SchedulingChecker">
+        <property name="schedulingService" ref="reportSchedulingService" />
+        <property name="types">
+            <set>
+                <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.ReportUnit</value>
+            </set>
+        </property>
+    </bean>
+
+    <bean id="repositorySearchService" class="com.jaspersoft.jasperserver.search.service.impl.RepositorySearchServiceImpl">
+        <property name="repositoryService" ref="${bean.repositoryService}"/>
+        <property name="resourceService" ref="resourceService"/>
+        <property name="transformerFactory">
+            <bean class="com.jaspersoft.jasperserver.search.transformer.SearchTransformerFactory"/>
+        </property>
+        <property name="childrenLoaders" ref="${bean.search.childrenLoaders}"/>
+        <property name="defaultSearchCriteriaFactory" ref="searchCriteriaFactory"/>
+        <property name="searchModeSettingsResolver" ref="searchModeSettingsResolver"/>
+        <property name="filterOptionToResourceTypes" ref="${bean.filterOptionToResourceTypes}"/>
+        <property name="sorter">
+            <bean class="com.jaspersoft.jasperserver.search.sorter.ByLabelSorter"/>
+        </property>
+    </bean>
+
+    <bean id="resourceService" class="com.jaspersoft.jasperserver.search.service.impl.ResourceServiceImpl">
+        <property name="repositoryService" ref="${bean.repositoryService}"/>
+        <property name="securityChecker" ref="${bean.repositoryServiceSecurityChecker}"/>
+        <property name="schedulingChecker" ref="${bean.search.schedulingChecker}"/>
+        <property name="childrenLoaders" ref="${bean.search.childrenLoaders}"/>
+        <property name="searchCriteriaFactory" ref="searchCriteriaFactory"/>
+        <property name="deleteOrder" ref="deleteOrder"/>
+        <property name="maxDependentReports" value="20"/>
+        <property name="tempFolderName" value="/temp"/>
+        <property name="checkDependentResourcesFor" ref="${bean.resourceService-checkDependentResourcesFor}"/>
+        <property name="resourceTypeResolver">
+            <bean class="com.jaspersoft.jasperserver.search.service.impl.CustomReportDataSourceTypeResolver" >
+                <property name="repositoryService" ref="${bean.repositoryService}"/>
+            </bean>
+        </property>
+    </bean>
+
+    <util:list id="resourceService-checkDependentResourcesFor">
+    </util:list>
+
+    <bean id="folderService" class="com.jaspersoft.jasperserver.search.service.impl.FolderServiceImpl">
+        <property name="repositoryService" ref="${bean.repositoryService}"/>
+    </bean>
+
+    <alias name="${bean.tenantService}" alias="concreteTenantService"/>
+
+    <bean id="clientResourceResolver" class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.ClientResourceResolver">
+        <property name="clientResourceTypeToServerResourceTypes" ref="${bean.clientResourceTypeToServerResourceTypes}"/>
+    </bean>
+
+</beans>

@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>Select List Controls</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <link type="text/css" href="../../../../demos/css/jasper-ui-dev.css" rel="stylesheet">
+</head>
+
+<body class="jr">
+
+<div class="jr-mMultiselect jr-uWidth-350px jr">
+    <div class="jr-mMultiselect-toggleContainer jr">
+        <div class="jr-mMultiselect-toggle jr-mMultiselect-toggleAvailable jr-isActive jr" title="">
+            <span class="jr-mMultiselect-toggle-label jr" title="Available: #">Available: 12</span>
+        </div>
+        <div class="jr-mMultiselect-toggle jr-mMultiselect-toggleSelected jr-isInactive jr">
+            <span class="jr-mMultiselect-toggle-label jr" title="Selected: #">Selected: 5</span>
+        </div>
+    </div>
+
+    <div class="jr-mMultiselect-listContainer j-active jr" style="padding-top:26px;">
+        <div class="jr-mMultiselect-search jr">
+            <input class="jr-mInput-search jr" type="text" placeholder="Search list...">
+        </div>
+
+        <div class="jr-mMultiselect-list j-available-list jr" style="top:0; height:100%; padding-top:38px; padding-bottom:22px;">
+            <div class="jr-mScalablelist jr" draggable="false" ondragstart="return false" unselectable="on" onselectstart="return false" style="visibility: visible; display: block;">
+                <div class="j-view-port-chunk" style="height: 264px">
+                    <ul style="position: relative; top: 0;" class="jr-mSelectlist jr">
+
+                        <li title="January" data-index="0" class="jr-mSelectlist-item jr ">
+                            <div class="jr-mSelectlist-item-wrapper jr">
+                                <a class="jr-mSelectlist-item-text jr">January</a>
+                            </div>
+                        </li>
+                        <li title="February" data-index="1" class="jr-mSelectlist-item jr jr-isHovered">
+                            <div class="jr-mSelectlist-item-wrapper jr">
+                                <a class="jr-mSelectlist-item-text jr">February - hovered</a>
+                            </div>
+                        </li>
+                        <li title="March" data-index="2" class="jr-mSelectlist-item jr  ">
+                            <div class="jr-mSelectlist-item-wrapper jr">
+                                <a class="jr-mSelectlist-item-text jr">March</a>
+                            </div>
+                        </li>
+                        <li title="April" data-index="3" class="jr-mSelectlist-item jr jr-isSelected">
+                            <div class="jr-mSelectlist-item-wrapper jr">
+                                <a class="jr-mSelectlist-item-text jr">April - selected</a>
+                            </div>
+                        </li>
+                        <li title="May" data-index="4" class="jr-mSelectlist-item jr">
+                            <div class="jr-mSelectlist-item-wrapper jr">
+                                <a class="jr-mSelectlist-item-text jr">May</a>
+                            </div>
+                        </li>
+                        <li title="June" data-index="5" class="jr-mSelectlist-item jr jr-isSelected jr-isHovered">
+                            <div class="jr-mSelectlist-item-wrapper jr">
+                                <a class="jr-mSelectlist-item-text jr">June - selected and hovered</a>
+                            </div>
+                        </li>
+                        <li title="July" data-index="6" class="jr-mSelectlist-item jr">
+                            <div class="jr-mSelectlist-item-wrapper jr">
+                                <a class="jr-mSelectlist-item-text jr">July</a>
+                            </div>
+                        </li>
+                        <li title="August" data-index="7" class="jr-mSelectlist-item jr">
+                            <div class="jr-mSelectlist-item-wrapper jr">
+                                <a class="jr-mSelectlist-item-text jr">August</a>
+                            </div>
+                        </li>
+                        <li title="September" data-index="8" class="jr-mSelectlist-item jr">
+                            <div class="jr-mSelectlist-item-wrapper jr">
+                                <a class="jr-mSelectlist-item-text jr">September</a>
+                            </div>
+                        </li>
+                        <li title="October" data-index="9" class="jr-mSelectlist-item jr">
+                            <div class="jr-mSelectlist-item-wrapper jr">
+                                <a class="jr-mSelectlist-item-text jr">October</a>
+                            </div>
+                        </li>
+                        <li title="November" data-index="10" class="jr-mSelectlist-item jr">
+                            <div class="jr-mSelectlist-item-wrapper jr">
+                                <a class="jr-mSelectlist-item-text jr">November</a>
+                            </div>
+                        </li>
+                        <li title="December" data-index="11" class="jr-mSelectlist-item jr">
+                            <div class="jr-mSelectlist-item-wrapper jr">
+                                <a class="jr-mSelectlist-item-text jr">December</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="jr-mMultiselect-buttonContainer jr">
+            <ul class="jr-mItemselector jr">
+                <li class="jr-mItemselector-button jr-uWidth-30pc jr jr-jSelectAll">
+                    <span class="jr-mItemselector-button-icon jr-mIcon jr-mIconSmall jr-checkmark jr"></span>
+                    <a class="jr-mItemselector-button-label jr">
+                        <span class="jr">Select All</span>
+                    </a>
+                </li>
+                <li class="jr-mItemselector-button jr-uWidth-30pc jr jr-jSelectNone">
+                    <span class="jr-mItemselector-button-icon jr-mIcon jr-mIconSmall jr-cancel jr"></span>
+                    <a class="jr-mItemselector-button-label jr">
+                        <span class="jr">Deselect All</span>
+                    </a>
+                </li>
+                <li class="jr-mItemselector-button jr-uWidth-40pc jr jr-jInvert">
+                    <span class="jr-mItemselector-button-icon jr-mIcon jr-mIconSmall jr-invert jr"></span>
+                    <a class="jr-mItemselector-button-label jr">
+                        <span class="jr">Invert Selection</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1 @@
+define(["require","jquery","backbone","underscore","text!./template/datatableCrosstabTemplate.htm"],function(e){"use strict";var t=e("jquery"),r=e("backbone"),a=e("underscore"),n=e("text!./template/datatableCrosstabTemplate.htm");return r.View.extend({template:a.template(n),initialize:function(){this.render()},render:function(){return this.$el=t(this.template()),this}})});

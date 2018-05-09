@@ -1,0 +1,30 @@
+<fieldset name="customFieldsContainer" class="group shortFields">
+
+	<legend class="offLeft"><span>Access Properties</span></legend>
+
+
+
+
+	<label title="MongoDB URI (required)" class="control input text">
+		<span class="wrap">{{- i18n['MongoDbDataSource.properties.mongoURI'] }} ({{- i18n['required.field']}}):</span>
+		<input name="mongoURI" type="text" size="40" class="fnormal" value="{{- modelAttributes.mongoURI }}">
+		<span class="message hint"></span>
+		<span class="message warning"></span>
+	</label>
+
+
+	<label title="User Name (optional)" class="control input text">
+		<span class="wrap">{{- i18n['MongoDbDataSource.properties.username'] }} ({{- i18n['optional.field']}}):</span>
+		<input name="username" type="text" size="40" class="fnormal" value="{{- modelAttributes.username }}">
+		<span class="message hint"></span>
+		<span class="message warning"></span>
+	</label>
+
+	<label title="Password (optional)" class="control input text">
+		<span class="wrap">{{- i18n['MongoDbDataSource.properties.password'] }} ({{- i18n['optional.field']}}):</span>
+		<input name="password" type="password" size="40" class="fnormal" value="{{- modelAttributes.password }}">
+		<span class="message hint"></span>
+		<span class="message warning"></span>
+	</label>
+
+</fieldset>

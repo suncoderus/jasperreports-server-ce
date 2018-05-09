@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE resources PUBLIC "-//Sun Microsystems Inc.//DTD Application Server 9.0 Domain//EN" "*<install directory>/lib/dtds/sun-resources_1_3.dtd*">
+
+
+<resources>
+    <jdbc-connection-pool 
+        name="jasperserver_pool" 
+        datasource-classname="${jdbcDataSourceClass}"
+        res-type="javax.sql.ConnectionPoolDataSource"
+        max-pool-size="50">
+        <property name="serverName" value="${dbHost}"/>
+        <property name="user" value="${js.dbUsername}"/>
+        <property name="password" value="${escapeXML:js.dbPassword}"/>
+        <property name="url" value="${js.jdbcUrl}&amp;user=${js.dbUsername}&amp;password=${escapeXML:js.dbPassword}"/>
+        <property name="databaseName" value="${js.dbName}"/>
+        <property name="driverType" value="${db2.driverType}"/>
+        <property name="portNumber" value="${dbPort}"/>
+        <property name="currentSchema" value="${js.dbName}"/>
+        <property name="fullyMaterializeLobData" value="${db2.fullyMaterializeLobData}"/>
+        <property name="fullyMaterializeInputStreams" value="${db2.fullyMaterializeInputStreams}"/>
+        <property name="progressiveStreaming" value="${db2.progressiveStreaming}"/>
+        <property name="progresssiveLocators" value="${db2.progresssiveLocators}"/>
+		<property name="JDBC30DataSource" value="true"/>
+    </jdbc-connection-pool>
+
+    <jdbc-resource enabled="true" jndi-name="${js.jndi}" object-type="user" pool-name="jasperserver_pool"/>
+
+
+    <jdbc-connection-pool 
+        name="sugarcrm_pool" 
+        datasource-classname="${jdbcDataSourceClass}"
+        res-type="javax.sql.ConnectionPoolDataSource"
+        max-pool-size="50">
+        <property name="serverName" value="${dbHost}"/>
+        <property name="user" value="${sugarcrm.dbUsername}"/>
+        <property name="password" value="${escapeXML:sugarcrm.dbPassword}"/>
+        <property name="url" value="${sugarcrm.jdbcUrl}&amp;user=${sugarcrm.dbUsername}&amp;password=${escapeXML:sugarcrm.dbPassword}"/>
+        <property name="databaseName" value="${sugarcrm.dbName}"/>
+        <property name="driverType" value="${db2.driverType}"/>
+        <property name="portNumber" value="${dbPort}"/>
+        <property name="currentSchema" value="${sugarcrm.dbName}"/>
+		 <property name="JDBC30DataSource" value="true"/>
+    </jdbc-connection-pool>
+
+    <jdbc-resource enabled="true" jndi-name="${sugarcrm.jndi}" object-type="user" pool-name="sugarcrm_pool"/>
+
+
+    <jdbc-connection-pool 
+        name="foodmart_pool" 
+        datasource-classname="${jdbcDataSourceClass}"
+        res-type="javax.sql.ConnectionPoolDataSource"
+        max-pool-size="50">
+        <property name="serverName" value="${dbHost}"/>
+        <property name="user" value="${foodmart.dbUsername}"/>
+        <property name="password" value="${escapeXML:foodmart.dbPassword}"/>
+        <property name="url" value="${foodmart.jdbcUrl}&amp;user=${foodmart.dbUsername}&amp;password=${escapeXML:foodmart.dbPassword}"/>
+        <property name="databaseName" value="${foodmart.dbName}"/>
+        <property name="driverType" value="${db2.driverType}"/>
+        <property name="portNumber" value="${dbPort}"/>
+        <property name="currentSchema" value="${foodmart.dbName}"/>
+		<property name="JDBC30DataSource" value="true"/>
+    </jdbc-connection-pool>
+
+    <jdbc-resource enabled="true" jndi-name="${foodmart.jndi}" object-type="user" pool-name="foodmart_pool"/>
+
+
+</resources> 

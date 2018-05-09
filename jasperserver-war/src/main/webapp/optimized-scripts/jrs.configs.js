@@ -1,0 +1,1 @@
+define([],function(){return"undefined"!=typeof __jrsConfigs__?__jrsConfigs__:{contextPath:"",userLocale:"en"}});

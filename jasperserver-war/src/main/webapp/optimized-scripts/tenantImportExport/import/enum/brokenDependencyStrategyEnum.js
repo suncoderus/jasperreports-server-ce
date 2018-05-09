@@ -1,0 +1,1 @@
+define({FAIL:"fail",SKIP:"skip",INCLUDE:"include"});

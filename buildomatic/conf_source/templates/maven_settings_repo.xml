@@ -1,0 +1,146 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<settings>
+  <offline>${maven.offline}</offline>
+  <localRepository>${maven-localrepo-path}</localRepository>  
+  <profiles>
+    <profile>
+      <id>JasperServerProfile</id>
+      <properties>
+        <repository.database.driver.groupId>${maven.jdbc.groupId}</repository.database.driver.groupId>
+        <repository.database.driver.artifactId>${maven.jdbc.artifactId}</repository.database.driver.artifactId>
+        <repository.database.driver.version>${maven.jdbc.version}</repository.database.driver.version>
+        <js.quartz.properties>${currentConf}/js.quartz.properties</js.quartz.properties>
+        <js.quartz.base.properties>${currentConf}/js.quartz.base.properties</js.quartz.base.properties>
+        <js.quartz.script>${js-base-path}/scripts/quartz/${quartz.ddlScript}</js.quartz.script>
+        <js.db.script.path>${currentSqlDir}</js.db.script.path>
+        <metadata.database.generate>false</metadata.database.generate>
+        <suppress.quartz.init>true</suppress.quartz.init>
+        <js-path>${js-path}</js-path>
+        <js-pro-path>${js-pro-path}</js-pro-path>
+        <jasperserver-repo>file:/${repo-path}</jasperserver-repo>  <!-- used for jpivot bld only -->
+        <platform-path>${currentConf}</platform-path>
+        <test.hibernate.cfg>${currentConf}/hibernate.cfg.xml</test.hibernate.cfg>
+        <test.hibernate.jdbc.properties>${currentConf}/js.jdbc.properties</test.hibernate.jdbc.properties>
+        <master.properties>${masterPropsSource}</master.properties>
+        <!-- workaround src w/o tibco drivers -->
+        <tibco.driver.available>${deploy-tibco-drivers}</tibco.driver.available>
+        <SKIP_TEST_ARG>skipTests</SKIP_TEST_ARG>
+        <disable.fafj>false</disable.fafj>
+      </properties>
+      <repositories>
+        <repository>
+          <id>js-repo-svn</id>
+          <name>Repository for JasperReports Server dependencies</name>
+          <url>file://${repo-path}</url>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+          </releases>
+        </repository>
+        <repository>
+          <id>js-repo-tibco-drivers</id>
+          <name>Repository for JasperReports Server additional resources (TIBCO data connectivity drivers)</name>
+          <url>file://${tibco-driver-path}</url>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+          </releases>
+        </repository>
+        <repository>
+          <id>Repo1 Maven</id>
+          <url>http://repo1.maven.org/maven2/</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </repository>
+        <repository>
+          <id>SpringSource</id>
+          <url>http://repo.springsource.org/release</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </repository>
+        <repository>
+          <id>JBoss</id>
+          <url>https://repository.jboss.org/nexus/content/groups/public</url>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </repository>
+        <repository>
+          <id>jboss-eap-alpha</id>
+          <name>JBoss EAP 6.3.0.Alpha</name>
+          <url>https://maven.repository.redhat.com/earlyaccess/all/</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>js-repo-svn</id>
+          <url>file://${repo-path}</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </pluginRepository>
+        <!-- The Maven tool has a Central Repository that is utilized even if -->
+        <!-- not specifid in the settings.xml. listed here for reference only -->
+        <!-- <pluginRepository> -->
+        <!--   <id>central</id> -->
+        <!--   <url>http://repo1.maven.org/maven2/</url> -->
+        <!-- </pluginRepository> -->
+      </pluginRepositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>JasperServerProfile</activeProfile>
+  </activeProfiles>
+  <servers>
+    <server>
+      <id>myserver</id>
+      <username>tomcat</username>
+      <password>tomcat</password>
+    </server>
+  </servers>
+</settings>

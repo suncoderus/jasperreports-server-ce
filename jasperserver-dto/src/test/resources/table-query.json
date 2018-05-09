@@ -1,0 +1,91 @@
+// application/vnd.jaspersoft.jrs-adhocquery+json; version 1;
+{
+    "query": {
+        "type": "Tabular|Multidimensional",
+        "select": {
+            "rows": [
+                {
+                    "id": "sales_fact_ALL.sales__store.sales__store__store_type",
+                    "expanded": false
+                }
+            ],
+            "columns": [
+                {
+                    "id": "_artificial"
+                },
+                {
+                    "id": "sales_fact_ALL.sales__product.sales__product__product_name"
+                },
+                {
+                    "id": "sales_fact_ALL.sales__product.sales__product__recyclable_package"
+                },
+                {
+                    "id": "sales_fact_ALL.sales_fact_ALL__store_sales_2013"
+                },
+                {
+                    "id": "sales_fact_ALL.sales_fact_ALL__store_cost_2013"
+                },
+                {
+                    "id": "sales_fact_ALL.sales_fact_ALL__unit_sales_2013"
+                }
+            ]
+        },
+        "from": "/uri",
+        "where": {
+            "fields": [
+                {
+                    "id": "filter_1",
+                    "fieldId": "sales_fact_ALL.sales__store.sales__store__region.sales__store__region__sales_country",
+                    "complexExpressionId": "A",
+                    "operatorName": "in",
+                    "optionsCount": 5,
+                    "options": [
+                        {
+                            "value": "Canada",
+                            "selected": true
+                        }
+                    ]
+                },
+                {
+                    "id": "filter_3",
+                    "fieldId": "sales_fact_ALL.sales__product.sales__product__product_name",
+                    "complexExpressionId": "B",
+                    "operatorName": "in",
+                    "optionsCount": 100,
+                    "options": [
+                        {
+                            "value": "Best Choice Chocolate Chip Cookies",
+                            "selected": true
+                        },
+                        {
+                            "value": "Fast Chocolate Chip Cookies",
+                            "selected": true
+                        },
+                        {
+                            "value": "Fort West Chocolate Chip Cookies",
+                            "selected": true
+                        },
+                        {
+                            "value": "Horatio Chocolate Chip Cookies",
+                            "selected": true
+                        },
+                        {
+                            "value": "Nationeel Chocolate Chip Cookies",
+                            "selected": true
+                        }
+                    ]
+                }
+            ],
+            "complexExpression": "A or B"
+        },
+        "order": [
+            {
+                "id": "sales_fact_ALL.sales__store.sales__store__store_type",
+                "asc": true
+            }
+        ],
+        "toggleNodes": ["ab/bc", ""],
+        "limit": 30,
+        "offset": 30
+    }
+}

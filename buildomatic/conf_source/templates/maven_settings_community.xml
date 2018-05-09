@@ -1,0 +1,195 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<settings>
+  <offline>${maven.offline}</offline>
+  <localRepository>${maven-localrepo-path}</localRepository>
+  <profiles>
+    <profile>
+      <id>JasperServerProfile</id>
+      <properties>
+        <repository.database.driver.groupId>${maven.jdbc.groupId}</repository.database.driver.groupId>
+        <repository.database.driver.artifactId>${maven.jdbc.artifactId}</repository.database.driver.artifactId>
+        <repository.database.driver.version>${maven.jdbc.version}</repository.database.driver.version>
+        <js.quartz.properties>${currentConf}/js.quartz.properties</js.quartz.properties>
+        <js.quartz.base.properties>${currentConf}/js.quartz.base.properties</js.quartz.base.properties>
+        <js.quartz.script>${js-base-path}/scripts/quartz/${quartz.ddlScript}</js.quartz.script>
+        <metadata.database.generate>false</metadata.database.generate>
+        <suppress.quartz.init>true</suppress.quartz.init>
+        <js-path>${js-path}</js-path>
+        <js-pro-path>${js-pro-path}</js-pro-path>
+        <jasperserver-repo>file:/${repo-path}</jasperserver-repo>  <!-- used for jpivot bld only -->
+        <platform-path>${currentConf}</platform-path>
+        <test.hibernate.cfg>${currentConf}/hibernate.cfg.xml</test.hibernate.cfg>
+        <test.hibernate.jdbc.properties>${currentConf}/js.jdbc.properties</test.hibernate.jdbc.properties>
+        <master.properties>${masterPropsSource}</master.properties>
+        <!-- workaround src w/o tibco drivers -->
+        <tibco.driver.available>false</tibco.driver.available>
+        <SKIP_TEST_ARG>skipTests</SKIP_TEST_ARG>
+        <disable.fafj>false</disable.fafj>
+      </properties>
+      <repositories>
+        <repository>
+          <id>JBoss</id>
+          <url>https://repository.jboss.org/nexus/content/groups/public</url>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </repository>
+        <repository>
+          <id>jaspersoft-external-addons</id>
+          <url>http://jaspersoft.jfrog.io/jaspersoft/jrs-ce-addons-releases</url>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </repository>
+        <repository>
+          <id>jaspersoft-external-addons-snapshots</id>
+          <url>http://jaspersoft.jfrog.io/jaspersoft/jrs-ce-addons-snapshots</url>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+          </snapshots>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+        </repository>
+        <repository>
+          <id>jaspersoft-js-modules</id>
+          <url>http://jaspersoft.jfrog.io/jaspersoft/jrs-ce-js-modules</url>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </repository>
+        <repository>
+          <id>jaspersoft-external-third-party</id>
+          <url>http://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </repository>
+        <repository>
+          <id>jasperreports-snapshots</id>
+          <url>http://jaspersoft.jfrog.io/jaspersoft/jr-ce-snapshots/</url>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+          </snapshots>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+        </repository>
+        <repository>
+          <id>jasperreports-releases</id>
+          <url>http://jaspersoft.jfrog.io/jaspersoft/jr-ce-releases</url>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </repository>
+        <repository>
+          <id>jboss-eap-alpha</id>
+          <name>JBoss EAP 6.3.0.Alpha</name>
+          <url>https://maven.repository.redhat.com/earlyaccess/all/</url>
+          <layout>default</layout>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>Repo1 Maven</id>
+          <url>http://repo1.maven.org/maven2/</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </repository>
+        <repository>
+          <id>SpringSource</id>
+          <url>http://repo.springsource.org/release</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </repository>
+        <repository>
+          <id>Google</id>
+          <url>http://z-os.googlecode.com/svn/release-repository/</url>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </repository>
+        <repository>
+          <id>jaspersoft-3rd-party</id>
+          <url>http://jaspersoft.jfrog.io/jaspersoft/jaspersoft-3rd-party</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </repository>
+        <repository>
+          <id>cloudera-repo-releases</id>
+          <url>https://repository.cloudera.com/artifactory/repo/</url>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>jaspersoft-external-third-party</id>
+          <url>http://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts</url>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>JasperServerProfile</activeProfile>
+  </activeProfiles>
+</settings>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <bean id="userManagerAction" class="${class.userManagerAction}">
+        <property name="userService">
+            <ref bean="${bean.userAuthorityService}"/>
+        </property>
+        <property name="managerService">
+            <ref bean="${bean.userManagerService}"/>
+        </property>
+        <property name="tenantService">
+            <ref bean="${bean.tenantService}"/>
+        </property>
+        <property name="configuration">
+            <ref bean="configurationBean"/>
+        </property>
+        <property name="messages">
+            <ref bean="messageSource"/>
+        </property>
+        <property name="jsonHelper">
+            <bean class="com.jaspersoft.jasperserver.war.helper.JSONHelper">
+            </bean>
+        </property>
+        <property name="auditContext" ref="${bean.auditContext}"/>
+    </bean>
+
+    <bean id="tenantTreeDataProviderFactory" class="com.jaspersoft.jasperserver.war.model.impl.TreeDataProviderFactoryImpl">
+        <property name="treeProvidersMap">
+            <map>
+                <entry key="tenantTreeFoldersProvider" value="tenantTreeFoldersProvider"/>
+            </map>
+        </property>
+    </bean>
+       
+    <bean id="tenantTreeFoldersProvider" class="com.jaspersoft.jasperserver.war.model.impl.TenantTreeDataProviderImpl">
+        <property name="repositoryService" ref="${bean.repositoryService}"/>
+        <property name="repositoryServiceSecurityChecker" ref="${bean.repositoryServiceSecurityChecker}"/>
+        <property name="tenantService" ref="${bean.tenantService}"/>
+    </bean>
+</beans>

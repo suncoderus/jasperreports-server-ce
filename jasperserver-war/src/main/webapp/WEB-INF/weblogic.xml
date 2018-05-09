@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<weblogic-web-app xmlns="http://xmlns.oracle.com/weblogic/weblogic-web-app" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://xmlns.oracle.com/weblogic/weblogic-web-app http://xmlns.oracle.com/weblogic/weblogic-web-app/1.2/weblogic-web-app.xsd">
+
+    <jsp-descriptor>
+        <keepgenerated>true</keepgenerated>
+        <page-check-seconds>1</page-check-seconds>
+        <precompile>false</precompile>
+        <print-nulls>true</print-nulls>
+        <encoding>UTF-8</encoding>
+    </jsp-descriptor>
+
+    <resource-description>
+        <res-ref-name>jdbc/jasperserver</res-ref-name>
+        <jndi-name>JasperServerDataBase</jndi-name>
+    </resource-description>
+    <resource-description>
+        <res-ref-name>jdbc/sugarcrm</res-ref-name>
+        <jndi-name>SugarcrmDataBase</jndi-name>
+    </resource-description>
+    <resource-description>
+        <res-ref-name>jdbc/foodmart</res-ref-name>
+        <jndi-name>FoodmartDataBase</jndi-name>
+    </resource-description>
+
+    <container-descriptor>
+        <servlet-reload-check-secs>60</servlet-reload-check-secs>
+        <prefer-application-packages>
+            <package-name>antlr.*</package-name>
+            <package-name>antlr.collections.*</package-name>
+            <package-name>antlr.collections.impl.*</package-name>
+            <package-name>antlr.debug.misc.*</package-name>
+            
+            <!-- START: added for weblogic 12-->
+            <package-name>org.antlr.runtime.*</package-name>
+            <package-name>com.sun.jersey.*</package-name>
+            <package-name>com.sun.research.ws.wadl.*</package-name>
+            <package-name>jersey.repackaged.com.google.common*</package-name>
+            <package-name>javax.ws.rs.*</package-name>
+            <package-name>javax.inject.*</package-name>
+            <package-name>org.jvnet.hk2.*</package-name>
+            <package-name>org.jvnet.tiger_types.*</package-name>
+            <package-name>org.glassfish.hk2.*</package-name>
+            <package-name>org.glassfish.jersey.*</package-name>
+            <package-name>jersey.repackaged.*</package-name>
+            <package-name>org.codehaus.*</package-name>
+            <package-name>com.fasterxml.jackson.*</package-name>
+            <package-name>com.google.*</package-name>
+            <!-- END: added for weblogic 12-->
+            
+            <package-name>com.sun.activation.*</package-name>
+            <package-name>com.sun.istack.*</package-name>
+            <package-name>com.sun.mail.*</package-name>
+            <package-name>javax.mail.*</package-name>
+            <package-name>javax.mail.event.*</package-name>
+            <package-name>javax.mail.internet.*</package-name>
+            <package-name>javax.mail.search.*</package-name>
+            <package-name>javax.mail.util.*</package-name>
+            <package-name>javax.transaction.*</package-name>
+            <package-name>javax.transaction.xa.*</package-name>
+            <package-name>org.joda.convert.*</package-name>
+            <package-name>org.joda.time.*</package-name>
+            <package-name>org.mozilla.classfile.*</package-name>
+            <package-name>org.mozilla.javascript.*</package-name>
+            <package-name>org.apache.commons.lang.*</package-name>
+            <package-name>repackage.*</package-name>
+            <package-name>schemaorg_apache_xmlbeans.system.sXMLCONFIG.*</package-name>
+            <package-name>schemaorg_apache_xmlbeans.system.sXMLLANG.*</package-name>
+            <package-name>schemaorg_apache_xmlbeans.system.sXMLSCHEMA.*</package-name>
+            <package-name>schemaorg_apache_xmlbeans.system.sXMLTOOLS.*</package-name>
+
+            <!-- JRS-9865
+                org.hibernate.validator was upgraded hence force application package to be used.
+            -->
+            <package-name>org.hibernate.validator.*</package-name>
+            <package-name>javax.validation.*</package-name>
+
+        </prefer-application-packages>
+        <prefer-application-resources>
+            <resource-name>WEB-INF/classes/*</resource-name>
+            <resource-name>WEB-INF/classes/esapi/*</resource-name>
+            <resource-name>META-INF/services/org.glassfish.jersey.server.spi.ComponentProvider</resource-name>
+            <resource-name>META-INF/services/org.glassfish.jersey.internal.spi.ForcedAutoDiscoverable</resource-name>
+            <resource-name>META-INF/services/org.glassfish.jersey.internal.spi.AutoDiscoverable</resource-name>
+            <resource-name>META-INF/services/javax.ws.rs.ext.RuntimeDelegate</resource-name>
+            <resource-name>org.glassfish.jersey.*</resource-name>
+            <resource-name>jersey.repackaged.*</resource-name>
+        </prefer-application-resources>
+        <show-archived-real-path-enabled>true</show-archived-real-path-enabled>
+    </container-descriptor>
+</weblogic-web-app>

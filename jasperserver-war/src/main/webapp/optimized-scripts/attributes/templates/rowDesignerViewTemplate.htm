@@ -1,0 +1,47 @@
+<div class="name table-column" data-tooltip="true">
+    <div class="item"><p data-bind="text:name"></p></div>
+</div>
+<div class="value table-column"
+     data-tooltip="true">
+    <div class="item">
+        <input readonly type="password" data-bind="toggle:secure, value:encrypt"/>
+        <p data-bind="toggle:not(secure), text:value"></p>
+    </div>
+</div>
+<div class="secure table-column">
+    <div class="item">
+        <input data-bind="toggle:not(readOnly), checked:secure" type="checkbox"/>
+        <span data-bind="toggle:readOnly, text:secure"></span>
+    </div>
+</div>
+{{ if (type !== types.SERVER) { }}
+<div class="inherited table-column">
+    <div class="item">
+        <span data-bind="text:inherited"></span>
+    </div>
+</div>
+{{ } if (type !== types.USER) { }}
+<div class="permission table-column">
+    <div class="item">
+        <select data-bind="value:integer(permissionEmbedded), disabled:readOnly">
+            <option value="1">{{- i18n["attributes.attribute.permissionMask.1"]}}</option>
+            <option value="2">{{- i18n["attributes.attribute.permissionMask.2"]}}</option>
+            <option value="32">{{- i18n["attributes.attribute.permissionMask.32"]}}</option>
+            <option value="0">{{- i18n["attributes.attribute.permissionMask.0"]}}</option>
+        </select>
+    </div>
+</div>
+{{ } }}
+<div class="actions table-column">
+    <div class="item">
+        <div class="actionButtons">
+            <span data-bind="toggle:not(readOnly)">
+                <button name="editButton" class="button action simple edit"></button>
+            </span>
+            <span data-bind="toggle:not(disableRemove)">
+                <button name="deleteButton" class="button action simple delete"></button>
+            </span>
+        </div>
+    </div>
+</div>
+

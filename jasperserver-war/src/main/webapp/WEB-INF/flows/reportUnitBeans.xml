@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+   
+	<!-- Backing action for reportUnitFlow -->
+    <bean id="reportUnitAction" class="com.jaspersoft.jasperserver.war.action.ReportUnitAction">
+	 	<property name="repository">
+            <ref bean="${bean.repositoryService}"/>
+        </property>
+        <property name="olapReportCheckUtil" ref="${bean.olapReportCheckUtil}"/>
+        <property name="securityChecker" ref="${bean.repositoryServiceSecurityChecker}"/>
+        <property name="permissionService" ref="objectPermissionService"/>
+        <property name="engine">
+        	<ref bean="engineService"/>
+	   	</property>
+		<property name="configuration">
+			<ref bean="configurationBean"/>
+		</property>
+        <property name="queryReferenceReqAttrName" value="queryReference"/>
+        <property name="queryReferenceOutpuAttrName" value="queryReference"/>
+		<property name="validator" ref="reportUnitValidator"/>
+		<property name="reportQueryLanguageFlowAttribute" value="JRXMLQueryLanguage"/>
+        <property name="securityContextProvider" ref="${bean.securityContextProvider}"/>
+        <property name="messages" ref="messageSource"/>
+        <property name="jrxmlTreeDataProvider" ref="jrxmlTreeDataProvider" />
+        <property name="queryTreeDataProvider" ref="queryTreeDataProvider"/>
+        <property name="inputControlResourceTreeDataProvider" ref="inputControlResourceTreeDataProvider"/>
+        <property name="dataSourceTreeDataProvider" ref="dsTreeDataProvider"/>
+        <!--Added for backward compatibility with pro-->
+        <property name="customDataSourceFactory" ref="customDataSourceServiceFactory"/>
+        <property name="jrxmlRepository" ref="jrxmlRepository"/>
+	</bean>
+
+	<bean name="reportUnitValidator" class="com.jaspersoft.jasperserver.war.validation.ReportDetailsValidator">
+		<property name="repository">
+		   <ref bean="${bean.repositoryService}"/>
+	   </property>
+	   <property name="servletContextInformation" ref="servletContextInformation"/>
+	</bean>
+
+    <bean id="olapReportCheckUtil"
+        class="com.jaspersoft.jasperserver.api.metadata.olap.util.OlapReportCheckUtilImpl"/>
+
+    <bean id="jrxmlRepository" class="com.jaspersoft.jasperserver.war.repository.JRXMLRepository" >
+        <property name="repository" ref="${bean.repositoryService}" />
+    </bean>
+
+    <import resource="repositoryExplorerBean.xml"/>
+</beans>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<flow xmlns="http://www.springframework.org/schema/webflow" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd" start-state="processTree">
+
+   <decision-state id="processTree">
+      <if test="requestParameters.method != null" then="${requestParameters.method}" else="ajaxError"/>
+   </decision-state>
+
+   <action-state id="getNode">
+      <evaluate expression="treeAction"/>
+      <transition on="success" to="treeView"/>
+   </action-state>
+
+   <action-state id="getChildren">
+      <evaluate expression="treeAction"/>
+      <transition on="success" to="treeView"/>
+   </action-state>
+
+   <action-state id="getMultipleChildren">
+      <evaluate expression="treeAction"/>
+      <transition on="success" to="treeView"/>
+   </action-state>
+
+   <action-state id="getMessage">
+      <evaluate expression="treeAction"/>
+      <transition on="success" to="treeView"/>
+   </action-state>
+
+   <view-state id="treeView" view="ajax/ajaxresponse"/>
+
+   <view-state id="ajaxError" view="ajax/ajaxerror"/>
+
+   <bean-import resource="spring-config.xml"/>
+   <bean-import resource="treeBeans.xml"/>
+
+</flow>

@@ -1,0 +1,15 @@
+<fieldset class="group shortFields">
+    <label title="{{- i18n['resource.analysisConnection.timeZone'] }}" class="control select">
+        <span class="wrap">{{- i18n["resource.dataSource.timezone"] }}</span>
+        <select class="fnormal timeZone" name="timezone">
+            <option {{ if (modelAttributes.timezone === "") { }}selected="selected"{{ } }} value="">{{- i18n["jsp.jdbcPropsForm.timezone.default.option"] }}</option>
+            {{ _.each(timezones, function(timezone) { }}
+            <option value="{{- timezone.code }}" {{ if (timezone.code === modelAttributes.timezone) { }}selected="selected"{{ } }}>
+                {{- i18n['timezone.option'].replace('{0}', timezone.code).replace('{1}', timezone.description) }}
+            </option>
+            {{ }); }}
+        </select>
+        <span class="message warning"></span>
+        <span class="message hint">{{- i18n["resource.dataSource.hint3"] }}</span>
+    </label>
+</fieldset>

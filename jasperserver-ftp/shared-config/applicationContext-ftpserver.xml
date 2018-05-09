@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:ftp="http://mina.apache.org/ftpserver/spring/v1"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	   http://mina.apache.org/ftpserver/spring/v1 http://mina.apache.org/ftpserver/ftpserver-1.0.xsd
+       "
+>
+
+
+    <ftp:server id="ftpServer">
+        <ftp:listeners>
+            <ftp:nio-listener name="default" port="2121">
+                <!--ftp:ssl>
+                    <ftp:keystore file="./res/ftpserver.jks" password="password" />
+                </ftp:ssl-->
+            </ftp:nio-listener>
+        </ftp:listeners>
+        <ftp:ftplets>
+            <ftp:ftplet name="ftplet1">
+                <bean class="com.jaspersoft.jasperserver.war.ftpserver.JSFtpLet">
+                </bean>
+            </ftp:ftplet>
+        </ftp:ftplets>
+        <ftp:user-manager>
+            <bean class="com.jaspersoft.jasperserver.war.ftpserver.JSFtpUserManager">
+                <property name="authenticationManager" ref="authenticationManager" />
+            </bean>
+        </ftp:user-manager>
+        <ftp:filesystem>
+            <bean class="com.jaspersoft.jasperserver.war.ftpserver.JSRepositoryFileSystemFactory">
+                <property name="repositoryService" ref="${bean.repositoryService}" />
+                <property name="repositorySecurityChecker" ref="${bean.repositoryServiceSecurityChecker}" />
+                <property name="resourceFactory" ref="mappingResourceFactory" />
+                <property name="configurationBean" ref="configurationBean" />
+                <property name="loadContent" value="true" />
+                <property name="typeMapping">
+                    <map>
+                        <entry key="GIF" value="img" />
+                        <entry key="JPG" value="img" />
+                        <entry key="JPEG" value="img" />
+                        <entry key="PNG" value="img" />
+                        <entry key="JRXML" value="jrxml" />
+                        <entry key="XML" value="xml" />
+                        <entry key="PROPERTIES" value="prop" />
+                        <entry key="CSS" value="css" />
+                    </map>
+                </property>
+            </bean>
+        </ftp:filesystem>
+    </ftp:server>
+    
+    <!--bean id="startFtpServer" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean" lazy-init="false">
+        <property name="targetObject" ref="ftpServer" />
+        <property name="targetMethod" value="start" />
+    </bean-->
+
+    <bean id="ftpStartUpHandler" class="com.jaspersoft.jasperserver.war.ftpserver.JSFtpStartUpHandler" lazy-init="false">
+        <property name="ftpServer" ref="ftpServer" />
+        <!-- set enable to true / false to enable / disable FTP server -->
+        <property name="enabled" value="${ftp.enabled}" />
+    </bean>
+
+    <bean id="ftpServerShutdownHandler" class="com.jaspersoft.jasperserver.war.ftpserver.JSFtpShutdownHandler" lazy-init="false">
+        <property name="ftpServer" ref="ftpServer" />
+    </bean>
+
+</beans>       

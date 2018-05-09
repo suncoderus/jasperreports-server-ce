@@ -1,0 +1,72 @@
+<html>
+<head>
+
+    <title>Multiselect Rendering</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+    <link type="text/css" href="../../../../demos/css/jasper-ui-dev.css" rel="stylesheet">
+    <link type="text/css" href="../../../../themes/default/jquery-ui/jquery-ui.css" rel="stylesheet">
+
+    <script type="text/javascript" src="../../requireSnippetsConfig.js"></script>
+    <script type="text/javascript" src="../../../bower_components/requirejs/require.js"></script>
+    <script type="text/javascript" src="../../../../config.js"></script>
+
+</head>
+<body class="jr" style="min-width: 300px">
+    <div id="multiselect-placer" class="jr-uWidth-300px jr" ></div>
+    <script type="text/javascript">
+        require([
+            "components/multiSelect/view/MultiSelect",
+            "jquery"
+        ],function(MultiSelect, $){
+
+            var options = {
+                getData : getSampleData(),
+                title: "New multi select",
+                label: "New multi select"
+            };
+
+            var multiselect = new MultiSelect(options);
+            $("#multiselect-placer").append(multiselect.$el);
+
+            function getSampleData() {
+
+                var sampleData = [
+                    "lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit", "sed", "vehicula", "diam", "in", "lectus", "bibendum", "malesuada", "proin", "erat", "eleifend", "imperdiet", "ut", "tincidunt", "felis", "nec", "ultrices", "lobortis", "nulla", "purus", "porttitor", "sem", "faucibus", "integer", "eu", "est", "tristique", "a", "morbi", "vitae", "tortor", "eget", "mollis", "ullamcorper", "pellentesque", "et", "metus", "euismod", "neque", "fusce", "venenatis", "nunc", "nisl", "egestas", "semper", "quis", "curabitur", "viverra", "pretium", "accumsan", "id", "arcu", "facilisis", "vivamus", "turpis", "pulvinar", "ac", "laoreet", "maecenas", "sollicitudin", "velit", "molestie", "at", "non", "orci", "nibh", "sagittis", "donec", "interdum", "aliquet", "mauris", "dignissim", "nam", "porta", "risus", "gravida", "rhoncus", "vel", "tempus", "quam", "class", "aptent", "taciti", "sociosqu", "ad", "litora", "torquent", "per", "conubia", "nostra", "inceptos", "himenaeos"
+                ];
+
+                var total = sampleData.length;
+
+                var getDataSegment = function(first, last) {
+
+                    var sx = first;
+
+                    last = Math.min(last + 1, total);
+
+                    var result = [];
+
+                    for (sx; sx < last; sx += 1) {
+                        result.push({label: sampleData[sx], value: sampleData[sx]});
+                    }
+
+                    return result;
+                };
+
+                return function(options) {
+                    var offset = options ? options.offset || 0 : 0;
+                    var limit = options ? options.limit || total : total;
+
+                    var data = getDataSegment(offset, offset + limit);
+
+                    var deferred = new $.Deferred();
+                    deferred.resolve({data: data, total: total});
+
+                    return deferred.promise();
+                };
+            }
+
+        });
+
+    </script>
+</body>
+</html>

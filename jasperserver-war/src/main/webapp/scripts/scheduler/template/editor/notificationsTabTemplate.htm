@@ -1,0 +1,178 @@
+<div class="notificationsTab">
+	<fieldset class="row inputs twoColumn_equal">
+		<div class="column secondary">
+			<div class="content">
+				<div id="jobSuccess" class="section">
+					<h4 class="title">
+						{{- i18n["report.scheduling.job.edit.email.header"] }}
+					</h4>
+					<fieldset class="group first">
+						<legend><span>
+							{{- i18n["report.scheduling.job.edit.sendreportwhenschedulerrunssuccessfully"] }}
+						</span></legend>
+						<label class="control input text">
+							<span class="wrap">
+								{{- i18n["report.scheduling.job.edit.email.label.to"] }}:
+							</span>
+							<input type="text" name="to_suc" />
+							<span class="message hint">
+								{{- i18n["report.scheduling.job.edit.usecommastoseparateaddresses"] }}
+							</span>
+							<div data-field="to_suc" class="warning message"></div>
+						</label>
+						<label class="control input text">
+							<span class="wrap">
+								{{- i18n["report.scheduling.job.edit.email.label.cc"] }}:
+							</span>
+							<input type="text" name="cc_suc" />
+							<div data-field="cc_suc" class="warning message"></div>
+						</label>
+						<label class="control input text">
+							<span class="wrap">
+								{{- i18n["report.scheduling.job.edit.email.label.bcc"] }}:
+							</span>
+							<input type="text" name="bcc_suc" />
+							<div data-field="bcc_suc" class="warning message"></div>
+						</label>
+						<label class="control input text">
+							<span class="wrap">
+								{{- i18n["report.scheduling.job.edit.email.label.subject"] }}:
+							</span>
+							<input type="text" name="subject_suc" />
+							<div data-field="subject_suc" class="warning message"></div>
+						</label>
+						<label class="control textArea">
+							<span class="wrap">
+								{{- i18n["report.scheduling.job.edit.email.label.message"] }}:
+							</span>
+							<textarea type="text" name="message_suc"></textarea>
+						</label>
+						<ul class="list inputSet">
+							<li class="leaf">
+								<div class="control radio">
+									<label for="jrsSchedule_resultTypeRadio1" class="wrap">
+										{{- i18n["report.scheduling.job.edit.includereportasrepositorylinksinemailbody"] }}
+									</label>
+									<input value="asRepoLinks" type="radio" name="resultSendTypeRadio" id="jrsSchedule_resultTypeRadio1" />
+								</div>
+							</li>
+							<li class="leaf">
+								<div class="control radio">
+									<label for="jrsSchedule_resultTypeRadio2" class="wrap">
+										{{- i18n["report.scheduling.job.edit.includereportfilesasattachments"] }}
+									</label>
+									<input value="asAttachedFiles" type="radio" name="resultSendTypeRadio" id="jrsSchedule_resultTypeRadio2">
+								</div>
+							</li>
+							<li class="leaf">
+								<div class="control radio">
+									<label for="jrsSchedule_resultTypeRadio3" class="wrap">
+										{{- i18n["report.scheduling.job.edit.includereportfiesaszip"] }}
+									</label>
+									<input value="asAttachedZip" type="radio" name="resultSendTypeRadio" id="jrsSchedule_resultTypeRadio3">
+								</div>
+							</li>
+							<li class="leaf">
+								<div class="control radio">
+									<label for="jrsSchedule_includeHtmlReport" class="wrap">
+										{{- i18n["report.scheduling.job.edit.includehtmlreportinemailbody"] }}
+									</label>
+									<input type="checkbox" name="includeHtmlReport" id="jrsSchedule_includeHtmlReport">
+								</div>
+							</li>
+							<li class="leaf">
+								<div class="control checkBox">
+									<label for="jrsSchedule_dont_send_empty_report" class="wrap">
+										{{- i18n["report.scheduling.job.edit.donotsendemailsforemptyreports"] }}
+									</label>
+									<input type="checkbox" name="dontSendEmptyReport" id="jrsSchedule_dont_send_empty_report">
+								</div>
+							</li>
+						</ul>
+					</fieldset>
+				</div>
+			</div>
+		</div>
+
+		<div class="column primary">
+			<div class="content">
+				<div id="jobNotification" class="section">
+					<fieldset class="group first">
+						<legend><span>
+							{{- i18n["report.scheduling.job.edit.sendjobstatusnotifications"] }}
+						</span></legend>
+						<label class="control input text">
+							<span class="wrap">
+								{{- i18n["report.scheduling.job.edit.email.label.to"] }}:
+							</span>
+							<input type="text" name="job_status_to">
+							<span class="message hint">
+								{{- i18n["report.scheduling.job.edit.usecommastoseparateaddresses"] }}
+							</span>
+							<div data-field="job_status_to" class="warning message"></div>
+						</label>
+						<label class="control input text">
+							<span class="wrap">
+								{{- i18n["report.scheduling.job.edit.email.label.subject"] }}:
+							</span>
+							<input type="text" name="job_status_subject">
+							<div data-field="job_status_subject" class="warning message"></div>
+						</label>
+						<ul class="list inputSet">
+							<li class="leaf last">
+								<div class="control checkBox">
+									<label for="jrsSchedule_send_success_notification" class="wrap">
+										{{- i18n["report.scheduling.job.edit.sendsuccessnotification"] }}
+									</label>
+									<input type="checkBox" name="send_success_notification" id="jrsSchedule_send_success_notification">
+								</div>
+								<label class="control textArea twoLine subItem">
+									<span class="wrap">
+										{{- i18n["report.scheduling.job.edit.email.label.successmessage"] }}:
+									</span>
+									<textarea type="text" name="job_status_success_message"></textarea>
+									<div data-field="job_status_success_message" class="warning message"></div>
+								</label>
+							</li>
+						</ul>
+						<ul id="failureIncludes" class="list inputSet">
+							<li class="leaf">
+								<div class="control checkBox">
+									<label for="jrsSchedule_send_failure_notification" class="wrap">
+										{{- i18n["report.scheduling.job.edit.sendfailurenotification"] }}
+									</label>
+									<input type="checkBox" name="send_failure_notification" id="jrsSchedule_send_failure_notification">
+								</div>
+								<label class="control textArea twoLine subItem">
+									<span class="wrap">
+										{{- i18n["report.scheduling.job.edit.email.label.failuremessage"] }}:
+									</span>
+									<textarea type="text" name="job_status_failed_message"></textarea>
+									<div data-field="job_status_failed_message" class="warning message"></div>
+								</label>
+							</li>
+							<ul class="list inputSet">
+								<li class="leaf">
+									<div class="control checkBox">
+										<label for="jrsSchedule_include_report" class="wrap">
+											{{- i18n["report.scheduling.job.edit.includereport"] }}
+										</label>
+										<input type="checkBox" name="include_report" id="jrsSchedule_include_report">
+									</div>
+								</li>
+								<li class="leaf">
+									<div class="control checkBox">
+										<label for="jrsSchedule_include_stack_trace" class="wrap">
+											{{- i18n["report.scheduling.job.edit.includestacktrace"] }}
+										</label>
+										<input type="checkBox" name="include_stack_trace" id="jrsSchedule_include_stack_trace">
+									</div>
+								</li>
+							</ul>
+						</ul>
+					</fieldset>
+				</div>
+			</div>
+		</div>
+	</fieldset>
+</div>

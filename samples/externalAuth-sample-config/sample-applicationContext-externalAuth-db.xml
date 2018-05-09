@@ -1,0 +1,153 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <!-- ########## External JDBC Auth ###########
+      - Sample configuration of JasperServer authentication via an external database
+    -->
+    <bean id="proxyAuthenticationProcessingFilter" class="com.jaspersoft.jasperserver.api.security.EncryptionAuthenticationProcessingFilter"
+          parent="authenticationProcessingFilter">
+        <property name="authenticationManager">
+            <ref local="dbAuthenticationManager"/>
+        </property>
+
+        <property name="authenticationSuccessHandler" ref="externalAuthSuccessHandler" />
+    </bean>
+
+    <bean id="proxyRequestParameterAuthenticationFilter"
+          class="com.jaspersoft.jasperserver.war.util.ExternalRequestParameterAuthenticationFilter" parent="requestParameterAuthenticationFilter">
+        <property name="authenticationManager">
+            <ref local="dbAuthenticationManager"/>
+        </property>
+        <property name="externalDataSynchronizer" ref="externalDataSynchronizer"/>
+    </bean>
+
+    <bean id="externalAuthSuccessHandler"
+          class="com.jaspersoft.jasperserver.api.security.externalAuth.JrsExternalAuthenticationSuccessHandler" parent="successHandler">
+        <property name="externalDataSynchronizer">
+            <ref local="externalDataSynchronizer"/>
+        </property>
+    </bean>
+
+    <bean id="proxyBasicProcessingFilter"
+          class="com.jaspersoft.jasperserver.api.security.externalAuth.ExternalAuthBasicProcessingFilter" parent="basicProcessingFilter">
+        <property name="authenticationManager" ref="dbAuthenticationManager"/>
+        <property name="externalDataSynchronizer" ref="externalDataSynchronizer"/>
+
+        <property name="authenticationEntryPoint">
+            <ref local="basicProcessingFilterEntryPoint"/>
+        </property>
+    </bean>
+
+    <bean id="dbAuthenticationManager" class="com.jaspersoft.jasperserver.api.security.externalAuth.wrappers.spring.JSProviderManager">
+        <property name="providers">
+            <list>
+                <ref bean="externalDaoAuthenticationProvider"/>
+                <ref bean="${bean.daoAuthenticationProvider}"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="externalDaoAuthenticationProvider" class="com.jaspersoft.jasperserver.api.security.externalAuth.wrappers.spring.jdbc.JSDaoAuthenticationProvider">
+        <property name="userDetailsService"><ref local="externalUserDetailsService"/></property>
+        <property name="passwordEncoder"><ref local="passwordValidator"/></property>
+    </bean>
+
+    <bean id="externalUserDetailsService" class="com.jaspersoft.jasperserver.api.security.externalAuth.db.ExternalJDBCUserDetailsService">
+        <property name="dataSource" ref="externalDataSource"/>
+        <property name="usersByUsernameQuery" value="SELECT u.username,u.password,u.enabled FROM jiuser u WHERE u.username = ?"/>
+        <property name="authoritiesByUsernameQuery" value="SELECT u.username, r.rolename FROM jiuser u, jiuserrole ur, jirole r WHERE u.id = ur.userId and ur.roleId=r.id and u.username = ?"/>
+    </bean>
+
+    <bean id="passwordValidator" class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.PasswordValidator" lazy-init="false">
+        <property name="keyInPlainText"><value>false</value></property>
+        <property name="secretKey"><value>0xC8 0x43 0x29 0x49 0xAE 0x25 0x2F 0xA1 0xC1 0xF2 0xC8 0xD9 0x31 0x01 0x2C 0x52 0x54 0x0B 0x5E 0xEA 0x9E 0x37 0xA8 0x61</value></property>
+        <property name="secretKeyAlgorithm"><value>DESede</value></property>
+        <property name="cipherTransformation"><value>DESede/CBC/PKCS5Padding</value></property>
+    </bean>
+
+    <!-- ########## External JDBC Auth ########### -->
+
+    <!-- ############ Synchronizer ############ -->
+    <bean id="externalDataSynchronizer"
+          class="com.jaspersoft.jasperserver.api.security.externalAuth.ExternalDataSynchronizerImpl">
+        <property name="externalUserDetailsService">
+            <ref local="externalUserDetailsService"/>
+        </property>
+        <property name="externalUserProcessors">
+            <list>
+                <ref local="externalUserSetupProcessor"/>
+                <!-- Example processor for creating user folder.
+                    Other custom processors can be created and
+                    added to the list.-->
+                <!--<ref local="externalUserFolderProcessor"/>-->
+            </list>
+        </property>
+    </bean>
+
+    <bean id="abstractExternalProcessor" class="com.jaspersoft.jasperserver.api.security.externalAuth.processors.AbstractExternalUserProcessor" abstract="true">
+        <property name="repositoryService" ref="${bean.repositoryService}"/>
+        <property name="userAuthorityService" ref="${bean.userAuthorityService}"/>
+        <property name="tenantService" ref="${bean.tenantService}"/>
+        <property name="profileAttributeService" ref="profileAttributeService"/>
+        <property name="objectPermissionService" ref="objectPermissionService"/>
+    </bean>
+
+    <bean id="externalUserSetupProcessor" class="com.jaspersoft.jasperserver.api.security.externalAuth.processors.ExternalUserSetupProcessor" parent="abstractExternalProcessor">
+        <!--Default permitted role characters; others are removed. Change regular expression to allow other chars.
+                    <property name="permittedExternalRoleNameRegex" value="[A-Za-z0-9_]+"/>-->
+
+        <property name="userAuthorityService">
+            <ref bean="${bean.internalUserAuthorityService}"/>
+        </property>
+
+        <property name="organizationRoleMap">
+            <map>
+                <!-- Mapping external roles to JRS internal roles. Example: map external role ADMIN to JRS role ROLE_ADMINISTRATOR  -->
+                <!--<entry key="ADMIN" value="ROLE_ADMINISTRATOR" />-->
+            </map>
+        </property>
+
+        <property name="defaultInternalRoles">
+            <list>
+                <value>ROLE_USER</value>
+            </list>
+        </property>
+    </bean>
+
+ <!--   <bean id="externalUserFolderProcessor" class="com.jaspersoft.jasperserver.api.security.externalAuth.processors.ExternalUserFolderProcessor" parent="abstractExternalProcessor">
+        <property name="repositoryService" ref="${bean.unsecureRepositoryService}"/>
+        &lt;!&ndash;<property name="userFoldersParentDirectory" value=""/>&ndash;&gt;
+    </bean>-->
+
+    <!-- ############ Synchronizer ############ -->
+
+
+    <!-- ############## external dataSource: config in master.properties ############### -->
+    <bean id="externalDataSource" class="com.jaspersoft.jasperserver.api.security.externalAuth.wrappers.spring.jdbc.JSDriverManagerDataSource">
+        <property name="driverClassName" value="${external.jdbc.driverClassName}"/>
+        <property name="url" value="${external.jdbc.url}"/>
+        <property name="username" value="${external.jdbc.username}"/>
+        <property name="password" value="${external.jdbc.password}"/>
+    </bean>
+    <!-- ############## external dataSource ############### -->
+
+</beans>

@@ -1,0 +1,1 @@
+define({DIAGNOSTIC:"diagnosticCustomDataSource",HIVE:"HiveDataSource",MONGODB:"MongoDbDataSource",TEXT_FILE:"textDataSource"});

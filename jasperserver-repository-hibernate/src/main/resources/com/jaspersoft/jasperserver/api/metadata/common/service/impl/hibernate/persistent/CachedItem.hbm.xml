@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class 
+			table="JIRepositoryCache" 
+			name="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.CachedItem">
+		<id name="id" type="long">
+			<generator class="native"/>
+		</id>
+		<natural-id mutable="false">
+			<property name="uri" not-null="true" length="250" type="string" column="uri"/>
+			<property name="cacheName" not-null="true" length="20" type="string" column="cache_name"/>
+		</natural-id>
+		<property name="data" type="com.jaspersoft.hibernate.ByteWrappingBlobType" length="20971520" column="data"/>
+		<property name="version" not-null="true" column="version"/>
+		<property name="versionDate" not-null="true" type="timestamp" column="version_date"/>
+		<many-to-one name="reference" column="item_reference" not-null="false" class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.CachedItem"/>
+		<set name="referrers" inverse="true" fetch="subselect"> 
+			<key column="item_reference"/>
+			<one-to-many class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.CachedItem"/>
+		</set>
+	</class>
+
+<!-- create index JIRepositoryCache_item_reference_index on JIRepositoryCache (item_reference); -->
+<!-- replacing JIRepositoryCache_item_reference_index with idx34_item_reference_idx -->
+<database-object>
+	<create>create index idx34_item_reference_idx on JIRepositoryCache (item_reference)</create>
+	<drop>DROP INDEX idx34_item_reference_idx ON JIRepositoryCache</drop>
+</database-object>
+
+</hibernate-mapping>

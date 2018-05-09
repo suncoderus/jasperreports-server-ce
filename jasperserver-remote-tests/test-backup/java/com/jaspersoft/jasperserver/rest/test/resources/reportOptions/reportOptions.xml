@@ -1,0 +1,50 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<resourceDescriptor name="Poland" wsType="reportOptions"
+	uriString="/reports/samples/Poland" isNew="true">
+	<label>Poland</label>
+	<creationDate>1319063061890</creationDate>
+	<resourceProperty name="PROP_RESOURCE_TYPE">
+		<value>com.jaspersoft.ji.report.options.metadata.ReportOptions</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_PARENT_FOLDER">
+		<value>/reports/samples</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_VERSION">
+		<value>0</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_HAS_DATA">
+		<value>false</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_IS_REFERENCE">
+		<value>false</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_REPORT_URI">
+		<value>/reports/samples/Freight</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_INPUT_VALUES">
+		<value>RequestDate,java.util.Date,865148400000;
+			OrderId,java.lang.Integer,10600;
+			Country,java.lang.String,Poland;
+		</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_OPTIONS_NAME">
+		<value>Freight_Poland</value>
+	</resourceProperty>
+</resourceDescriptor>

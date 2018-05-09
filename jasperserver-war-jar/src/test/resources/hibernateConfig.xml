@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+       
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="searchSystemEnvironment" value="true"/>
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+		<property name="location">
+	    	<value>${platform-path}/js.jdbc.properties</value>
+		</property>
+	</bean>
+
+  
+	<!-- Configurer that replaces ${...} placeholders with values from a properties file -->
+	<!-- (in this case, JDBC-related settings for the dataSource definition below)
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:/jdbc.properties"/>
+	</bean>
+	 -->
+	 
+	<!-- Local DataSource that works in any environment -->
+	<!-- Note that DriverManagerDataSource does not pool; it is not intended for production -->
+	<!-- See JPetStore for an example of using Commons DBCP BasicDataSource as alternative -->
+	<!-- See Image Database for an example of using C3P0 ComboPooledDataSource as alternative -->
+	<bean id="dataSource" class="com.jaspersoft.jasperserver.api.engine.jasperreports.service.impl.BasicDataSourceWrapper" destroy-method="close">
+		<property name="driverClassName" value="${metadata.jdbc.driverClassName}"/>
+		<property name="url" value="${metadata.jdbc.url}"/>
+		<property name="username" value="${metadata.jdbc.username}"/>
+		<property name="password" value="${metadata.jdbc.password}"/>
+	</bean>
+
+	<!-- Hibernate SessionFactory -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="mappingResources">
+		    <list>
+                               <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/CachedItem.hbm.xml</value>
+                               <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/ContentRepoFileResource.hbm.xml</value>
+                               <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/RepoBeanDataSource.hbm.xml</value>
+                               <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/RepoDataType.hbm.xml</value>
+                               <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/RepoFileResource.hbm.xml</value>
+                               <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/RepoFolder.hbm.xml</value>
+                               <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/RepoInputControl.hbm.xml</value>
+                               <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/RepoJdbcDataSource.hbm.xml</value>
+                               <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/RepoJndiJdbcDataSource.hbm.xml</value>
+                               <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/RepoVirtualDataSource.hbm.xml</value>
+                               <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/RepoAwsDataSource.hbm.xml</value>
+                <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/RepoAzureSqlDataSource.hbm.xml</value>
+                <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/RepoListOfValues.hbm.xml</value>
+			       <value>/security/SecureMondrianConnection.hbm.xml</value>
+			       <value>/security/RepoMondrianXMLADefinition.hbm.xml</value>
+<!-- RepoMondrianConnection is in the process of being deprecated, 
+                               <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/RepoMondrianConnection.hbm.xml</value>
+                               <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/RepoMondrianXMLADefinition.hbm.xml</value>
+-->
+                               <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/RepoOlapClientConnection.hbm.xml</value>
+                               <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/RepoOlapUnit.hbm.xml</value>
+                               <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/RepoQuery.hbm.xml</value>
+                               <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/RepoReportUnit.hbm.xml</value>
+				<value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/RepoResource.hbm.xml</value>
+                               <value>/com/jaspersoft/jasperserver/api/metadata/common/service/impl/hibernate/persistent/RepoXMLAConnection.hbm.xml</value>
+				<value>/com/jaspersoft/jasperserver/api/metadata/user/domain/impl/hibernate/RepoUser.hbm.xml</value>
+				<value>/com/jaspersoft/jasperserver/api/metadata/user/domain/impl/hibernate/RepoRole.hbm.xml</value>
+				<value>/com/jaspersoft/jasperserver/api/metadata/user/domain/impl/hibernate/RepoTenant.hbm.xml</value>
+				<value>/com/jaspersoft/jasperserver/api/metadata/user/domain/impl/hibernate/RepoObjectPermission.hbm.xml</value>
+				<value>/com/jaspersoft/jasperserver/api/metadata/user/domain/impl/hibernate/RepoProfileAttribute.hbm.xml</value>
+				<value>/com/jaspersoft/jasperserver/api/engine/scheduling/hibernate/PersistentReportJob.hbm.xml</value>
+				<value>/com/jaspersoft/jasperserver/api/engine/scheduling/hibernate/PersistentReportJobTrigger.hbm.xml</value>
+				<value>/com/jaspersoft/jasperserver/api/engine/scheduling/hibernate/PersistentReportJobRepositoryDestination.hbm.xml</value>
+				<value>/com/jaspersoft/jasperserver/api/engine/scheduling/hibernate/PersistentReportJobMailNotification.hbm.xml</value>
+                <value>/com/jaspersoft/jasperserver/api/engine/scheduling/hibernate/PersistentReportJobAlert.hbm.xml</value>
+				<value>/com/jaspersoft/ji/adhoc/AdhocReportUnit.hbm.xml</value>
+				<value>/com/jaspersoft/ji/adhoc/AdhocState.hbm.xml</value>
+		    </list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${metadata.hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.generate_statistics">true</prop>
+			</props>
+		</property>
+		<property name="eventListeners">
+			<map>
+				<entry key="merge">
+					<bean class="org.springframework.orm.hibernate3.support.IdTransferringMergeEventListener"/>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<!-- Transaction manager for a single Hibernate SessionFactory (alternative to JTA)
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	 -->
+	 
+	<!--
+	  - Jasper Server's central data access object: Hibernate implementation.
+    -->
+	<bean id="jasperServerDao" class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.HibernateDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+
+	<bean id="objectFactory" class="com.jaspersoft.jasperserver.api.common.service.impl.ObjectFactoryImpl"/>
+</beans>

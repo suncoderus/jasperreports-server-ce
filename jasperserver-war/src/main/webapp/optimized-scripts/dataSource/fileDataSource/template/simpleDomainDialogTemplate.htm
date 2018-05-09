@@ -1,0 +1,49 @@
+<div class="usageTooltip">{{- i18n['resource.datasource.createDomain.useTooltip']}}.</div>
+
+<div class="tableHolder">
+    <table class="table" unselectable="on" onselectstart="return false">
+        <tbody>
+
+        <tr class="header">
+            <td class="jrs-grid-cell"><div class="jrs-grid-cell-content">{{- i18n['resource.datasource.createDomain.table.fields.show']}}</div></td>
+            <td class="jrs-grid-cell"><div class="jrs-grid-cell-content">{{- i18n['resource.datasource.createDomain.table.fields.fieldName']}}</div></td>
+            <td class="jrs-grid-cell"><div class="jrs-grid-cell-content">{{- i18n['resource.datasource.createDomain.table.fields.displayLabel']}}</div></td>
+            <td class="jrs-grid-cell"><div class="jrs-grid-cell-content">{{- i18n['resource.datasource.createDomain.table.fields.type']}}</div></td>
+        </tr>
+
+        {{_.each(columns, function(field, y) { }}
+        <tr class="bodyCell" data-fieldId="{{- y }}">
+            <td class="jrs-grid-cell cell_1">
+                <div class="jrs-grid-cell-content">
+                    <input type="checkbox" name="show" {{- field.show ? "checked" : "" }} />
+                </div>
+            </td>
+            <td class="jrs-grid-cell cell_2">
+                <div class="jrs-grid-cell-content">
+                    {{- field.name }}
+                </div>
+            </td>
+            <td class="jrs-grid-cell cell_3">
+                <div class="jrs-grid-cell-content">
+                    <input type="text" name="label" value="{{- field.label }}" />
+                    <span class="message warning"></span>
+                </div>
+            </td>
+            <td class="jrs-grid-cell cell_4">
+                <div class="jrs-grid-cell-content">
+                    <select name="javaType">
+                    {{ _.each(javaTypes, function(javaType) { }}
+                        <option value="{{- javaType }}" {{- javaType === field.javaType ? "selected" : ""}}>{{- i18n[javaTypeMapper[javaType]]}}</option>
+                    {{ }); }}
+                    </select>
+                </div>
+            </td>
+        </tr>
+        {{ }); }}
+        </tbody>
+    </table>
+</div>
+
+<div class="usageDescription">{{- i18n['resource.datasource.createDomain.useTooptip.firstPart']}}.</div>
+
+<div class="usageDescription2">{{- i18n['resource.datasource.createDomain.useTooptip.secondPart']}}.</div>

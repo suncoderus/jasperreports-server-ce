@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<flow xmlns="http://www.springframework.org/schema/webflow" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+      ns0:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd"
+      start-state="initEvent">
+
+    <action-state id="initEvent">
+        <evaluate expression="ResourceAction"/>
+        <transition on="success" to="repoStart"/>
+    </action-state>
+
+    <decision-state id="repoStart">
+        <if test="requestParameters.method != null" then="${requestParameters.method}" else="repositoryExplorer"/>
+    </decision-state>
+
+    <action-state id="getResources">
+        <evaluate expression="ResourceAction"/>
+        <transition on="success" to="resourceView"/>
+    </action-state>
+
+    <action-state id="getResourceProperties">
+        <evaluate expression="ResourceAction"/>
+        <transition on="success" to="treeView"/>
+    </action-state>
+
+    <action-state id="getBreadCrumb">
+        <evaluate expression="ResourceAction"/>
+        <transition on="success" to="treeView"/>
+    </action-state>
+
+    <view-state id="resourceView" view="ajax/RepositoryExplorerAjaxTable">
+        <transition on="ViewReport" to="viewReport"/>
+    </view-state>
+
+    <view-state id="repositoryExplorer" view="repository/repositoryExplorer">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'repositoryExplorer'"/>
+        </on-entry>
+        <transition on="success" to="repositoryExplorer"/>
+        <transition on="ViewReport" to="viewReport"/>
+        <!--<transition on="ViewOlapModel" to="viewOlapModel"/>-->
+        <transition on="ScheduleReport" to="reportJobs"/>
+        <transition on="runReportInBackground" to="runReportInBackground"/>
+        <transition on="goToPage" to="goToPage"/>
+        <!-- Handle back from SubFlows -->
+        <transition on="back" to="repositoryExplorer"/>
+    </view-state>
+
+    <action-state id="getNode">
+        <evaluate expression="RepositoryTreeAction"/>
+        <transition on="success" to="treeView"/>
+    </action-state>
+
+    <action-state id="getChildren">
+        <evaluate expression="RepositoryTreeAction"/>
+        <transition on="success" to="treeView"/>
+    </action-state>
+
+    <action-state id="createFolder">
+        <evaluate expression="ResourceAction"/>
+        <transition on="success" to="treeView"/>
+        <transition on="error" to="treeView"/>
+    </action-state>
+
+    <action-state id="doesFolderExist">
+        <evaluate expression="ResourceAction"/>
+        <transition on="success" to="treeView"/>
+    </action-state>
+
+    <action-state id="deleteFolder">
+        <evaluate expression="ResourceAction"/>
+        <transition on="success" to="treeView"/>
+    </action-state>
+
+    <action-state id="deleteResources">
+        <evaluate expression="ResourceAction"/>
+        <transition on="success" to="treeView"/>
+    </action-state>
+
+    <action-state id="updateResourceProperties">
+        <evaluate expression="ResourceAction"/>
+        <transition on="success" to="treeView"/>
+    </action-state>
+
+    <action-state id="getNewFolderName">
+        <evaluate expression="ResourceAction"/>
+        <transition on="success" to="treeView"/>
+    </action-state>
+
+    <action-state id="copyFolder">
+        <evaluate expression="ResourceAction"/>
+        <transition on="success" to="treeView"/>
+        <transition on="no" to="treeView"/>
+    </action-state>
+
+    <action-state id="moveFolder">
+        <evaluate expression="ResourceAction"/>
+        <transition on="success" to="treeView"/>
+        <transition on="no" to="treeView"/>
+    </action-state>
+
+    <action-state id="copyResource">
+        <evaluate expression="ResourceAction"/>
+        <transition on="success" to="treeView"/>
+        <transition on="no" to="treeView"/>
+    </action-state>
+
+    <action-state id="moveResource">
+        <evaluate expression="ResourceAction"/>
+        <transition on="success" to="treeView"/>
+        <transition on="no" to="treeView"/>
+    </action-state>
+
+    <action-state id="getUriDisplayLabelList">
+        <evaluate expression="ResourceAction"/>
+        <transition on="success" to="treeView"/>
+    </action-state>
+
+    <action-state id="getConfirmationOption">
+        <evaluate expression="ResourceAction"/>
+        <transition on="success" to="treeView"/>
+    </action-state>
+
+    <view-state id="treeView" view="ajax/ajaxresponse"/>
+
+    <!-- exceptions handling -->
+    <decision-state id="backFromError">
+        <if test="not (flowScope.prevForm == null or flowScope.prevForm == '')" then="${flowScope.prevForm}"
+            else="initAction"/>
+    </decision-state>
+
+    <view-state id="errorPage" view="modules/system/errorPage">
+        <on-entry>
+            <evaluate expression="errorPageHandlerAction"/>
+        </on-entry>
+    </view-state>
+
+    <global-transitions>
+        <transition on="backFromErrorPage" to="backFromError"/>
+        <transition on-exception="java.lang.Throwable" to="errorPage"/>
+    </global-transitions>
+
+    <!-- end exceptions handling -->
+
+    <bean-import resource="spring-config.xml"/>
+    <bean-import resource="repositoryBeans.xml"/>
+    <bean-import resource="repositoryExplorerBean.xml"/>
+
+</flow>

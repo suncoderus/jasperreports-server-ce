@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:webflow="http://www.springframework.org/schema/webflow-config"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/webflow-config
+           http://www.springframework.org/schema/webflow-config/spring-webflow-config-2.0.xsd
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+    <bean id="servletPropertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>/WEB-INF/js.spring.properties</value>
+                <value>/WEB-INF/js.config.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- Enable annotation-based wiring -->
+    <context:annotation-config/>
+
+    <!-- ENTRIES FOR JASPER SERVER BEGINS HERE -->
+
+    <mvc:view-controller path="/awsconfiguration.html" view-name="modules/administer/awsConfiguration"/>
+    <mvc:view-controller path="/xdm.html" view-name="modules/xdm"/>
+
+    <mvc:view-controller path="/logCollectors.html" view-name="modules/administer/logCollectors"/>
+
+    <!-- Handler for URL Mapping in the JS Application -->
+    <bean id="handlerMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <ref bean="${bean.handlerMapping.mappings}"/>
+        </property>
+        <property name="interceptors">
+            <ref bean="renderViewExceptionInterceptor"/>
+        </property>
+    </bean>
+
+    <bean id="urlHandlerMapping" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+            <props>
+                <!-- note: any new anonymous or user pages must be added
+                     to the filterInvocationInterceptor bean in applicationContext-security.xml
+                     All other pages require ROLE_ADMINISTRATOR to access
+                 -->
+				<prop key="/fileview/**">jsFileViewContr</prop>
+
+                <!-- anonymous pages -->
+                <prop key="/login.html">jsCommContr</prop>
+                <prop key="/logout.html">jsCommContr</prop>
+                <prop key="/exituser.html">jsCommContr</prop>
+                <prop key="/loginerror.html">jsCommContr</prop>
+                <prop key="/error.html">jsCommContr</prop>
+                <prop key="/encrypt.html">jsCommContr</prop>
+                <prop key="/externallogin.html">jsCommContr</prop>
+
+                <!-- user pages -->
+                <prop key="/loginsuccess.html">loginController</prop>
+                <prop key="/home.html">loginController</prop>
+
+                <!-- OLAP pages -->
+                <prop key="/olap/viewOlap.html">olapModelController</prop>
+                <prop key="/olap/error.html">olapContr</prop>
+                <prop key="/olap/busy.html">olapContr</prop>
+                <prop key="/olap/flush.html">olapContr</prop>
+                <prop key="/olap/properties.html">olapContr</prop>
+                <prop key="/listOlapViews.html">olapViewListController</prop>
+
+                <!-- admin pages -->
+                <prop key="/**/flow.html">flowController</prop>
+                <prop key="/**/flowFile/**">flowController</prop>
+                <prop key="/menutest.html">jsCommContr</prop>
+                <prop key="/heartbeat.html">jsCommContr</prop>
+                <prop key="/heartbeatInfo.html">jsCommContr</prop>
+				<prop key="/reportimage">reportImageController</prop>
+				<prop key="/reportresource/**">reportResourceController</prop>
+				<prop key="/jrpxml">xmlExportController</prop>
+
+				<!-- report execution cancel -->
+				<prop key="/viewReportCancel.html">reportExecutionController</prop>
+				<prop key="/viewReportAsyncCancel.html">reportExecutionController</prop>
+				<prop key="/viewReportPageUpdateCheck.html">reportExecutionController</prop>
+
+				<prop key="/getReportComponents.html">reportExecutionController</prop>
+				<prop key="/getRequirejsConfig.html">reportExecutionController</prop>
+				<prop key="/runReportAction.html">reportExecutionController</prop>
+
+                <!-- BIF -->
+                <prop key="/client.js">bifController</prop>
+                <prop key="/visualize.js">bifController</prop>
+                <prop key="/login.jsp">bifController</prop>
+                <prop key="/providers/**">bifController</prop>
+                <prop key="/mods/**">bifController</prop>
+
+                <!--scheduler-->
+                <prop key="/scheduler/main.html">schedulerController</prop>
+
+                <!-- System error pages -->
+                <prop key="/404.html">systemErrorController</prop>
+                <prop key="/500.html">systemErrorController</prop>
+
+                <prop key="/themeMinimalCss.css">urlViewController</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="renderViewExceptionInterceptor" class="com.jaspersoft.jasperserver.war.control.interceptor.RenderViewExceptionInterceptor">
+        <property name="messageSource" ref="messageSource"/>
+    </bean>
+
+    <bean id="urlViewController"
+          class="org.springframework.web.servlet.mvc.UrlFilenameViewController">
+    </bean>
+
+    <!-- View Resolver object which picks up the destination Page -->
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+        <property name="exposedContextBeanNames">
+            <array>
+                <value>commonProperties</value>
+                <value>templateProperties</value>
+                <value>jsOptimizationProperties</value>
+            </array>
+        </property>
+    </bean>
+
+    <util:map id="commonProperties" scope="prototype">
+        <entry key="organizationId" value="#{${bean.securityContextProvider}.contextUser.tenantId}"/>
+        <entry key="publicFolderUri" value="#{configurationBean.publicFolderUri}"/>
+        <entry key="tempFolderUri" value="#{configurationBean.tempFolderUri}"/>
+        <entry key="enableAccessibility" value="#{configurationBean.enableAccessibility}"/>
+    </util:map>
+
+    <!-- handle file uploads using commons-fileupload -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- property should be kept in sync with one in applicationContext-security-web.xml-->
+        <property name="maxUploadSize" value="${file.upload.max.size}" />
+    </bean>
+
+    <!-- js common controller -->
+    <bean id="jsCommContr" class="com.jaspersoft.jasperserver.war.control.JSCommonController">
+        <property name="methodNameResolver" ref="paramResolver"/>
+        <property name="repository">
+            <ref bean="${bean.repositoryService}"/>
+        </property>
+        <property name="userAuthService">
+            <ref bean="${bean.internalUserAuthorityService}"/>
+        </property>
+        <property name="objPermService" ref="objectPermissionService"/>
+		<property name="timezones">
+			<ref bean="userTimeZonesList"/>
+		</property>
+		<property name="locales">
+			<ref bean="userLocalesList"/>
+		</property>
+		<property name="allowUserPasswordChange" value="false" />
+		<!-- note: if passwordExpirationInDays is positive, it will overwrite the above allowUserPasswordChange and the password changing UI will be displayed -->
+		<property name="passwordExpirationInDays" value="0" />
+        <!-- Turn off/on login form auto completion.
+                true  = user can use saved data for the login form
+                false = user cannot use saved login form data; user must type it in -->
+		<property name="autoCompleteLoginForm" value="true" />
+        <property name="heartbeat">
+            <ref bean="concreteHeartbeatBean"/>
+        </property>
+    </bean>
+
+    <!-- Controller for login success -->
+    <bean id="loginController" class="com.jaspersoft.jasperserver.war.control.LoginController">
+        <property name="methodNameResolver" ref="paramResolver"/>
+        <property name="repository">
+            <ref bean="${bean.repositoryService}"/>
+        </property>
+        <property name="userAuthService">
+            <ref bean="${bean.internalUserAuthorityService}"/>
+        </property>
+        <property name="objPermService" ref="objectPermissionService"/>
+        <property name="homePageByRole">
+            <ref bean="${bean.loginController.homePageByRole}"/>
+        </property>
+        <property name="defaultHomePage">
+        	<value>redirect:/home.html</value>
+      	</property>
+    </bean>
+
+    <bean id="homePageByRole" class="java.util.ArrayList">
+        <constructor-arg index="0" type="java.util.Collection">
+            <list>
+                <value>ROLE_ADMINISTRATOR|redirect:/flow.html?_flowId=searchFlow</value>
+                <value>ROLE_USER|redirect:/flow.html?_flowId=searchFlow</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <!-- OLAP controller -->
+    <bean id="olapContr" class="com.jaspersoft.jasperserver.war.control.OLAPController">
+        <property name="repository">
+            <ref bean="${bean.repositoryService}"/>
+        </property>
+        <property name="olapManagementService" ref="olapManagementService"/>
+	</bean>
+
+	<bean id="olapViewListController"
+      class="com.jaspersoft.jasperserver.war.control.OlapViewListController">
+        <property name="repository">
+            <ref bean="${bean.repositoryService}"/>
+        </property>
+	</bean>
+
+	<bean id="olapModelController" class="${class.olapModelController}">
+        <property name="olapConnectionService">
+            <ref bean="olapConnectionService"/>
+        </property>
+        <property name="olapManagementService">
+            <ref bean="olapManagementService"/>
+        </property>
+        <property name="repository">
+            <ref bean="${bean.repositoryService}"/>
+        </property>
+        <property name="auditContext" ref="${bean.auditContext}"/>
+	</bean>
+
+    <bean id="logSettingsMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <props>
+                <prop key="/log_settings.html">logSettingsController</prop>
+                <prop key="/adminImport.html">adminImportController</prop>
+                <prop key="/adminExport.html">adminExportController</prop>
+                <prop key="/customAttributes.html">customAttributesController</prop>
+                <prop key="/resetSettings.html">resetSettingsController</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="logSettingsController" class="com.jaspersoft.jasperserver.war.control.LogSettingsController">
+		<property name="log4jSettingsService" ref="log4jSettingsService"/>
+        <property name="propertiesManagementService" ref="propertiesManagementService"/>
+	</bean>
+
+    <bean id="resetSettingsController" class="com.jaspersoft.jasperserver.war.control.ResetSettingsController"/>
+    <bean id="customAttributesController" class="com.jaspersoft.jasperserver.war.control.CustomAttributesController"/>
+    <bean id="adminImportController" class="com.jaspersoft.jasperserver.war.control.AdminImportController"/>
+    <bean id="adminExportController" class="com.jaspersoft.jasperserver.war.control.AdminExportController"/>
+
+	<!-- List of Validators used in JS -->
+
+
+    <!-- js mac method name resolver -->
+    <bean id="paramResolver" class="org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver">
+        <property name="mappings">
+            <props>
+                <prop key="/home.html">homePage</prop>
+                <prop key="/login.html">login</prop>
+                <prop key="/loginsuccess.html">loginSuccess</prop>
+                <prop key="/externallogin.html">externalLogin</prop>
+                <prop key="/logout.html">logout</prop>
+                <prop key="/exituser.html">exitUser</prop>
+                <prop key="/loginerror.html">modules/loginError</prop>
+                <prop key="/error.html">securityError</prop>
+                <prop key="/menutest.html">menuTest</prop>
+                <prop key="/heartbeat.html">heartbeat</prop>
+                <prop key="/heartbeatInfo.html">heartbeatInfo</prop>
+                <prop key="/olap/viewOlap.html">modules/olap/viewOlap</prop>
+                <prop key="/olap/busy.html">modules/olap/busy</prop>
+                <prop key="/olap/flush.html">modules/olap/flush</prop>
+                <prop key="/olap/properties.html">modules/olap/properties</prop>
+                <prop key="/olap/error.html">modules/system/prepErrorPage</prop>
+                <prop key="/404.html">handle404</prop>
+                <prop key="/500.html">handle500</prop>
+                <prop key="/encrypt.html">encryptionPage</prop>
+                <prop key="/viewReportCancel.html">viewReportCancel</prop>
+                <prop key="/viewReportAsyncCancel.html">viewAsyncReportCancel</prop>
+                <prop key="/viewReportPageUpdateCheck.html">viewReportPageUpdateCheck</prop>
+                <prop key="/getReportComponents.html">getReportComponents</prop>
+                <prop key="/getRequirejsConfig.html">getRequirejsConfig</prop>
+                <prop key="/runReportAction.html">runReportAction</prop>
+
+                <!--scheduler-->
+                <prop key="/scheduler/main.html">schedulerController</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!--<bean id="flowExecutorTarget" class="org.springframework.webflow.config.FlowExecutorFactoryBean">-->
+        <!--<property name="flowDefinitionLocator" ref="flowRegistry"/>-->
+        <!--<property name="executionAttributes">-->
+        	<!--<map>-->
+        		<!--<entry key="alwaysRedirectOnPause">-->
+        			<!--<value type="java.lang.Boolean">false</value>-->
+        		<!--</entry>-->
+        	<!--</map>-->
+        <!--</property>-->
+        <!--<property name="repositoryType" value="CONTINUATION"/>-->
+        <!--<property name="maxFlowExecutions" value="-1"/>-->
+        <!--<property name="maxFlowExecutionSnapshots" value="500"/>-->
+    <!--</bean>-->
+
+    <webflow:flow-executor id="flowExecutorTarget" flow-registry="flowRegistry">
+
+        <webflow:flow-execution-attributes>
+            <webflow:always-redirect-on-pause value="false"/>
+        </webflow:flow-execution-attributes>
+
+        <webflow:flow-execution-repository max-executions="-1" max-execution-snapshots="500" />
+    </webflow:flow-executor>
+
+	<bean id="flowExecutor" class="org.springframework.aop.framework.ProxyFactoryBean">
+	  <property name="interceptorNames">
+	    <list>
+	      <idref bean="flowExecuterSecurity"/>
+	      <idref local="flowExecutorTarget"/>
+	    </list>
+	  </property>
+	</bean>
+
+    <bean class="com.jaspersoft.jasperserver.war.webflow.WebFlowConfigurer">
+        <property name="flowExecutorBeanName" value="flowExecutorTarget"/>
+        <property name="lockTimeoutSeconds" value="90"/>
+    </bean>
+
+    <!--<bean id="flowRegistry" class="org.springframework.webflow.engine.builder.xml.XmlFlowRegistryFactoryBean">-->
+        <!--<property name="flowLocations" value="/WEB-INF/flows/**/*Flow.xml"/>-->
+    <!--</bean>-->
+
+    <webflow:flow-registry id="flowRegistry" flow-builder-services="flowBuilderServices">
+        <webflow:flow-location-pattern value="/WEB-INF/flows/**/*Flow.xml" />
+    </webflow:flow-registry>
+
+    <webflow:flow-builder-services id="flowBuilderServices" view-factory-creator="mvcViewFactoryCreator" expression-parser="expressionParser"/>
+
+    <bean id="mvcViewFactoryCreator" class="org.springframework.webflow.mvc.builder.MvcViewFactoryCreator">
+        <property name="viewResolvers">
+            <list>
+                <ref bean="jsonFlowViewResolver"/>
+                <ref bean="viewResolver"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="jsonFlowViewResolver" class="com.jaspersoft.jasperserver.war.webflow.JsonFlowViewResolver">
+    	<property name="order" value="10"/>
+    </bean>
+
+    <bean id="expressionParser" class="org.springframework.webflow.expression.WebFlowOgnlExpressionParser"/>
+
+    <bean id="flowController" class="org.springframework.webflow.mvc.servlet.FlowController">
+        <property name="flowExecutor"><ref bean="flowExecutor"/></property>
+        <property name="flowUrlHandler">
+            <bean class="org.springframework.webflow.context.servlet.WebFlow1FlowUrlHandler"/>
+        </property>
+        <!--<property name="defaultFlowId" value="defaultFlow"/>-->
+    </bean>
+
+	<bean id="jsFileViewContr" class="com.jaspersoft.jasperserver.war.control.FileViewController">
+		<property name="repository">
+			<ref bean="${bean.repositoryService}"/>
+		</property>
+	</bean>
+
+    <!-- basic exception resolver for jasperserver application -->
+    <bean id="exceptionResolver"  class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="exceptionMappings">
+            <props>
+                <prop key="org.springframework.security.access.AccessDeniedException">modules/system/AccessDeniedPage</prop>
+                <prop key="org.springframework.webflow.execution.repository.NoSuchFlowExecutionException">modules/system/sessionExpiredErrorPage</prop>
+                <prop key="java.lang.Exception">modules/system/prepErrorPage</prop>
+            </props>
+        </property>
+    </bean>
+
+
+	<bean id="localeResolver" class="com.jaspersoft.jasperserver.war.JSSessionLocaleResolver"/>
+    <!-- ENTRIES FOR JASPER SERVER ENDS HERE -->
+
+
+    <bean id="reportImageController" class="com.jaspersoft.jasperserver.war.control.ReportImageController">
+    	<property name="jasperReportsContext" ref="${bean.jasperReportsContext}"/>
+    	<property name="jasperPrintAccessor" ref="jasperPrintAccessor"/>
+    	<property name="jasperPrintNameParameter" value="jrprint"/>
+    	<property name="imageNameParameter" value="image"/>
+    </bean>
+
+    <bean id="reportResourceController" class="com.jaspersoft.jasperserver.war.control.ReportResourceController">
+    	<property name="jasperReportsContext" ref="${bean.jasperReportsContext}"/>
+    </bean>
+
+    <bean id="schedulerController" class="com.jaspersoft.jasperserver.war.control.SchedulerController">
+        <property name="scheduler" ref="${bean.reportSchedulingService}"/>
+        <property name="timezones">
+            <ref bean="userTimeZonesList"/>
+        </property>
+        <property name="enableSaveToHostFS" value="#{configurationBean.enableSaveToHostFS}"/>
+        <property name="enableDataSnapshot" value="#{dataSnapshotService.snapshotPersistenceEnabled}"/>
+        <property name="availableReportJobOutputFormats" ref="availableReportJobOutputFormats"/>
+        <property name="availableDashboardJobOutputFormats" ref="availableDashboardJobOutputFormats"/>
+        <property name="reportJobDefaults" ref="reportJobDefaults"/>
+        <property name="repository" ref="${bean.repositoryService}"/>
+        <property name="profileAttributeService" ref="profileAttributeService"/>
+    </bean>
+
+    <bean id="xmlExportController" class="com.jaspersoft.jasperserver.war.control.XmlExportController">
+    	<property name="jasperPrintAccessor" ref="jasperPrintAccessor"/>
+    	<property name="jasperPrintNameParameter" value="jrprint"/>
+    	<property name="pageParameter" value="page"/>
+    	<property name="hyperlinkProducerFactory" ref="swfReportHyperlinkProducerFactory"/>
+    	<property name="jasperReportsContext" ref="${bean.jasperReportsContext}"/>
+    </bean>
+
+    <bean id="systemErrorController" class="com.jaspersoft.jasperserver.war.control.SystemErrorController">
+        <property name="methodNameResolver" ref="paramResolver"/>
+    </bean>
+
+	<bean id="httpUtils" class="com.jaspersoft.jasperserver.war.util.DefaultHttpUtils">
+		<property name="characterEncodingProvider" ref="encodingProvider"/>
+		<property name="headerEncoders">
+			<list>
+				<bean class="com.jaspersoft.jasperserver.war.util.DefaultHttpUtils$HeaderEncoder">
+					<property name="userAgentPattern" value=".*msie.*"/>
+					<property name="headerEncoder">
+						<bean class="com.jaspersoft.jasperserver.war.util.URLStringEncoder"/>
+					</property>
+				</bean>
+				<bean class="com.jaspersoft.jasperserver.war.util.DefaultHttpUtils$HeaderEncoder">
+					<property name="userAgentPattern" value=".*mozilla.*"/>
+					<property name="headerEncoder">
+						<bean class="com.jaspersoft.jasperserver.war.util.MimeWordEncoder"/>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="reportExecutionController" class="com.jaspersoft.jasperserver.war.action.ReportExecutionController">
+		<property name="engineService">
+			<ref bean="engineService"/>
+		</property>
+		<property name="jasperPrintAccessor">
+			<ref bean="jasperPrintAccessor"/>
+		</property>
+		<property name="dataCacheProvider">
+			<ref bean="engineServiceDataCacheProvider"/>
+		</property>
+        <property name="jasperReportsContext">
+            <ref bean="${bean.jasperReportsContext}"/>
+        </property>
+        <property name="reportContextAccessor">
+            <ref bean="reportContextWebAccessor"/>
+        </property>
+        <property name="hyperlinkProducerFactory">
+            <ref bean="viewReportHyperlinkProducerFactory"/>
+        </property>
+        <property name="reportContextFactory" ref="${bean.reportExecutionControllerReportContextFactory}" />
+	</bean>
+
+    <bean id="reportExecutionControllerReportContextFactory" class="com.jaspersoft.jasperserver.war.action.hyperlinks.DefaultReportContextFactory"/>
+
+    <bean id="bifController" class="com.jaspersoft.jasperserver.war.BIFController">
+        <property name="pagesLocation" value="modules/bif" />
+    </bean>
+
+</beans>

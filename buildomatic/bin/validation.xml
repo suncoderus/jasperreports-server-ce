@@ -1,0 +1,651 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<project name="validation">
+
+  <!-- validateJdbcJar:                                                           -->
+  <!--   Has attribute: calling-target-context                                    -->
+  <!--     values can be: runSQL, deploy-webapp                                   -->
+  <!--     if runSQL context: fail execution, give info to user if no jdbc driver -->
+  <!--     if deploy-webapp context: continue execution, give user a warning      -->
+  <!--                               if no jdbc driver found                      -->
+  <!--                                                                            -->
+  <!--   The jdbcJar property can have two values:                                -->
+  <!--     1) actual file name (utilizing the artifactId and version properties)  -->
+  <!--     2) a "*.jar" value                                                     -->
+  <!--   In the first case validate that the files pointed to exists.             -->
+  <!--   In the second case validate that there is at least one file that ends    -->
+  <!--   with .jar. (ie driver copied manually be the user)                       -->
+  <!--                                                                            -->
+  <macrodef name="validateJdbcJar">
+    <attribute name="calling-target-context"/> 
+
+    <sequential>
+    
+      <if>
+        <equals arg1="${jdbcJar}" arg2="*.jar" />
+        <then>
+
+          <echo>About to validate JDBC jar existence</echo>
+          <echo>  Look in: ${currentDbJDBCDir}</echo>
+          
+          <condition property="jdbcMoreThanOne">
+            <!-- chk num jars greater or equal one -->
+            <resourcecount when="ge" count="1">
+              <fileset id="jarNames"  dir="${currentDbJDBCDir}" includes="*.jar"/>
+            </resourcecount>
+          </condition>
+      
+          <if>
+            <isset property="jdbcMoreThanOne" />
+            <then>
+              <echo>  Found jar file: assuming OK</echo>
+              <!-- print out the name(s) of the jar(s) found -->
+              <echo>  Jar or Jars found: ${toString:jarNames} </echo>
+            </then>
+            <else>
+              <!-- chk if context is runSQL or deploy-webapp -->
+              <if>
+                <equals arg1="@{calling-target-context}" arg2="runSQL" />
+                <then>
+                  <echo>context is runSQL</echo>
+                  <echo>  jar not found</echo>
+                  <setJdbcDownloadURL />
+                  <displayJdbcErrorMsg/>
+                  <fail>WARNING: STOP EXECUTION: no JDBC driver jar found (see above)</fail> 
+                </then>
+                <elseif>
+                  <equals arg1="@{calling-target-context}" arg2="deploy-webapp" />
+                  <then>
+                    <echo>  jar not found</echo>
+                    <displayJdbcWarningMsg/>
+                  </then>
+                </elseif>
+                <else>
+                  <echo>validateJdbcJar: WARNING: invalid context, 
+                        calling-target-context=@{calling-target-context}</echo>
+                </else>
+              </if>
+            </else>
+          </if>
+          
+        </then>
+        <elseif>
+          <!-- validate that fully qualified jar file path is good -->
+          <and>
+            <isset property="maven.jdbc.artifactId" />
+            <isset property="maven.jdbc.version" />
+          </and>
+          <then>
+            <echo>For JDBC driver the artifactId and version properties are set:</echo>
+            <echo>  maven.jdbc.artifactId=${maven.jdbc.artifactId}</echo>
+            <echo>  maven.jdbc.version=${maven.jdbc.version}</echo>
+            <if>
+              <available file="${currentDbJDBCDir}/${jdbcJar}"/>
+              <then>
+                <echo>  Specified JDBC driver jar exists</echo>
+              </then>
+              <else>
+                <echo>  Specified JDBC driver jar not found on this path: </echo>
+                <echo>  ${currentDbJDBCDir}/${jdbcJar}</echo>
+
+                <!-- chk if context is runSQL or deploy-webapp -->
+                <if>
+                  <equals arg1="@{calling-target-context}" arg2="runSQL" />
+                  <then>
+                    <setJdbcDownloadURL />
+                    <displayJdbcErrorMsg/>
+                    <fail>WARNING: STOP EXECUTION: no JDBC driver jar found (see above)</fail> 
+                  </then>
+                  <elseif>
+                    <equals arg1="@{calling-target-context}" arg2="deploy-webapp" />
+                    <then>
+                      <displayJdbcWarningMsg/>
+                    </then>
+                  </elseif>
+                  <else>
+                    <echo>validateJdbcJar: WARNING: invalid context, 
+                          calling-target-context=@{calling-target-context}</echo>
+                  </else>
+                </if>
+              </else>
+            </if> 
+          </then>
+        </elseif>
+        <else>
+          <echo>WARNING: something is wrong with jdbcJar property, jdbcJar=${jdbcJar}</echo>
+          <echo>WARNING: should not get to this else condition</echo>
+        </else>
+      </if>
+
+    </sequential>
+  </macrodef>
+
+  <macrodef name="displayJdbcErrorMsg">
+    <sequential>
+      <echo>  </echo>
+      <echo>  </echo>
+      <echo>=============== PLEASE READ THESE INSTRUCTIONS ===============  </echo>
+      <echo>                                                                </echo>
+      <echo>WARNING: STOP EXECUTION: no JDBC driver jar found               </echo> 
+      <echo>                                                                </echo>
+      <echo>Instructions:                                                   </echo>
+      <echo>                                                                </echo>
+      <echo> 1) Please download a JDBC driver for the "${dbType}" database  </echo>
+      <echo>    A driver can be found at the following general location:    </echo>
+      <echo>                                                                </echo>
+      <echo>     ${jdbcDownloadURL}                                         </echo>
+      <echo>                                                                </echo>
+      <echo> 2) Copy the JDBC driver to the following buildomatic location: </echo>
+      <echo>                                                                </echo>
+      <echo>    ${currentDbJDBCDir}  </echo>
+      <echo>                                                                </echo>
+      <echo> 3) Re-run this installation step                               </echo>
+      <echo>                                                                </echo>              
+      <echo>=============== PLEASE READ THESE INSTRUCTIONS ===============  </echo>
+      <echo>  </echo>
+      <echo>  </echo>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="displayJdbcWarningMsg">
+    <sequential>
+      <echo>  </echo>
+      <echo>========== WARNING: no JDBC driver jar found  ================  </echo> 
+      <echo>                                                                </echo>
+      <echo> No JDBC driver found in the following location:                </echo>
+      <echo>   ${currentDbJDBCDir}  </echo>
+      <echo> Continuing execution. Make sure to add a JDBC driver to your   </echo>
+      <echo> application server.                                            </echo>
+      <echo>                                                                </echo>
+      <echo>==============================================================  </echo> 
+    </sequential>
+  </macrodef>
+
+  <macrodef name="setJdbcDownloadURL">
+    <sequential>
+      <if>
+        <equals arg1="${dbType}" arg2="postgresql" />
+        <then>
+          <property name="jdbcDownloadURL" value="http://jdbc.postgresql.org/download.html"/>
+        </then>
+        <elseif>
+          <equals arg1="${dbType}" arg2="mysql" />
+          <then>
+            <property name="jdbcDownloadURL" value="http://dev.mysql.com/downloads/connector/j/"/>
+          </then>
+        </elseif>
+        <elseif>
+          <equals arg1="${dbType}" arg2="oracle" />
+          <then>
+            <property name="jdbcDownloadURL" value="http://www.oracle.com/technetwork/indexes/downloads/index.html"/>
+          </then>
+        </elseif>
+        <elseif>
+          <equals arg1="${dbType}" arg2="sqlserver" />
+          <then>
+            <property name="jdbcDownloadURL" value="http://msdn.microsoft.com/en-us/sqlserver/aa937724"/>
+          </then>
+        </elseif>
+        <elseif>
+          <equals arg1="${dbType}" arg2="db2" />
+          <then>
+            <property name="jdbcDownloadURL" value="http://www-01.ibm.com/software/data/db2/linux-unix-windows/download.html"/>
+          </then>
+        </elseif>
+        <elseif>
+          <equals arg1="${dbType}" arg2="ingres" />
+          <then>
+            <property name="jdbcDownloadURL" value="http://community.ingres.com/wiki/Ingres_JDBC_Driver_Downloads"/>
+          </then>
+        </elseif>
+        <else>
+          <echo message="WARNING: unknown database type, dbType=${dbType}"/>
+        </else>
+      </if>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="validateHostAndPort">
+    <attribute name="host" />
+    <attribute name="port" />
+    <attribute name="type" default="given" />
+    <attribute name="failOnError" default="true" />
+    <attribute name="errorProperty" default="host.or.port.invalid" />
+
+    <sequential>
+      <echo>Checking @{type} host and port:</echo>
+        <!--It`s not correct to fail when host don`t respond on ICMP packages -->
+        <!--<validateHost host="@{host}" failOnError="@{failOnError}" errorProperty="@{errorProperty}" />-->
+      <if>
+        <not>
+          <isset property="@{errorProperty}" />
+        </not>
+        <then>
+          <validatePort host="@{host}" port="@{port}" failOnError="@{failOnError}"
+              errorProperty="@{errorProperty}" />
+        </then>
+      </if>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="validateHost">
+    <attribute name="host" />
+    <attribute name="failOnError" default="true" />
+    <attribute name="errorProperty" default="host.not.reachable" />
+
+    <sequential>
+      <echo>About to validate host:  @{host}</echo>
+      <property name="validateHostTimeout" value="5" />
+      <if>
+        <isreachable host="@{host}" timeout="${validateHostTimeout}" />
+        <then>
+          <echo message="  Host @{host} is OK" />
+        </then>
+        <else>
+          <fail>
+            <condition>
+              <istrue value="@{failOnError}" />
+            </condition>
+            Error: host @{host} is not reachable
+          </fail>
+
+          <echo>  Error: host @{host} is not reachable</echo>
+          <property name="@{errorProperty}" value="true" />
+        </else>
+      </if>
+      <echo>Done validating host: @{host}</echo>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="validatePort">
+    <attribute name="host" />
+    <attribute name="port" />
+    <attribute name="failOnError" default="true" />
+    <attribute name="errorProperty" default="port.not.reachable" />
+
+    <sequential>
+      <echo>About to validate port: @{host}:@{port}</echo>
+      <if>
+        <socket server="@{host}" port="@{port}" />
+        <then>
+          <echo message="  Port @{port} is OK" />
+        </then>
+        <else>
+          <fail>
+            <condition>
+              <istrue value="@{failOnError}" />
+            </condition>
+            Error: port @{port} is not reachable at host @{host}
+          </fail>
+
+          <echo>  Error: port @{port} is not reachable at host @{host}</echo>
+          <property name="@{errorProperty}" value="true" />
+        </else>
+      </if>
+      <echo>Done validating port: @{host}:@{port}</echo>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="validatePropsNotBlank">
+    <attribute name="properties"/>
+
+    <sequential>
+      <propertyregex property="list"
+                     override="true"
+                     input="@{properties}"
+                     regexp="\s+"
+                     replace=""
+                     casesensitive="false" />
+
+      <echo>Checking properties:</echo>
+      <for list="${list}" delimiter="," param="prop" parallel="false">
+        <sequential>
+          <if>
+              <or>
+                  <equals arg1="@{prop}" arg2="dbPassword" />
+                  <equals arg1="@{prop}" arg2="sysPassword" />
+              </or>
+            <then>
+              <echo>  @{prop}=**********</echo>
+            </then>
+            <else>
+              <echo>  @{prop}=${@{prop}}</echo>
+            </else>
+          </if>
+          <if>
+            <not>
+              <isset property="@{prop}" />
+            </not>
+            <then>
+              <fail>  Error: @{prop} property is not set</fail>
+            </then>
+          </if>
+        </sequential>
+      </for>
+    </sequential>
+  </macrodef>
+
+  <!-- ==================================================================== -->
+  <!--                                                                      -->
+  <!-- JDBC connection validation and database existence check              -->
+  <!--                                                                      -->
+  <!-- ==================================================================== -->
+
+  <property name="failOnDBMSConnectionError" value="false" />
+  <property name="failOnDBNotExists" value="false" />
+  <property name="failOnUnrecoverableDBMSConnectionError" value="true" />
+
+  <property name="databaseNotExistsMessage" value="Database doesn't exist" />
+
+  <macrodef name="validateDB"
+      description="Validates JDBC connection and checks existence of the database (written to 'dbExists' variable)">
+    <attribute name="systemName" />
+    <attribute name="phase" default="before" />
+    <attribute name="failOnDBNotExists" default="${failOnDBNotExists}" />
+    <attribute name="failOnUnrecoverableConnectionError" default="${failOnUnrecoverableDBMSConnectionError}" />
+
+    <sequential>
+      <var name="displayNameOfDBToValidate" value="${@{systemName}.db.displayName}" />
+      <var name="connectionURLOfDBToValidate" value="${@{systemName}.jdbcUrl}" />
+
+      <echo>Validating ${displayNameOfDBToValidate} database connection at ${connectionURLOfDBToValidate}. Phase: [@{phase}]</echo>
+      <validateDBMSConnection jdbcUrl="${connectionURLOfDBToValidate}" phase="@{systemName}DB@{phase}" systemName="@{systemName}"
+          failOnConnectionError="@{failOnConnectionError}"
+          failOnDBNotExists="@{failOnDBNotExists}"
+          failOnUnrecoverableConnectionError="@{failOnUnrecoverableConnectionError}">
+      </validateDBMSConnection>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="connectionValidationFailureInfoListener"
+      description="Listens for connection validation failure and prints out information about the failure">
+    <attribute name="errorSqlStateCodeProperty" />
+    <attribute name="errorNativeCodeProperty" />
+    <attribute name="errorMessageProperty" />
+
+    <sequential>
+      <echo>Connection failed:</echo>
+      <echo>  SQLState: ${@{errorSqlStateCodeProperty}}</echo>
+      <echo>  Vendor specific error code: ${@{errorNativeCodeProperty}}</echo>
+      <echo>  Message: [${@{errorMessageProperty}}]</echo>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="hostPortValidationFailureListener"
+      description="Listens for host/port validation failure and prints out information about the failure">
+   <attribute name="failOnUnrecoverableConnectionError" />
+
+   <sequential>
+     <failIfUnrecoverable flag="@{failOnUnrecoverableConnectionError}"
+         message="Invalid host/port combination: [${dbHost}:${dbPort}]" />
+     </sequential>
+   </macrodef>
+
+  <macrodef name="usernamePasswordValidationFailureListener"
+      description="Listens for userName/password validation failure and prints out information about the failure">
+    <attribute name="failOnUnrecoverableConnectionError" />
+    <attribute name="userName" />
+    <attribute name="password" />
+
+    <sequential>
+      <failIfUnrecoverable flag="@{failOnUnrecoverableConnectionError}"
+          message="Invalid username/password combination: [@{userName}/@{password}]" />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="dBExistsValidationFailureListener"
+      description="Listens for db exists validation failure and prints out information about the failure">
+    <attribute name="failOnDBNotExists" />
+
+    <sequential>
+      <var name="dbExists" value="false" />
+        <if>
+            <and>
+                <equals arg1="${strategy}" arg2="inDatabase" />
+                <equals arg1="${js.setup.mode}" arg2="upgrade" />
+            </and>
+            <then>
+                <failIfUnrecoverable flag="true"
+                  message="${databaseNotExistsMessage}" />
+            </then>
+            <else>
+                <failIfUnrecoverable flag="@{failOnDBNotExists}"
+                  message="${databaseNotExistsMessage}" />
+            </else>
+        </if>
+     </sequential>
+  </macrodef>
+
+  <macrodef name="genericConnectionValidationFailureListener"
+      description="Listens generic connection validation failure and prints out information about the failure">
+    <attribute name="failOnUnrecoverableConnectionError" />
+    <attribute name="errorMessageProperty" />
+
+    <sequential>
+      <failIfUnrecoverable flag="@{failOnUnrecoverableConnectionError}"
+          message="Generic connection failure: [${@{errorMessageProperty}}]" />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="connectionOKValidationListener"
+      description="Listens for successfully connection and prints out information about the failure">
+
+    <sequential>
+      <var name="dbExists" value="true" />
+        <echo>Connection OK</echo>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="failIfUnrecoverable"
+      description="Fails build with message about unrecoverable problem with JDBC connection if flag is set to 'true'.
+      Otherwise just prints the warning.">
+    <attribute name="flag" />
+    <attribute name="message" />
+
+    <sequential>
+      <if>
+        <istrue value="@{flag}" />
+        <then>
+          <fail>@{message}. Treating problem with JDBC connection as unrecoverable</fail>
+        </then>
+        <else>
+          <echo>@{message}. Treating problem with JDBC connection as noncritical. Proceeding to next step</echo>
+        </else>
+      </if>
+    </sequential>
+  </macrodef>
+  
+  <!-- ==================================================================== -->
+  <!--                                                                      -->
+  <!-- Core install and upgrade check                                                    -->
+  <!--                                                                      -->
+  <!-- ==================================================================== -->
+
+  <target name="do-install-upgrade-test"
+       description="Tests system before installing or upgrading JasperServer">
+
+     <!-- comment out line below if there is a "hang" error on validateHost step -->
+    <validateHostAndPort host="${dbHost}" port="${dbPort}" type="DBMS" />
+    <if>
+      <not>
+        <equals arg1="${dbType}" arg2="db2" />
+      </not>
+      <then>
+        <validateDB systemName="admin" phase="test" failOnDBNotExists="true" />
+      </then>
+    </if>
+    <validateDB systemName="js" phase="test" />
+  </target>
+
+  <!-- ==================================================================== -->
+  <!--                                                                      -->
+  <!-- Pre-install check                                                    -->
+  <!--                                                                      -->
+  <!-- ==================================================================== -->
+
+  <target name="do-pre-install-test"
+      description="Tests system before installing JasperServer"
+      depends="do-install-upgrade-test">
+
+    <validateDB systemName="foodmart" phase="test" />
+    <validateDB systemName="sugarcrm" phase="test" />
+  </target>
+
+  <target name="pre-install-test-ce"
+      depends="test-ce-all-props, check-dbtype-ce, test-appServerType-ce, do-pre-install-test"
+      description="Tests system before installing JasperServer CE">
+  </target>
+
+  <target name="pre-install-test-pro"
+      depends="test-pro-all-props, check-dbtype-pro, test-appServerType-pro, do-pre-install-test"
+      description="Tests system before installing JasperServer Pro">
+  </target>
+
+  <target name="check-dbtype-ce"
+      description="Check DB type for JasperServer CE">
+    <if>
+      <not>
+        <or>
+          <equals arg1="${dbType}" arg2="mysql" />
+          <equals arg1="${dbType}" arg2="postgresql" />
+        </or>
+      </not>
+      <then>
+        <fail>JasperServer CE doesn't support ${dbType} DB type!</fail>
+      </then>
+    </if>
+  </target>
+
+  <target name="check-dbtype-pro"
+      description="Check DB type for JasperServer Pro">
+    <if>
+      <not>
+        <or>
+          <equals arg1="${dbType}" arg2="mysql" />
+          <equals arg1="${dbType}" arg2="postgresql" />
+          <equals arg1="${dbType}" arg2="oracle" />
+          <equals arg1="${dbType}" arg2="sqlserver" />
+          <equals arg1="${dbType}" arg2="db2" />
+        </or>
+      </not>
+      <then>
+        <fail>JasperServer Pro doesn't support ${dbType} DB type!</fail>
+      </then>
+    </if>
+  </target>
+
+  <target name="test-appServerType-ce"
+      description="Check application server type for JasperServer CE">
+    <if>
+      <not>
+        <or>
+          <equals arg1="${appServerType}" arg2="skipAppServerCheck" />
+          <equals arg1="${appServerType}" arg2="tomcat" />
+          <equals arg1="${appServerType}" arg2="jboss-eap-6" />
+          <equals arg1="${appServerType}" arg2="jboss-eap-7" />
+          <equals arg1="${appServerType}" arg2="wildfly" />
+          <equals arg1="${appServerType}" arg2="glassfish" />
+        </or>
+      </not>
+      <then>
+        <fail>JasperServer CE doesn't support ${appServerType} application server type!</fail>
+      </then>
+    </if>
+  </target>
+
+  <target name="test-appServerType-pro"
+      description="Check application server type for JasperServer Pro">
+    <if>
+      <not>
+        <or>
+          <equals arg1="${appServerType}" arg2="skipAppServerCheck" />
+          <equals arg1="${appServerType}" arg2="tomcat" />
+          <equals arg1="${appServerType}" arg2="jboss-eap-6" />
+          <equals arg1="${appServerType}" arg2="jboss-eap-7" />
+          <equals arg1="${appServerType}" arg2="wildfly" />
+          <equals arg1="${appServerType}" arg2="glassfish" />
+        </or>
+      </not>
+      <then>
+        <fail>JasperServer Pro doesn't support ${appServerType} application server type!</fail>
+      </then>
+    </if>
+  </target>
+
+  <!-- ==================================================================== -->
+  <!--                                                                      -->
+  <!-- Pre-upgrade check                                                    -->
+  <!--                                                                      -->
+  <!-- ==================================================================== -->
+
+  <target name="do-pre-upgrade-test"
+      description="Tests system before upgrading JasperServer"
+      depends="do-install-upgrade-test">
+  </target>
+
+  <target name="pre-upgrade-test-ce"
+      depends="test-ce-all-props, check-dbtype-for-upgrade-ce, do-pre-upgrade-test"
+      description="Tests system before upgrading JasperServer CE">
+  </target>
+
+  <target name="pre-upgrade-test-pro"
+      depends="test-pro-all-props, check-dbtype-for-upgrade-pro, do-pre-upgrade-test"
+      description="Tests system before upgrading JasperServer Pro">
+  </target>
+
+  <target name="check-dbtype-for-upgrade-ce"
+          description="Check DB type for JasperServer CE">
+    <if>
+      <and>
+        <not>
+          <or>
+            <equals arg1="${dbType}" arg2="mysql" />
+            <equals arg1="${dbType}" arg2="postgresql" />
+          </or>
+        </not>
+          <equals arg1="${strategy}" arg2="inDatabase" />
+      </and>
+      <then>
+        <fail>JasperServer CE doesn't support "in-database" upgrade strategy for ${dbType} DB type!</fail>
+      </then>
+    </if>
+  </target>
+
+  <target name="check-dbtype-for-upgrade-pro"
+          description="Check DB type for JasperServer Pro">
+    <if>
+      <and>
+        <not>
+          <or>
+            <equals arg1="${dbType}" arg2="mysql" />
+            <equals arg1="${dbType}" arg2="oracle" />
+            <equals arg1="${dbType}" arg2="sqlserver" />
+            <equals arg1="${dbType}" arg2="db2" />
+            <equals arg1="${dbType}" arg2="postgresql" />
+          </or>
+        </not>
+          <equals arg1="${strategy}" arg2="inDatabase" />
+      </and>
+      <then>
+        <fail>JasperServer Pro doesn't support "in-database" upgrade strategy for ${dbType} DB type!</fail>
+      </then>
+    </if>
+  </target>
+
+</project>

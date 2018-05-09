@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+
+  <!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+  <!-- ==================================================================== -->
+  <!--  Ant build file for Installer Install-Time                           -->
+  <!--                                                                      -->
+  <!--  This build.xml is used for executing the import operation during    -->
+  <!--  installer install-time. Also can be used as an example for running  -->
+  <!--  import-export from an ant file.                                     -->
+  <!-- ==================================================================== -->
+
+<project name="import-export" default="usage" basedir=".">
+
+  <description>Execute the Import-Export Utility</description>
+
+  <property name="import-arg1" value="--input-dir=my-catalog"/>     <!-- UPDATE HERE -->
+  
+  <property name="export-arg1" value="--output-dir=my-catalog --uris=/reports"/>  <!-- UPDATE HERE -->
+  
+
+  <!-- ============================================================= -->
+  <!-- import-os                                                    -->
+  <!-- ============================================================= -->
+  <target name="import-os">
+    <java classname="com.jaspersoft.jasperserver.export.ImportCommand">
+        <arg value="--import"/>
+        <arg value="${import-arg1}"/>
+        
+        <classpath>
+            <pathelement location="${basedir}/config"/>
+            <fileset dir="${basedir}/lib">
+                <include name="**/*.jar"/>
+            </fileset>
+        </classpath>
+     </java>
+  </target>
+
+  <!-- ============================================================= -->
+  <!-- export-os                                                     -->
+  <!-- ============================================================= -->
+  <target name="export-os">
+    <java classname="com.jaspersoft.jasperserver.export.ExportCommand">
+        <arg value="--export"/>
+        <arg value="${export-arg1}"/>
+        <!-- arg value="${export-arg2}"/ -->
+        
+        <classpath>
+            <pathelement location="${basedir}/config"/>        
+            <fileset dir="${basedir}/lib">
+                <include name="**/*.jar"/>
+            </fileset>
+        </classpath>
+     </java>
+  </target>
+
+
+  <!-- ============================================================= -->
+  <!-- import-pro                                                    -->
+  <!-- ============================================================= -->
+  <target name="import-pro">
+    <java classname="com.jaspersoft.jasperserver.export.ImportCommand">
+        <arg value="--import"/>
+        <arg value="${import-arg1}"/>
+        
+        <classpath>
+            <pathelement location="${basedir}/config"/>        
+            <fileset dir="${basedir}/lib">
+                <include name="**/*.jar"/>
+            </fileset>
+        </classpath>
+     </java>
+  </target>
+
+
+  <!-- ============================================================= -->
+  <!-- export-pro                                                    -->
+  <!-- ============================================================= -->
+  <target name="export-pro">
+    <java classname="com.jaspersoft.jasperserver.export.ExportCommand">
+        <arg value="--export"/>
+        <arg value="${export-arg1}"/>
+        <!-- arg value="${export-arg2}"/ -->
+        
+        <classpath>
+            <pathelement location="${basedir}/config"/>        
+            <fileset dir="${basedir}/lib">
+                <include name="**/*.jar"/>
+            </fileset>
+        </classpath>
+     </java>
+  </target>
+
+
+  <!-- ============================================================= -->
+  <!-- import-inst-os - Import command for the installer             -->
+  <!-- ============================================================= -->
+  <target name="import-inst-os">
+    <java classname="com.jaspersoft.jasperserver.export.ImportCommand">
+        <arg value="--import"/>
+        <arg value="--input-dir=js-catalog"/>
+        
+        <classpath>
+            <pathelement location="${basedir}/config"/>        
+            <fileset dir="${basedir}/lib">
+                <include name="**/*.jar"/>
+            </fileset>
+        </classpath>
+     </java>
+  </target>
+
+  <!-- ============================================================= -->
+  <!-- import-inst-pro - Import command for the installer            -->
+  <!-- ============================================================= -->
+  <target name="import-inst-pro">
+    <java classname="com.jaspersoft.jasperserver.export.ImportCommand">
+        <arg value="--import"/>
+        <arg value="--input-dir=js-catalog"/>
+        
+        <classpath>
+            <pathelement location="${basedir}/config"/>        
+            <fileset dir="${basedir}/lib">
+                <include name="**/*.jar"/>
+            </fileset>
+        </classpath>
+     </java>
+  </target>
+
+
+  <!-- ============================================================= -->
+  <!-- usage                                                         -->
+  <!-- ============================================================= -->
+
+  <target name="usage">
+    <echo message="  " />  
+    <echo message=" First modify the runtime arg values in this ant script. " />
+    <echo message="  " />  
+    <echo message=" Then run the import-export operation with one of the " />
+    <echo message=" following targets: " />
+    <echo message="  " />    
+    <echo message="   ant import-os " />
+    <echo message="  " />
+    <echo message="   ant export-os " />
+    <echo message="  " />
+    <echo message="   ant import-pro " />
+    <echo message="  " />
+    <echo message="   ant export-pro " />
+    <echo message="  " />
+
+    <echo message="  " />
+  </target>
+  
+</project>  

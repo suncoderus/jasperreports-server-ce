@@ -1,0 +1,100 @@
+ul, ol {
+  border-color: transparent;
+  border-style: solid;
+  border-width: 1px;
+}
+
+
+.grid {
+  display: table;
+  background-color: yellow;
+  text-align: center;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 1px;
+}
+.gridrow {
+  display: table-row;
+  background-color: pink;
+  text-align: center;
+}
+.gridcell {
+  display: table-cell;
+  background-color: blue;
+  color: white;
+  text-align: center;
+  vertical-align: middle;
+  border-width: 1px;
+  border-style: solid;
+  border-color: black;
+  text-align: center;
+  vertical-align: middle;
+}
+.infobubble {
+  border-radius: 8px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: white;
+  background-color: blue;
+  margin: 4px;
+  padding: 4px;
+  color: white;
+}
+.subfocus {
+  background-color: yellow;
+  color: black;
+}
+.ghostfocus{
+  border-style:dashed;
+  border-color: green;
+  border-width:1px;
+}
+.gridcell:hover,
+.infobubble:hover {
+  color: white;
+  background-color: cyan;
+}
+
+.navtype-section {
+  background-color: #9999AA;
+  border-style: solid;
+  border-radius: 16px;
+  margin: 4px;
+  padding: 4px;
+}
+
+.navtype-header {
+  color: blue;
+  vertical-align: top;
+}
+
+.navtype-example {
+  display: inline-block;
+  vertical-align: top;
+  background-color: #CCCCFF;
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.example-desc {
+  font-size:75%;
+}
+
+
+a:link {
+  color: cyan;
+}
+a:visited {
+  color: cyan;
+}
+a:hover {
+  color: blue;
+}
+body {
+  font-family:"sans-serif";
+}
+body *:focus {
+  border-style: dashed;
+  border-color: red;
+  border-width: 1px;
+}

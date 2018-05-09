@@ -1,0 +1,16 @@
+{{ if (message) { }}<p class="message">{{- message }}</p> {{ } }}
+<div class="control groupBox">
+    <ol class="list tabular oneColumn">
+        {{ for (var i = 0; i<items.length; i++) { }}
+        <li class="leaf {{-  i === 0 ? ' first' : '' }} {{- i === items.length - 1 ? 'last' : '' }}" tabindex="-1">
+            <div class="wrap">
+                <div class="column one">
+                    <p class="uri">{{- items[i] }} </p>
+                </div>
+            </div>
+        </li>
+        {{ } }}
+    </ol>
+
+</div>
+

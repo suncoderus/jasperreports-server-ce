@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <import resource="getValueSomeDefaultValuesAreNotValidAgainstDataType-config.xml"/>
+
+    <bean id="getValueSomeTypedParametersAreNotValidAgainstDataType" parent="getValueSomeDefaultValuesAreNotValidAgainstDataType">
+        <constructor-arg index="0">
+            <map merge="true">
+                <entry key-ref="QUERY_EXECUTOR" value-ref="queryExecutor"/>
+                <entry key-ref="TYPED_PARAMS_MAP" value-ref="typedParameters"/>
+                <entry key-ref="EXPECTED_RESULT" value-ref="expectedResult"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="typedParameters" class="java.util.HashMap">
+        <constructor-arg index="0">
+            <map value-type="java.util.Collection">
+                <entry key="order">
+                    <list>
+                        <value type="java.lang.Integer">123</value>
+                        <value type="java.lang.Integer">234</value>
+                        <value type="java.lang.Integer">345</value>
+                        <value type="java.lang.Integer">456</value>
+                    </list>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+</beans>

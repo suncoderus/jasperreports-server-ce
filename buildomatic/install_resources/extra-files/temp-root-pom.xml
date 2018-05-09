@@ -1,0 +1,694 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>jaspersoft.ji-pro</groupId>
+	<artifactId>jaspersoft.ji-pro</artifactId>
+	<packaging>pom</packaging>
+	<version>4.0.0</version>
+	<name>JasperServer and JasperAnalysis Pro</name>
+	<description>JasperServer Pro - including JasperAnalysis Pro</description>
+	<url>http://www.jaspersoft.com</url>
+	<modules>
+		<module>common</module>
+		<module>common-export</module>
+		<module>mondrian-aop-woven</module>
+		<module>jpivot-aop-woven</module>
+		<!-- for 4.0 src building comment out license module -->
+		<!-- <module>license</module> -->
+		<module>datarator</module>
+		<module>datarator-el</module>
+		<module>semantic-layer</module>
+		<module>multi-tenancy</module>
+		<module>analysis</module>
+		<module>analysis-export</module>
+		<module>gyroscope</module>
+		<module>gyroscope-export</module>
+		<module>report-options</module>
+		<module>jasperserver-war-jar</module>
+		<module>gyroscope-ireport-plugin</module>
+		<module>repository-hibernate</module>
+		<module>jasperserver-common-ws</module>
+		<module>search</module>
+		<module>jasperserver-war</module>
+		<module>export-tool</module>
+		<module>unit-tests</module>
+	</modules>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<aggregate>true</aggregate>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.0.2</version>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.5-Jaspersoft</version>
+				<configuration>
+					<useConsolidated>true</useConsolidated>
+					<instrumentation>
+						<includesGroupId>
+							<includeGroupId>^jaspersoft.*</includeGroupId>
+						</includesGroupId>
+						<excludesArtifactId>
+							<excludeArtifactId>^jdbc-dep$</excludeArtifactId>
+						</excludesArtifactId>
+						<excludes>
+							<exclude>
+								com/jaspersoft/ji/ireport/**/*.class</exclude>
+							<exclude>mondrian/**/*.class</exclude>
+							<exclude>com/tonbeller/**/*.class</exclude>
+						</excludes>
+					</instrumentation>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.4.2</version>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.0.4</version>
+		</dependency>
+		<!-- for 4.0 src building add this dependency -->
+		<dependency>
+			<groupId>jaspersoft.ji-pro</groupId>
+			<artifactId>ji-license</artifactId>
+			<version>4.0.0</version>
+		</dependency>
+	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.jaspersoft.jasperserver.api.common.impl</groupId>
+				<artifactId>jasperserver-api-common-impl</artifactId>
+				<version>${ji-os-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.jaspersoft.jasperserver.api.common</groupId>
+				<artifactId>jasperserver-api-common</artifactId>
+				<version>${ji-os-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.jaspersoft.jasperserver.api.engine</groupId>
+				<artifactId>jasperserver-api-engine</artifactId>
+				<version>${ji-os-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.jaspersoft.jasperserver.api.engine.impl</groupId>
+				<artifactId>jasperserver-api-engine-impl</artifactId>
+				<version>${ji-os-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.jaspersoft.jasperserver.api.metadata.impl</groupId>
+				<artifactId>jasperserver-api-metadata-impl</artifactId>
+				<version>${ji-os-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.jaspersoft.jasperserver.api.metadata.impl</groupId>
+				<artifactId>jasperserver-repository-hibernate</artifactId>
+				<version>${ji-os-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.jaspersoft.jasperserver.api.metadata</groupId>
+				<artifactId>jasperserver-api-metadata</artifactId>
+				<version>${ji-os-version}</version>
+				<exclusions>
+					<exclusion>
+						<!--Not the Mondrian JAR as we are overriding it with an AOP version.
+						The JARs Mondrian depends on are in the OS WAR, so we get them
+						when we include that WAR-->
+						<groupId>mondrian</groupId>
+						<artifactId>mondrian</artifactId>
+					</exclusion>
+					<exclusion>
+						
+						<!--Not the Jpivot JAR as we are overriding it with an AOP version.-->
+						<groupId>${jpivot-groupId}</groupId>
+						<artifactId>${jpivot-artifactId}</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>com.jaspersoft.jasperserver.core.util</groupId>
+				<artifactId>jasperserver-core-util</artifactId>
+				<version>${ji-os-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.jaspersoft.jasperserver.api.unitTest</groupId>
+				<artifactId>jasperserver-api-unit-test</artifactId>
+				<version>${ji-os-version}</version>
+				<type>test-jar</type>
+			</dependency>
+			<dependency>
+				<groupId>com.jaspersoft.jasperserver</groupId>
+				<artifactId>jasperserver-export-tool</artifactId>
+				<version>${ji-os-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.jaspersoft.jasperserver</groupId>
+				<artifactId>jasperserver-search</artifactId>
+				<version>${ji-os-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.jaspersoft.jasperserver</groupId>
+				<artifactId>jasperserver-war-jar</artifactId>
+				<version>${ji-os-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.jaspersoft.jasperserver</groupId>
+				<artifactId>jasperserver-common-ws</artifactId>
+				<version>${ji-os-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.jaspersoft.jasperserver</groupId>
+				<artifactId>jasperserver-ireport-plugin</artifactId>
+				<version>${ji-os-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-analysis</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>mondrian-aop-woven</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-common</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-common-export</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-common-ws-server</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-datarator</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-datarator-el</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-semantic-layer</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-multi-tenancy</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-export-tool</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-gyroscope</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-gyroscope-export</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-license</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-repository</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-report-options-api</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-report-options-export</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-multi-tenancy</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-report-options-web</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-ws-server</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-search</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji-pro</groupId>
+				<artifactId>ji-war-jar</artifactId>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jaspersoft.ji.test</groupId>
+				<artifactId>ji-unit-tests</artifactId>
+				<type>test-jar</type>
+				<version>${ji-pro-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${jpivot-groupId}</groupId>
+				<artifactId>${jpivot-artifactId}</artifactId>
+				<version>${jpivot-version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>axis.axis-saaj</groupId>
+						<artifactId>saaj-ri</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>mondrian</groupId>
+						<artifactId>mondrian</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xom</groupId>
+						<artifactId>xom</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xpp3</groupId>
+						<artifactId>xpp3</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>stax</groupId>
+						<artifactId>stax-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>com.jaspersoft.jasperserver</groupId>
+				<artifactId>jdbc-dep</artifactId>
+				<type>pom</type>
+				<version>1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>jaxen</groupId>
+				<artifactId>jaxen</artifactId>
+				<version>1.1-beta-8</version>
+				<exclusions>
+					<exclusion>
+						<groupId>pull-parser</groupId>
+						<artifactId>pull-parser</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xerces</groupId>
+						<artifactId>xmlParserAPIs</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xerces</groupId>
+						<artifactId>xercesImpl</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xom</groupId>
+						<artifactId>xom</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>xalan</groupId>
+				<artifactId>xalan</artifactId>
+				<version>2.7.1</version>
+			</dependency>
+			<dependency>
+				<groupId>jproductivity</groupId>
+				<artifactId>protection</artifactId>
+				<version>4.5</version>
+			</dependency>
+			<dependency>
+				<groupId>dom4j</groupId>
+				<artifactId>dom4j</artifactId>
+				<version>1.6.1</version>
+				<exclusions>
+					<exclusion>
+						<groupId>xalan</groupId>
+						<artifactId>xalan</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xml-apis</groupId>
+						<artifactId>xml-apis</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xerces</groupId>
+						<artifactId>xmlParserAPIs</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xerces</groupId>
+						<artifactId>xercesImpl</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xom</groupId>
+						<artifactId>xom</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xpp3</groupId>
+						<artifactId>xpp3</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>stax</groupId>
+						<artifactId>stax-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>jdom</groupId>
+				<artifactId>jdom</artifactId>
+				<version>1.1</version>
+				<exclusions>
+					<exclusion>
+						<groupId>xalan</groupId>
+						<artifactId>xalan</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xml-apis</groupId>
+						<artifactId>xml-apis</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xerces</groupId>
+						<artifactId>xmlParserAPIs</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xerces</groupId>
+						<artifactId>xercesImpl</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xom</groupId>
+						<artifactId>xom</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xpp3</groupId>
+						<artifactId>xpp3</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>stax</groupId>
+						<artifactId>stax-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>commons-dbcp</groupId>
+				<artifactId>commons-dbcp</artifactId>
+				<version>1.2.1</version>
+				<exclusions>
+					<exclusion>
+						<groupId>xml-apis</groupId>
+						<artifactId>xml-apis</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xerces</groupId>
+						<artifactId>xerces</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>commons-pool</groupId>
+				<artifactId>commons-pool</artifactId>
+				<version>1.2</version>
+				<exclusions>
+					<exclusion>
+						<groupId>xml-apis</groupId>
+						<artifactId>xml-apis</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xerces</groupId>
+						<artifactId>xerces</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>commons-digester</groupId>
+				<artifactId>commons-digester</artifactId>
+				<version>1.7</version>
+				<exclusions>
+					<exclusion>
+						<groupId>xml-apis</groupId>
+						<artifactId>xml-apis</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>net.sf.jasperreports</groupId>
+				<artifactId>jasperreports</artifactId>
+				<version>4.0.0</version>
+				<exclusions>
+					<exclusion>
+						<groupId>xml-apis</groupId>
+						<artifactId>xml-apis</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>commons-discovery</groupId>
+				<artifactId>commons-discovery</artifactId>
+				<version>0.4</version>
+			</dependency>
+			<dependency>
+				<groupId>com.jaspersoft.jasperreports</groupId>
+				<artifactId>jasperreports-pro</artifactId>
+				<version>4.0.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.jaspersoft.jasperreports</groupId>
+				<artifactId>jasperreports-fusion</artifactId>
+				<version>4.0.0</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-core</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-beans</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-core</artifactId>
+				<version>3.2.5.RELEASE</version>
+				<!--<type>test-jar</type>-->
+				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-remoting</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-web</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-webmvc</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-jdbc</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-core</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-context</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-aop</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-context-support</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-support</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-beans</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	<distributionManagement>
+		<repository>
+			<id>internalDeployed</id>
+			<name>Internal artifacts</name>
+			<url>${ji-repo-releases}</url>
+		</repository>
+		<snapshotRepository>
+			<id>internalDeployed</id>
+			<name>Internal artifacts</name>
+			<url>${ji-repo-snapshots}</url>
+		</snapshotRepository>
+	</distributionManagement>
+	<properties>
+		<ji-pro-version>4.0.0</ji-pro-version>
+		<ji-os-version>4.0.0</ji-os-version>
+		<jpivot-groupId>jaspersoft.ji-pro.ji-jpivot-ui</jpivot-groupId>
+		<jpivot-artifactId>ji-jpivot</jpivot-artifactId>
+		<jpivot-version>4.0.0</jpivot-version>
+		<mondrian-version>3.2.0-13661</mondrian-version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	
+	<!-- Profiles for two types of javadoc to run -->
+	<profiles>
+		
+		
+		<!-- Profile for JasperServer API javadoc, which creates JavaDoc for classes annotated with -->
+		
+		<!-- annotated with @JasperServerAPI using DocFlex doclet                                   -->
+		<profile>
+			<id>docflex-javadoc</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>2.4</version>
+						
+						<configuration>
+							
+							<!-- The maximum heap size available to JVM when running Javadoc -->
+							<maxmemory>512m</maxmemory>
+							<!-- Using DocFlex Doclet -->
+							<doclet>com.docflex.javadoc.Doclet</doclet>
+							<docletArtifact>
+								<groupId>docflex</groupId>
+								<artifactId>docflex-doclet</artifactId>
+								<version>${docFlex-version}</version>
+							</docletArtifact>
+							
+							
+							<!-- Specify command-line parameters for DocFlex Doclet -->
+							<additionalparam>
+                                <!-- license file -->
+						        -license ${docflex-home}/docflex-javadoc-full.license
+
+    	    					<!-- The main template -->
+	    	    				-template ${docflex-home}/templates/javadocPro/FramedDoc.tpl
+
+						        <!-- template params start with "p:" -->
+
+						        <!-- set titles -->
+						        -p:windowTitle "JasperServer API ${project.version}"
+						        -p:docTitle "JasperServer API ${project.version}"
+
+                                <!--generate deprecated-list.html-->
+                                -p:gen.deprecatedList true
+
+                                <!-- Only include classes annotated as api's -->
+                                -p:filter.byAnns.include.classes com.jaspersoft.jasperserver.api.JasperServerAPI
+                                <!---p:include.byAnns.classes com.jaspersoft.jasperserver.api.JasperServerAPI-->
+
+						        <!-- leave out empty packages -->
+                                -p:include.emptyPackages false
+                                <!---p:exclude.package.empty true-->
+
+                                <!-- Omit members inherited from java.lang classes -->
+                                -p:omit.inheritedMemberLists.for java.lang.
+
+						        <!-- Set the output format -->
+						        -format HTML
+								
+								<!-- Supress showing up the doclet GUI -->
+								-nodialog
+								
+								<!-- Do not launch documentation viewer -->
+								-launchviewer=false
+								
+								<!-- Tell DocFlex the output directory -->
+                                -d ${project.build.directory}/site/public-api
+							</additionalparam>
+							<!-- Tell Maven the output directory -->
+							<destDir>site/public-api</destDir>
+							
+							<!-- For the project-reports page -->
+							<name>JasperServer Public API</name>
+														
+							<!-- combine all the javadoc from the subprojects -->
+							<aggregate>true</aggregate>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+			<activation>
+				<property>
+					<name>javadoc-type</name>
+					<value>public-api</value>
+				</property>
+			</activation>
+		</profile>
+	</profiles>
+</project>

@@ -1,0 +1,20 @@
+<div class="section roles-users">
+    <p class="title">{{- i18n["export.dialog.roles.users"] }}</p>
+    <div class="group rolesAndUsers">
+        <div class="control radio">
+            <label class="wrap" title="" for="selectedUsersRoles">{{- i18n["export.dialog.roles.users.selected.roles.users"] }}</label>
+            <input id="selectedUsersRoles" class="selectedUsersRoles" name="sample" type="radio" data-bind="disabled:everything" checked="checked">
+        </div>
+        <div class="control radio">
+            <label class="wrap" title="" for="usersWithSelectedRoles">{{- i18n["export.dialog.roles.users.users.with.selected.roles"] }}</label>
+            <input id="usersWithSelectedRoles" class="usersWithSelectedRoles" name="sample" type="radio" data-bind="disabled:everything">
+        </div>
+        <div class="control radio">
+            <label class="wrap" title="" for="rolesWithSelectedUsers">{{- i18n["export.dialog.roles.users.roles.with.selected.users"] }}</label>
+            <input id="rolesWithSelectedUsers" class="rolesWithSelectedUsers" name="sample" type="radio" data-bind="disabled:everything">
+        </div>
+    </div>
+    <div class="group">
+        <div class="selectRolesUsers column two control pickWells"></div>
+    </div>
+</div>

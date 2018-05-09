@@ -1,0 +1,593 @@
+<!DOCTYPE html PUBLIC"-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>Embeddable Ad Hoc Viewer</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <link type="text/css" href="../../../../demos/css/jasper-ui-dev.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="jr-mAdhoc jr-mAdhocViewer jr">
+    <div class="jr-mAdhoc-visualization jr">
+
+        <div class="jr-mAdhoc-visualization-launcher jr">
+            <button class="jr-mButton jr-mButtonAction jr-mButtonOutline jr" aria-label="chart options">
+                <span class="jr-mButton-icon jr-mIcon jr-chartColumn jr"></span>
+                <span class="jr-mButton-icon jr-mIcon jr-meatball jr"></span>
+            </button>
+        </div>
+
+        <div class="jr-mAdhoc-visualization-title jr">
+            <h2 class="jr-mAdhoc-visualization-title-text jr">Ad Hoc View Title</h2>
+        </div>
+
+        <div class="jr-mDatatableContainer jr">
+
+            <table class="jr-mDatatable jr">
+                <colgroup class="jr-mDatatable-columngroup jr">
+                    <col class="jr-mDatatable-column jr">
+                    <col class="jr-mDatatable-column jr">
+                    <col class="jr-mDatatable-column jr">
+                    <col class="jr-mDatatable-column jr">
+                    <col class="jr-mDatatable-column jr">
+                    <col class="jr-mDatatable-column jr">
+                </colgroup>
+
+                <thead class="jr-mDatatable-header jr">
+                <tr class="jr-mDatatable-row jr">
+                    <th scope="row" class="jr-mDatatable-cell jr"></th>
+                    <th scope="row" class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Last Name</div>
+                        </div>
+                    </th>
+                    <th scope="row" class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">First Name</div>
+                        </div>
+                    </th>
+                    <th scope="row" class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-number jr">Active Clients</div>
+                        </div>
+                    </th>
+                    <th scope="row" class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-currency jr">Bonus</div>
+                        </div>
+                    </th>
+                    <th scope="row" class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-date jr">Date Hired</div>
+                        </div>
+                    </th>
+                </tr>
+                </thead>
+                <tbody class="jr-mDatatable-body jr">
+
+                <!-- GROUP, ACCOUNT REP -->
+                <!-- basic tables can have group rows. These span all columns, and have a unique style -->
+                <tr class="jr-mDatatable-row jr-mDatatable-rowGroup jr">
+                    <td class="jr-mDatatable-cell jr" colspan="6">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Account Rep</div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="jr-mDatatable-row jr-mDatatable-rowOdd jr">
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr"></div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Anderson</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Matt</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-number jr">9</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-currency jr">9,000.00</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-date jr">05/08/2004</div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="jr-mDatatable-row jr-mDatatable-rowEven jr">
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr"></div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Daniels</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Kieth</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-number jr">2</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-currency jr">1,000.00</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-date jr">08/02/2008</div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="jr-mDatatable-row jr-mDatatable-rowOdd jr">
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr"></div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Jensen</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Max</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-number jr">10</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-currency jr">3,000.00</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-date jr">12/01/2003</div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="jr-mDatatable-row jr-mDatatable-rowEven jr">
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr"></div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Johnson</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Chris</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-number jr">8</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-currency jr">2,250.00</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-date jr">08/15/2011</div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="jr-mDatatable-row jr-mDatatable-rowOdd jr">
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr"></div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Olliver</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Chris</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-number jr">4</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-currency jr">1,500.00</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-date jr">08/28/2005</div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="jr-mDatatable-row jr-mDatatable-rowEven jr">
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr"></div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Sasseen</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Beth</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-number jr">12</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-currency jr">4,000.00</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-date jr">01/22/2010</div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="jr-mDatatable-row jr-mDatatable-rowOdd jr">
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr"></div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Ulrich</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Megan</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-number jr">4</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-currency jr">1,800.00</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-date jr">01/12/2005</div>
+                        </div>
+                    </td>
+                </tr>
+                <!-- Group Totals -->
+                <!-- basic tables can have group total rows. These have a unique style -->
+                <tr class="jr-mDatatable-row jr-mDatatable-rowGrouptotal jr">
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Account Rep Totals</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">7</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">7</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-number jr">49</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-currency jr">22,550.00</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-date jr">7</div>
+                        </div>
+                    </td>
+                </tr>
+
+
+                <!-- GROUP, SALES MGR EAST -->
+                <tr class="jr-mDatatable-row jr-mDatatable-rowGroup jr">
+                    <td class="jr-mDatatable-cell jr" colspan="6">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Sales Manager East</div>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr class="jr-mDatatable-row jr-mDatatable-rowOdd jr">
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr"></div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Brown</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Tim</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-number jr">5</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-currency jr">5,600.00</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-date jr">12/12/2012</div>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr class="jr-mDatatable-row jr-mDatatable-rowEven jr">
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr"></div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Gerhardt</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Justine</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-number jr">3</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-currency jr">2,800.00</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-date jr">18/15/2013</div>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr class="jr-mDatatable-row jr-mDatatable-rowOdd jr">
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr"></div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Jensen</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Max</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-number jr">6</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-currency jr">5,250.00</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-date jr">02/02/2012</div>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr class="jr-mDatatable-row jr-mDatatable-rowEven jr">
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr"></div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Ritchy</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Daniel</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-number jr">4</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-currency jr">4,800.00</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-date jr">02/15/2011</div>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr class="jr-mDatatable-row jr-mDatatable-rowOdd jr">
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr"></div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Verona</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Kristen</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-number jr">7</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-currency jr">7,500.00</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-date jr">11/01/2011</div>
+                        </div>
+                    </td>
+                </tr>
+                <!-- Group Totals -->
+                <tr class="jr-mDatatable-row jr-mDatatable-rowGrouptotal jr">
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Sales Manager East Totals</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">6</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">6</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-number jr">25</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-currency jr">25,950.00</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-date jr">6</div>
+                        </div>
+                    </td>
+                </tr>
+
+
+                <!-- ALL Totals -->
+                <!-- basic tables can have a grand total row. This row has a unique style -->
+                <tr class="jr-mDatatable-row jr-mDatatable-rowTotal jr">
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">Totals</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">13</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-text jr">13</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-number jr">74</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-currency jr">48,500.00</div>
+                        </div>
+                    </td>
+                    <td class="jr-mDatatable-cell jr">
+                        <div class="jr-mDatatable-cell-wrapper jr">
+                            <div class="jr-mDatatable-cell-date jr">13</div>
+                        </div>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

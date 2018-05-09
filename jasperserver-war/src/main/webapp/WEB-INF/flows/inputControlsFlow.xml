@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<flow xmlns="http://www.springframework.org/schema/webflow" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+      ns0:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd"
+      start-state="initControlDefinition">
+
+    <input name="masterFlow"/>
+    <input name="masterFlowStep"/>
+    <input name="control"/>
+    <input name="parentFolder"/>
+
+    <action-state id="initControlDefinition">
+        <evaluate expression="inputControlsAction"/>
+        <transition on="success" to="controlNamingAndType"/>
+    </action-state>
+
+    <view-state id="controlNamingAndType" view="inputControls/controlNamingAndType">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'controlNamingAndType'"/>
+        </on-entry>
+        <transition on="Next" to="prepareForControlType">
+            <evaluate expression="inputControlsAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateControlNaming"/>
+            </evaluate>
+        </transition>
+        <transition on="Back" to="back"/>
+        <transition on="Cancel" to="cancel"/>
+        <transition on="Jump" to="jumpTo"/>
+    </view-state>
+
+    <action-state id="prepareForControlType">
+        <evaluate expression="inputControlsAction"/>
+        <transition on="success" to="decideControlType"/>
+    </action-state>
+
+    <decision-state id="decideControlType">
+        <if test="flowScope.control.inputControl.inputControlType==1" then="saveInputControl"/>
+        <if test="flowScope.control.inputControl.inputControlType==2 || flowScope.control.inputControl.inputControlType==5"
+            then="singleOrMultiValue"/>
+        <if test="flowScope.control.inputControl.inputControlType==3 || flowScope.control.inputControl.inputControlType==6 || flowScope.control.inputControl.inputControlType == 8 || flowScope.control.inputControl.inputControlType == 10"
+            then="listOfValues"/>
+        <if test="flowScope.control.inputControl.inputControlType==4 || flowScope.control.inputControl.inputControlType==7 || flowScope.control.inputControl.inputControlType == 9 || flowScope.control.inputControl.inputControlType == 11"
+            then="query" else="controlNamingAndType"/>
+    </decision-state>
+
+    <!--  Data type -->
+    <view-state id="singleOrMultiValue" view="inputControls/singleOrMultiValue">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'singleOrMultiValue'"/>
+        </on-entry>
+        <transition on="Next" to="handleDataTypeControl"/>
+        <transition on="Back" to="controlNamingAndType"/>
+        <transition on="Cancel" to="cancel"/>
+    </view-state>
+
+    <action-state id="handleDataTypeControl">
+        <evaluate expression="inputControlsAction"/>
+        <transition on="success" to="dataTypeSubflow"/>
+        <transition on="yes" to="saveInputControl"/>
+    </action-state>
+
+    <subflow-state id="dataTypeSubflow" subflow="dataTypeFlow">
+        <input name="masterFlow" value="flowScope.masterFlow == null ? 'inputControls' : flowScope.masterFlow"/>
+        <input name="dataType" value="flowScope.dataType"/>
+        <transition on="saved" to="saveInputControl"/>
+        <transition on="cancel" to="cancelFlow"/>
+        <transition on="back" to="prepareForControlType"/>
+    </subflow-state>
+
+    <!-- Query -->
+    <action-state id="query">
+        <evaluate expression="inputControlsAction.prepareQuery"/>
+        <transition on="success" to="queryFlow"/>
+    </action-state>
+
+    <subflow-state id="queryFlow" subflow="queryReferenceFlow">
+        <input name="masterFlow" value="flowScope.masterFlow"/>
+        <input name="masterFlowStep" value="flowScope.masterFlowStep"/>
+        <input name="queryReference" value="requestScope.queryReference"/>
+        <output name="queryReference"/>
+        <transition on="done" to="queryExtraData">
+            <evaluate expression="inputControlsAction.setQueryReference"/>
+        </transition>
+        <transition on="back" to="controlNamingAndType"/>
+        <transition on="cancel" to="cancel"/>
+    </subflow-state>
+
+    <view-state id="queryExtraData" view="inputControls/queryExtraData">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'queryExtraData'"/>
+        </on-entry>
+        <transition on="back" to="query"/>
+        <transition on="cancel" to="cancel"/>
+        <transition on="save" to="saveInputControl">
+            <evaluate expression="inputControlsAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateAddValueColumn"/>
+            </evaluate>
+        </transition>
+        <transition on="removeItem" to="removeVisibleColumn"/>
+        <transition on="addItem" to="addVisibleColumn">
+            <evaluate expression="inputControlsAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateAddVisibleColumn"/>
+            </evaluate>
+        </transition>
+    </view-state>
+
+    <action-state id="addVisibleColumn">
+        <evaluate expression="inputControlsAction"/>
+        <transition on="success" to="queryExtraData"/>
+    </action-state>
+
+    <action-state id="removeVisibleColumn">
+        <evaluate expression="inputControlsAction"/>
+        <transition on="success" to="queryExtraData"/>
+    </action-state>
+
+    <!-- List of values -->
+    <action-state id="handleLovControl">
+        <evaluate expression="inputControlsAction"/>
+        <transition on="success" to="listOfValuesSubflow"/>
+        <transition on="yes" to="saveInputControl"/>
+    </action-state>
+
+    <subflow-state id="listOfValuesSubflow" subflow="listOfValuesFlow">
+        <input name="masterFlow" value="flowScope.masterFlow"/>
+        <input name="listOfValuesDTO" value="flowScope.listOfValuesDTO"/>
+        <transition on="saved" to="saveInputControl"/>
+        <transition on="cancel" to="cancel"/>
+        <transition on="back" to="prepareForControlType"/>
+    </subflow-state>
+
+    <view-state id="listOfValues" view="inputControls/listOfValues">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'listOfValues'"/>
+        </on-entry>
+        <transition on="Next" to="handleLovControl"/>
+        <transition on="Back" to="controlNamingAndType"/>
+        <transition on="Cancel" to="cancel"/>
+    </view-state>
+
+    <action-state id="saveInputControl">
+        <evaluate expression="inputControlsAction"/>
+        <transition on="yes" to="backToSearch"/>
+        <transition on="success" to="done"/>
+        <transition on="error" to="controlNamingAndType"/>
+    </action-state>
+
+    <end-state id="done">
+        <output name="control"/>
+    </end-state>
+
+    <end-state id="back">
+		<output name="control"/>
+    </end-state>
+
+	<decision-state id="cancelFlow">
+		<if test="flowExecutionContext.activeSession.root" then="toSearch" else="cancel"/>
+	</decision-state>
+
+    <end-state id="cancel">
+        <output name="control"/>
+    </end-state>
+    
+	<end-state id="toSearch" view="flowRedirect:searchFlow"/>
+
+    <end-state id="displayError">
+        <output name="control"/>
+    </end-state>
+
+    <end-state id="jumpTo"/>
+
+    <end-state id="backToSearch" view="flowRedirect:searchFlow"/>
+
+    <!-- exceptions handling -->
+    <decision-state id="backFromError">
+        <if test="not (flowScope.prevForm == null or flowScope.prevForm == '')" then="${flowScope.prevForm}"
+            else="done"/>
+    </decision-state>
+
+    <view-state id="errorPage" view="modules/system/errorPage">
+        <on-entry>
+            <evaluate expression="errorPageHandlerAction"/>
+        </on-entry>
+    </view-state>
+
+    <global-transitions>
+        <transition on="backFromErrorPage" to="backFromError"/>
+        <transition on-exception="java.lang.Throwable" to="errorPage"/>
+    </global-transitions>
+
+    <!-- end exceptions handling -->
+    <bean-import resource="spring-config.xml"/>
+
+    <bean-import resource="inputControlsBeans.xml"/>
+
+</flow>

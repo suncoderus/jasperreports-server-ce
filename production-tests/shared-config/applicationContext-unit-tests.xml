@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <bean id="concreteAuditContext"
+          class="com.jaspersoft.jasperserver.api.logging.audit.context.impl.DummyAuditContext"/>
+
+    <context:component-scan base-package="com.jaspersoft.jasperserver.remote.utils" use-default-filters="false">
+    	<context:include-filter type="assignable" expression="com.jaspersoft.jasperserver.remote.utils.AuditHelper"/>   	
+ 	</context:component-scan>
+ 	
+    <alias name="${bean.userAuthorityService}" alias="concreteUserAuthorityService"/>
+    <bean id="remoteResourceHandlerRegistry" class="com.jaspersoft.jasperserver.remote.MapResourceHandlerRegistry">
+        <property name="handlers">
+            <map>
+            </map>
+        </property>
+    </bean>
+
+    <context:component-scan base-package="com.jaspersoft.jasperserver.remote.services.impl" use-default-filters="false">
+    	<context:include-filter type="assignable" expression="com.jaspersoft.jasperserver.remote.services.impl.PermissionsServiceImpl"/>
+    	<context:include-filter type="assignable" expression="com.jaspersoft.jasperserver.remote.services.impl.ResourcesManagementRemoteServiceImpl"/>   	
+ 	</context:component-scan>
+       
+
+  <bean id="propertyConfigurer" class="com.jaspersoft.jasperserver.api.common.properties.DecryptingPropertyPlaceholderConfigurer">
+    <property name="locations">
+      <list>
+        <value>classpath:js.jdbc.properties</value>
+        <value>classpath:js.quartz.properties</value>
+        <value>classpath:js.spring.properties</value>
+        <value>classpath:js.spring.export.properties</value>
+        <value>classpath:js.spring.tests.properties</value>
+        <value>classpath:js.scheduling.properties</value>
+        <value>classpath:mondrian.connect.string.properties</value>
+        <value>classpath:js.aws.datasource.properties</value>
+        <value>classpath:js.config.properties</value>
+        <value>classpath:js.externalAuth.properties</value>
+          <value>classpath:relativedate.properties</value>
+
+      </list>
+    </property>
+    <property name="properties">
+      <props>
+        <prop key="resource.root">classpath:</prop>
+        <prop key="bean.olapCacheManager">cacheManager</prop>
+      </props>
+    </property>
+  </bean>
+
+  <!-- include jdbc props as a bean -->
+  <util:properties id="jdbcProps" location="classpath:js.jdbc.properties"/>
+
+
+  <!-- query manipulator to make engineService happy -->
+  <bean id="CascadeQueryManipulator" class="com.jaspersoft.jasperserver.war.cascade.token.QueryFilter">
+    <property name="filterResolver">
+      <bean class="com.jaspersoft.jasperserver.war.cascade.token.FilterCore">
+        <property name="builtInParameterProviders" ref="builtInParameterProviders"/>
+      </bean>
+    </property>
+  </bean>
+
+
+  <!-- Local DataSource that works in any environment -->
+  <!-- Note that DriverManagerDataSource does not pool; it is not intended for production -->
+  <!-- See JPetStore for an example of using Commons DBCP BasicDataSource as alternative -->
+  <!-- See Image Database for an example of using C3P0 ComboPooledDataSource as alternative -->
+  <bean id="dataSource" class="com.jaspersoft.jasperserver.api.engine.jasperreports.service.impl.BasicDataSourceWrapper" destroy-method="close">
+    <property name="driverClassName" value="${metadata.jdbc.driverClassName}"/>
+    <property name="url" value="${metadata.jdbc.url}"/>
+    <property name="username" value="${metadata.jdbc.username}"/>
+    <property name="password" value="${metadata.jdbc.password}"/>
+  </bean>
+
+
+  <!-- non-standard access to Hibernate (we usually go to the repo manager) -->
+  <bean id="jasperServerDao" class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.HibernateDaoImpl">
+    <property name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+
+  <!-- repositoryService bean: moved from applicationContext.xml                         -->
+  <!-- the bean definition here is unchanged. bean was moved to accommodate non-standard -->
+  <!-- definition that is found for for import-export.                                   -->  
+  <bean id="repositoryService" class="org.springframework.aop.framework.ProxyFactoryBean"
+          depends-on="hibernateRepositoryService">
+    <!--<property name="proxyInterfaces"><value>com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService</value></property>-->
+    <property name="interceptorNames">
+      <list>
+        <idref bean="hibernateRepoServiceSecurity"/>
+        <idref bean="permissionsPrefetcher"/>
+        <idref bean="hibernateRepositoryService"/>
+      </list>
+    </property>
+  </bean>
+
+  <!-- reportJobsPersistenceService bean: moved from appContext-report-scheduling.xml    -->
+  <!-- the bean definition here is unchanged. bean was moved to accommodate non-standard -->
+  <!-- definition that is found for for import-export.                                   -->
+<!--
+TODO: SSU
+  <bean id="reportJobsPersistenceService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="interceptorNames">
+      <list>
+        <idref bean="reportJobSecurity"/>
+        <idref bean="reportJobsPersistenceHibernateService"/>
+      </list>
+    </property>
+  </bean>
+-->
+
+  <bean id="hibernateCompositeDeleteListenerListeners" class="java.util.ArrayList">
+     <constructor-arg index="0" type="java.util.Collection">
+        <list>
+            <ref bean="hibernateReportJobsUserDeleteListener"/>
+            <ref bean="hibernateLoggingServiceUserDeleteListener"/>
+            <ref bean="hibernateAccessEventDeleteListener"/>
+            <ref bean="hibernateRoleDeleteListener"/>
+            <!-- Removed theme listener. -->
+        </list>
+     </constructor-arg>
+  </bean>
+
+  <bean id="hibernateCompositeSaveOrUpdateListeners" class="java.util.ArrayList">
+        <constructor-arg index="0" type="java.util.Collection">
+            <list>
+                 <!-- Empty list. Removed theme listener. -->
+            </list>
+        </constructor-arg>
+   </bean>
+
+  <bean id="hibernateCompositePostUpdateListeners" class="java.util.ArrayList">
+        <constructor-arg index="0" type="java.util.Collection">
+            <list>
+                  <ref bean="olapConnectionRepositoryPostUpdateListener"/>
+            </list>
+        </constructor-arg>
+  </bean>
+
+    <!--request bean is added to the testing applicationContext configuration to avoid errors
+    if @Autowired HttpServletRequest property is used in any bean (e.g. com.jaspersoft.jasperserver.remote.exporters.HtmlExporter)-->
+    <bean id="request" class="org.springframework.mock.web.MockHttpServletRequest"/>
+
+    <bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
+        <property name="scopes">
+            <map>
+                <entry key="session">
+                    <bean class="org.springframework.context.support.SimpleThreadScope" />
+                </entry>
+                <entry key="request">
+                    <bean class="org.springframework.context.support.SimpleThreadScope" />
+                </entry>
+            </map>
+        </property>
+    </bean>
+</beans>

@@ -1,0 +1,50 @@
+{{
+	var moment = require("moment");
+}}
+
+<div class="wrap draggable">
+    <div class="column one">
+        <p class="jobID">{{- model.id }}</p>
+    </div>
+    <div class="column two">
+        <p class="jobName">{{- model.label }}</p>
+        <p class="jobOwner">{{- model.owner }}</p>
+    </div>
+    <div class="column three">
+        <p class="jobState">{{- model.state.value }}</p>
+    </div>
+    <div class="column four">
+        <p class="lastRanDate">
+            {{ if (model.state.previousFireTime) { }}
+                {{-
+                    moment(model.state.previousFireTime).utcOffset(timeZoneOffsetFunction(model.state.previousFireTime)).format("M/D/YYYY hh:mm:ss A")
+                }}
+            {{ } else { }}
+                &nbsp;
+            {{ } }}
+        </p>
+        <p class="nextRunDate">
+            {{ if (model.state.value!=='NORMAL' && model.state.value!=='EXECUTING'){ }}
+                {{- i18n['report.scheduling.list.label.disabled'] }}
+            {{ } else if (model.state.nextFireTime) { }}
+                {{-
+                    moment(model.state.nextFireTime).utcOffset(timeZoneOffsetFunction(model.state.nextFireTime)).format("M/D/YYYY hh:mm:ss A")
+                }}
+            {{ } else { }}
+                &nbsp;
+            {{ } }}
+        </p>
+    </div>
+    <div class="column five">
+	    <div class="jobDelete">
+		    <button name="deleteJob" class="button action simple delete"></button>
+	    </div>
+	    <div class="jobEdit">
+		    <button name="editJob" class="button action simple edit"></button>
+	    </div>
+	    <p class="jobEnabled">
+		    <input name="enableJob" type="checkbox" {{ if (model.state.value=='NORMAL' || model.state.value=='EXECUTING') { }} checked="checked" {{ } }} ></input>
+	    </p>
+    </div>
+</div>
+

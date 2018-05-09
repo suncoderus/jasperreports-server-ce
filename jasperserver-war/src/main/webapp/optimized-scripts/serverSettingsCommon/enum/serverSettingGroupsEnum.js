@@ -1,0 +1,1 @@
+define({CUSTOM:"custom",LOG4J:"log4j",MONDRIAN:"mondrian",AWS:"aws",JDBC:"jdbc",ADHOC:"adhoc",JI:"ji",CUSTOM_SERVER_SETTINGS:"customServerSettings"});

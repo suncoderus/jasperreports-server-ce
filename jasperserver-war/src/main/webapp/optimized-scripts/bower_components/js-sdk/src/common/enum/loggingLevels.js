@@ -1,0 +1,1 @@
+!function(n,g){"function"==typeof define&&define.amd?define([],n):(g.logging||(g.logging={}),g.logging.loggingLevels=n())}(function(){return{DEBUG:100,INFO:200,WARN:300,ERROR:400}},this);

@@ -1,0 +1,52 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<jboss-deployment-structure>
+    <!-- This corresponds to the top level deployment. For a war this is the war's module, for an ear -->
+    <!-- This is the top level ear module, which contains all the classes in the EAR's lib folder     -->
+    <deployment>
+
+        <exclusions>
+        </exclusions>
+
+        <dependencies>
+            <module name="jaspersoft.tibcosoftware"/>
+            <system>
+                <paths>
+                    <path name="com/sun/management"/>
+                </paths>
+            </system>
+        </dependencies>
+
+        <!-- Add additional classes to the deployment module. In this case, it is the same as including the jar in the EAR's lib directory
+            [dlitvak] Jboss7 seems to read jars from vfs (virtual) directory: a security mechanism?
+            Jboss's classloader assigns vfs location to CodeSource object of the loaded jar classes.
+            In order to assign the class object physical deployment module location, wwe found it necessary to introduce this file with
+            additional resource roots marked with use-physical-code-source="true" (issue 26780)
+
+            References:     https://community.jboss.org/thread/170527
+                            https://issues.jboss.org/browse/AS7-308
+                            https://docs.jboss.org/author/display/AS7/Class+Loading+in+AS7?_sscc=t
+
+        -->
+        <resources>
+        </resources>
+    </deployment>
+
+
+</jboss-deployment-structure>

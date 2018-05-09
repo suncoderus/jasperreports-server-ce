@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<!-- mapping a simple (non inherited) class on the same table as RepoFileResource for the update below -->
+	<class
+		name="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.util.BasicPersistentFileResource"
+		table="JIFileResource">
+		<id name="id" type="long">
+			<generator class="native"/>
+		</id>
+		<property name="data" type="binary" length="20971520" column="data"/>
+	</class>
+	
+	<query name="FileResourceReplaceDataById">
+		update com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.util.BasicPersistentFileResource 
+		set data = :data
+		where id = :id
+	</query>
+</hibernate-mapping>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class abstract="true" 
+			table="JIResource" 
+			name="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoResource" batch-size="1000">
+		<id name="id" type="long">
+			<generator class="native"/>
+		</id>
+		<natural-id mutable="true">
+			<property name="name" not-null="true" length="200" type="string" column="name"/>
+			<many-to-one column="parent_folder" name="parent" outer-join="auto"/>
+		</natural-id>
+		<version column="version" unsaved-value="negative" name="version"/>
+		<many-to-one column="childrenFolder" cascade="save-update,delete" name="childrenFolder" outer-join="auto"/>
+		<property name="label" not-null="true" length="200" type="string" column="label"/>
+		<property name="description" length="250" type="string" column="description"/>
+        <property name="resourceType" not-null="true" length="255" type="string" column="resourceType"
+                  index="resource_type_index"/>
+		<property name="creationDate" not-null="true" type="timestamp" column="creation_date"/>
+		<property name="updateDate" not-null="true" type="timestamp" column="update_date"/>
+        <set inverse="true" cascade="all-delete-orphan" name="accessEvents" outer-join="auto" batch-size="1000">
+            <key column="resource_id" on-delete="cascade"/>
+            <one-to-many class="com.jaspersoft.jasperserver.api.logging.access.domain.hibernate.RepoAccessEvent"/>
+        </set>
+        <set inverse="true" cascade="all-delete-orphan" name="thumbnails" batch-size="1000" outer-join="auto">
+            <key column="resource_id" on-delete="cascade"/>
+            <one-to-many class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoReportThumbnail"/>
+        </set>
+	</class>
+
+<!-- create index JIResource_childrenFolder_index on JIResource (childrenFolder); -->
+<!-- replacing JIResource_childrenFolder_index with JIResource_childrenFolder_idx -->
+<database-object>
+	<create>create index JIResource_childrenFolder_idx on JIResource (childrenFolder)</create>
+	<drop>DROP INDEX JIResource_childrenFolder_idx ON JIResource</drop>
+</database-object>
+
+<!-- create index JIResource_parent_folder_index on JIResource (parent_folder); -->
+<database-object>
+	<create>create index JIResource_parent_folder_index on JIResource (parent_folder)</create>
+	<drop>DROP INDEX JIResource_parent_folder_index ON JIResource</drop>
+</database-object>
+
+</hibernate-mapping>

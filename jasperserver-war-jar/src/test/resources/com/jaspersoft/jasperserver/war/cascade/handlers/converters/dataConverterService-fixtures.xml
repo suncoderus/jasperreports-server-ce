@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:util="http://www.springframework.org/schema/util"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+    <import resource="../base-fixtures-config.xml"/>
+
+
+    <bean id="multiSelectICAndICInfoWithoutNestedType" class="java.util.HashMap" parent="baseTestCaseMap">
+        <constructor-arg index="0">
+            <map merge="true">
+                <entry key-ref="CONTROLS">
+                    <map>
+                        <entry key="orderDate"> <!-- Control name -->
+                            <map>
+                                <entry key-ref="INPUT_CONTROL"> <!-- InputControl implementation -->
+                                    <bean parent="orderDateMultiSelectControl"/>
+                                </entry>
+                                <entry key-ref="CONTROL_INFO"> <!-- ReportInputControlInformation -->
+                                    <bean parent="orderCollectionWithoutTypeICInfo"/>
+                                </entry>
+                            </map>
+                        </entry>
+                    </map>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="correctSingleValueDateICAndICInfo" class="java.util.HashMap" parent="baseTestCaseMap">
+        <constructor-arg index="0">
+            <map merge="true">
+                <entry key-ref="CONTROLS">
+                    <map>
+                        <entry key="orderDate"> <!-- Control name -->
+                            <map>
+                                <entry key-ref="INPUT_CONTROL"> <!-- InputControl implementation -->
+                                    <bean parent="orderDateSingleValueControl"/>
+                                </entry>
+                                <entry key-ref="CONTROL_INFO"> <!-- ReportInputControlInformation -->
+                                    <bean parent="orderDateICInfo"/>
+                                </entry>
+                            </map>
+                        </entry>
+                    </map>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="correctSingleValueTimestampICAndICInfo" class="java.util.HashMap" parent="baseTestCaseMap">
+        <constructor-arg index="0">
+            <map merge="true">
+                <entry key-ref="CONTROLS">
+                    <map>
+                        <entry key="orderDate"> <!-- Control name -->
+                            <map>
+                                <entry key-ref="INPUT_CONTROL"> <!-- InputControl implementation -->
+                                    <bean parent="orderTimestampSingleValueControl"/>
+                                </entry>
+                                <entry key-ref="CONTROL_INFO"> <!-- ReportInputControlInformation -->
+                                    <bean parent="orderTimestampICInfo"/>
+                                </entry>
+                            </map>
+                        </entry>
+                    </map>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="correctSingleValueTimeICAndICInfo" class="java.util.HashMap" parent="baseTestCaseMap">
+        <constructor-arg index="0">
+            <map merge="true">
+                <entry key-ref="CONTROLS">
+                    <map>
+                        <entry key="orderDate"> <!-- Control name -->
+                            <map>
+                                <entry key-ref="INPUT_CONTROL"> <!-- InputControl implementation -->
+                                    <bean parent="orderTimeSingleValueControl"/>
+                                </entry>
+                                <entry key-ref="CONTROL_INFO"> <!-- ReportInputControlInformation -->
+                                    <bean parent="orderTimeICInfo"/>
+                                </entry>
+                            </map>
+                        </entry>
+                    </map>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="singleValueDateAndICTimestamp" class="java.util.HashMap" parent="baseTestCaseMap">
+        <constructor-arg index="0">
+            <map merge="true">
+                <entry key-ref="CONTROLS">
+                    <map>
+                        <entry key="orderDate"> <!-- Control name -->
+                            <map>
+                                <entry key-ref="INPUT_CONTROL"> <!-- InputControl implementation -->
+                                    <bean parent="orderDateSingleValueControl"/>
+                                </entry>
+                                <entry key-ref="CONTROL_INFO"> <!-- ReportInputControlInformation -->
+                                    <bean parent="orderTimestampICInfo"/>
+                                </entry>
+                            </map>
+                        </entry>
+                    </map>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="jrParameterClassIsAssignableFromValueClass" class="java.util.HashMap" parent="baseTestCaseMap">
+        <constructor-arg index="0">
+            <map merge="true">
+                <entry key-ref="CONTROLS">
+                    <map>
+                        <entry key="orderDate"> <!-- Control name -->
+                            <map>
+                                <entry key-ref="INPUT_CONTROL"> <!-- InputControl implementation -->
+                                    <bean parent="dateRangeSingleValueControl"/>
+                                </entry>
+                                <entry key-ref="CONTROL_INFO"> <!-- ReportInputControlInformation -->
+                                    <bean parent="orderDateRangeICInfo"/>
+                                </entry>
+                            </map>
+                        </entry>
+                    </map>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="query" class="com.jaspersoft.jasperserver.api.metadata.common.domain.client.QueryImpl"/>
+    <bean id="queryOrder" parent="query">
+        <property name="sql" value=""/>
+    </bean>
+    <bean id="queryRefOrder" class="com.jaspersoft.jasperserver.api.metadata.common.domain.ResourceReference">
+        <constructor-arg ref="queryOrder"/>
+    </bean>
+
+    <bean id="collectionWithoutTypeICInfo" class="com.jaspersoft.jasperserver.war.cascade.utils.ReportInputControlInformationMock">
+        <property name="valueType" value="java.util.Collection"/>
+        <!--<property name="nestedType" value=""/>-->
+    </bean>
+
+    <bean id="dateICInfo" class="com.jaspersoft.jasperserver.war.cascade.utils.ReportInputControlInformationMock">
+        <property name="valueType" value="java.util.Date"/>
+    </bean>
+
+    <bean id="timestampICInfo" class="com.jaspersoft.jasperserver.war.cascade.utils.ReportInputControlInformationMock">
+        <property name="valueType" value="java.sql.Timestamp"/>
+    </bean>
+
+    <bean id="timeICInfo" class="com.jaspersoft.jasperserver.war.cascade.utils.ReportInputControlInformationMock">
+        <property name="valueType" value="java.sql.Time"/>
+    </bean>
+
+    <bean id="dateRangeICInfo" class="com.jaspersoft.jasperserver.war.cascade.utils.ReportInputControlInformationMock">
+        <property name="valueType" value="net.sf.jasperreports.types.date.DateRange"/>
+    </bean>
+
+    <bean id="timestampRangeICInfo" class="com.jaspersoft.jasperserver.war.cascade.utils.ReportInputControlInformationMock">
+        <property name="valueType" value="net.sf.jasperreports.types.date.TimestampRange"/>
+    </bean>
+
+    <bean id="orderCollectionWithoutTypeICInfo" parent="collectionWithoutTypeICInfo">
+        <property name="parameterName" value="orderDate"/>
+        <property name="promptLabel" value="Order Date"/>
+    </bean>
+
+    <bean id="orderDateICInfo" parent="dateICInfo">
+        <property name="parameterName" value="orderDate"/>
+        <property name="promptLabel" value="Order Date"/>
+    </bean>
+
+    <bean id="orderTimestampICInfo" parent="timestampICInfo">
+        <property name="parameterName" value="orderTimestamp"/>
+        <property name="promptLabel" value="Order Timestamp"/>
+    </bean>
+
+    <bean id="orderTimeICInfo" parent="timeICInfo">
+        <property name="parameterName" value="orderTime"/>
+        <property name="promptLabel" value="Order Time"/>
+    </bean>
+
+    <bean id="orderDateRangeICInfo" parent="dateRangeICInfo">
+        <property name="parameterName" value="orderDateRange"/>
+        <property name="promptLabel" value="Order Date Range"/>
+    </bean>
+
+    <bean id="multiSelectQueryControl" class="com.jaspersoft.jasperserver.war.cascade.utils.InputControlMock">
+        <property name="inputControlType" ref="TYPE_MULTI_SELECT_QUERY"/>
+    </bean>
+
+    <bean id="singleValueControl" class="com.jaspersoft.jasperserver.war.cascade.utils.InputControlMock">
+        <property name="inputControlType" ref="TYPE_SINGLE_VALUE"/>
+    </bean>
+
+    <bean id="orderDateMultiSelectControl" parent="multiSelectQueryControl">
+        <property name="name" value="orderDate"/>
+        <property name="mandatory" value="true"/>
+        <property name="query" ref="queryRefOrder"/>
+        <property name="queryValueColumn" value="orderDate"/>
+        <property name="queryVisibleColumnsList">
+            <list><value>orderDate</value></list>
+        </property>
+    </bean>
+
+    <bean id="orderDateSingleValueControl" parent="singleValueControl">
+        <property name="name" value="orderDate"/>
+        <property name="mandatory" value="true"/>
+        <property name="dataType" ref="dateDataTypeRef"/>
+    </bean>
+
+    <bean id="orderTimestampSingleValueControl" parent="singleValueControl">
+        <property name="name" value="orderDate"/>
+        <property name="mandatory" value="true"/>
+        <property name="dataType" ref="timestampDataTypeRef"/>
+    </bean>
+
+    <bean id="orderTimeSingleValueControl" parent="singleValueControl">
+        <property name="name" value="orderDate"/>
+        <property name="mandatory" value="true"/>
+        <property name="dataType" ref="timeDataTypeRef"/>
+    </bean>
+
+    <bean id="orderTimeControl" parent="multiSelectQueryControl">
+        <property name="name" value="orderTime"/>
+        <property name="mandatory" value="true"/>
+        <property name="query" ref="queryRefOrder"/>
+        <property name="queryValueColumn" value="orderTime"/>
+        <property name="queryVisibleColumnsList">
+            <list><value>orderTime</value></list>
+        </property>
+    </bean>
+
+    <bean id="dateRangeSingleValueControl" parent="singleValueControl">
+        <property name="name" value="dateRange"/>
+        <property name="mandatory" value="true"/>
+        <property name="dataType" ref="dateDataTypeRef"/>
+    </bean>
+
+    <bean id="dateDataTypeRef" class="com.jaspersoft.jasperserver.api.metadata.common.domain.ResourceReference">
+        <constructor-arg ref="dateDataType"/>
+    </bean>
+    <bean id="dateDataType" class="com.jaspersoft.jasperserver.api.metadata.common.domain.client.DataTypeImpl">
+        <property name="dataTypeType" value="3"/>
+    </bean>
+
+    <bean id="timestampDataTypeRef" class="com.jaspersoft.jasperserver.api.metadata.common.domain.ResourceReference">
+        <constructor-arg ref="timestampDataType"/>
+    </bean>
+    <bean id="timestampDataType" class="com.jaspersoft.jasperserver.api.metadata.common.domain.client.DataTypeImpl">
+        <property name="dataTypeType" value="4"/>
+    </bean>
+
+    <bean id="timeDataTypeRef" class="com.jaspersoft.jasperserver.api.metadata.common.domain.ResourceReference">
+        <constructor-arg ref="timeDataType"/>
+    </bean>
+    <bean id="timeDataType" class="com.jaspersoft.jasperserver.api.metadata.common.domain.client.DataTypeImpl">
+        <property name="dataTypeType" value="5"/>
+    </bean>
+
+</beans>
+
+
+
+

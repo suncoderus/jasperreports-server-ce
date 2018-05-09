@@ -1,0 +1,311 @@
+/*
+.overrides_custom css
+
+(Accessible Version)
+
+Place styles for simple UI customization in this file.
+
+This file is loaded after all other CSS, so selectors here will win in case of
+conflicts with the default rules.
+
+Using this file for customizations is the method most likely to conserve your
+customizations even if markup changes occur in future product releases.
+
+Extensive customizations may be easier to implement by replacing one or more of
+the standard theme files in your custom theme folder.  However, if future
+product releases place styles for new markup components into the files you have
+replaced, your theme will not have these new styles, and therefore will not
+display the new components correctly.
+*/
+
+/* Standard Navigation toggle
+ * The JavaScript logic that enabled accessible navigation of JRS is enabled by
+ * detecting the existance of the class ".js-accessibility-enabled".  The class
+ * defines a single rule to avoid being dropped or optimized out, but is not
+ * applied to any element in the DOM.
+ *
+ * To disable the system, and test visual effects only, comment out this
+ * definition.
+ */
+.js-accessibility-enabled{
+    border-radius:0px;
+}
+
+
+/* Standard Navigation classes and styles
+ *
+ * The Standard Navigation accessibility system (StdNav) provides some special
+ * CSS class to augment the normal ":focus" pseudoclass available to track
+ * browser focus.  By default, only the familiar dashed-line ":focus" indicator
+ * is used.  This focus indication is as per W3C recommendations, and is
+ * generally expected by users.
+ *
+ * However, additional classes are available as well, and are described below.
+ * If you wish to use these, you should start by using and modifying the "Easy
+ * Access" theme, or a copy of it.
+ *
+ * ==========================================================================
+ * superfocus   A class given to exactly one element in the page at all times
+ *              to indicate which major UI region is the user's current "area
+ *              of interest".  This will generally either be, or contain, the
+ *              browser focus, but will generally be broader than browser
+ *              focus.  Jaspersoft extension.
+ *
+ * :focus       The normal browser focus metaclass.  However, for reasons of
+ *              accessibility and navigation, be aware that focus can and will
+ *              be set on items that TEMPORARILY have a valid tabindex, but
+ *              will not necessarily retain it after navigation (such as an
+ *              individual table cell).  Note that when a user is using pure
+ *              keyboard navigation, there will be times when NO element in the
+ *              page has :focus because the user is tabbing through browser
+ *              toolbars, etc.  For screen readers, this is the element whose
+ *              content we want to be read, and whose navigation details we
+ *              expect to be relayed.
+ *
+ * subfocus     Fine navigation focus.  Normally, this is applied to the same
+ *              element as :focus, but if it is necessary to indicate position
+ *              within the child subdom of an element without moving browser
+ *              focus to those elements, subfocus may be changed instead.  In
+ *              any case, subfocus must always be set correctly, even if it
+ *              is simply to the same element that has :focus.  Jaspersoft
+ *              extension.
+ *
+ * ghostfocus - Whenever a major UI region has superfocus, either it or a child
+ *              element must have browser TAB focus and StdNav subfocus.  When
+ *              superfocus moves to another major UI region-- for example, when
+ *              the user presses TAB-- subfocus is replaced by ghostfocus in
+ *              the de-focused region.  Likewise, if an element in the newly
+ *              superfocused region has ghostfocus, that is replaced by
+ *              subfocus.  Finally, the browser is explicitly focused to the
+ *              new subfocus (the old ghostfocus, if there was one, or a
+ *              sensible default for the region).  This functionality allows a
+ *              user to tab back and force between grids, tables, lists, and
+ *              other complex controls without losing their place.  Jaspersoft
+ *              extension, and not in use by all control types.
+ */
+
+/* THEME */
+.superfocus {
+    outline: 3px solid orange;
+}
+
+:focus {
+    outline: 1px dotted royalblue;
+}
+
+/* NOTE: Form controls and CSS are not always the best of friends.  Applying
+ * global styles can cause problems when the rules fall through to form
+ * controls, because even a simple background color change can cause browsers
+ * to drop ALL of the default styling for the control, radically changing its
+ * appearance.  In particular, Firefox has serious issues with this with respect
+ * to "select" (dropdown/droplist) controls.
+ *
+ * This can be gotten around using the :not CSS selector, HOWEVER, be aware that
+ * IE8 does not support ":not".  Conveniently, though, it also doesn't have such
+ * big issues with CSS styles messing up form controls.
+ */
+.subfocus:not(select) {
+    background-color: #c9ebf8;
+}
+
+.ghostfocus {
+}
+
+/* BUTTONS */
+.sourceDialogNew.overlay > .content > .header > .sub.header > .button.superfocus {
+    border: 2px dotted royalblue;
+    outline: none;
+    top: 14px;
+}
+
+.button.action.subfocus {
+    outline: 2px dotted orange;
+}
+
+/* CONTAINERS */
+
+/* CONTROLS */
+input[type="text"]:focus,
+input[type="password"]:focus,
+button.action:focus,
+#loginPage #metaLinks:focus {
+    outline: 2px dotted orange;
+}
+
+#searchInput:focus {
+    outline: 2px dotted orange;
+    margin-top: 2px !important;
+    margin-left: 2px !important;
+    height: 18px !important;
+    width: 170px !important;
+}
+
+select:focus {
+    outline: 2px dotted orange;
+    outline-offset: 1px;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0)
+{
+    select:focus {
+        outline: 2px dotted orange;
+        outline-offset: 1px;
+    }
+
+    #searchInput.subfocus {
+        outline-offset: 2px;
+    }
+
+    #secondarySearchInput.subfocus {
+        outline-offset: 0;
+    }
+
+
+    #searchInput.superfocus,
+    #secondarySearchInput.superfocus {
+        outline-offset: 0;
+    }
+}
+
+
+/* TREE */
+.folders.node.selected:focus {
+    outline: 1px dashed royalblue;
+}
+
+/* LISTS */
+/* SELECT LIST CONTROLS */
+#resultsContainer .list .selected.leaf p,
+#resultsContainer .list .selected.node p
+{
+    color: white;
+}
+
+.subfocus .fileType {
+    color: #333;
+}
+
+.list li.resources.leaf.cursor:focus > div {
+  outline: 3px dotted orange;
+  outline-offset: -3px;
+}
+
+.list li.resources.leaf.cursor:not(.selected) > div {
+    background-color: #CCC;
+}
+
+/* GLOBAL BANNER AND NON-MENU CONTENTS */
+.banner {
+    border-bottom: 1px solid #1388d8;
+    height: 28px;
+    top: 2px;
+} 
+
+#logo {
+    margin-top: 5px;
+    }
+
+#globalSearch.searchLockup {
+    margin-top: 3px;
+}
+
+#systemMessageConsole {
+    border-bottom: 1px solid #1388d8;
+    height: 29px;
+}
+
+#systemMessage {
+    line-height: 28px;
+}
+
+/* MENUS */
+#mainNavigation.horizontal li:focus {
+    outline-style:dotted;
+    outline-width:2px;
+    outline-color:white;
+}
+
+#mainNavigation.horizontal li:.subfocus {
+    background-color: #157bc1;
+}
+
+.menu.primaryNav .wrap {
+    height: 28px;
+    line-height: 28px;
+}
+
+.menu.primaryNav #main_home .wrap > .icon,
+.menu.primaryNav .node > .wrap > .icon {
+    height: 28px;
+}
+
+#metaLinks {
+    height: 28px;
+}
+
+#metaLinks li {
+    border: none;
+    line-height: 27px;
+    margin: 0;
+    padding-bottom: 1px;
+}
+
+
+/* PAGE-SPECIFIC */
+#sortDialogSortFields.superfocus,
+#sortDialogSortFields:focus {
+     outline-offset: -4px;
+}
+
+.sourceDialogNew.superfocus.subfocus {
+    outline: none;
+}
+
+/* JIVE */
+
+
+/*
+.list .selected .sublist a,
+.list .selected .sublist p a
+{
+    color: #1958ba;
+}
+*/
+
+/*
+textarea.subfocus {
+    background-color: white;
+}
+*/
+
+#loginPage #loginForm.superfocus,
+#loginPage #metaLinks.superfocus {
+    outline: none;
+}
+
+#loginPage #metaLinks li.subfocus:not(select) a {
+    color: #fff;
+}
+
+#loginPage #metaLinks li.subfocus:not(select) {
+    background-color: #195b8a;
+}
+
+/*
+ * organization tree
+ */
+#orgTree, #orgTree :focus, #orgTree .subfocus li {
+    background-color: transparent;
+}
+
+.workflow.subfocus {
+    background-color: #c9ebf8;
+}
+
+.resourceBlock-table td.subfocus {
+    background-color: #c9ebf8;
+}
+
+.resourceBlock-table td.fileType.subfocus{
+    color: #333;
+}

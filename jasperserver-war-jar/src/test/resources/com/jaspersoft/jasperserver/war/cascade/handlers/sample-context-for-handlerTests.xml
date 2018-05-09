@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:util="http://www.springframework.org/schema/util"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+    <import resource="base-fixtures-config.xml"/>
+
+    <!-- sampleTestCase -->
+
+    <bean id="sampleTestCase" class="java.util.HashMap" parent="baseTestCaseMap">
+        <constructor-arg index="0">
+            <map merge="true">
+                <entry key-ref="CONTROLS">
+                    <map>
+                        <entry key="country"> <!-- Control name -->
+                            <map>
+                                <entry key-ref="INPUT_CONTROL"> <!-- InputControl implementation -->
+                                    <bean parent="multiSelectQuery_inputControl">
+                                        <property name="name" value="country"/>
+                                        <property name="mandatory" value="true"/>
+                                        <property name="query" ref="queryRefCountry"/>
+                                        <property name="queryValueColumn" value="country"/>
+                                        <property name="queryVisibleColumnsList">
+                                            <list><value>country</value></list>
+                                        </property>
+                                    </bean>
+                                </entry>
+                                <entry key-ref="CONTROL_INFO"> <!-- ReportInputControlInformation -->
+                                    <bean parent="country_controlInfo"/>
+                                </entry>
+                            </map>
+                        </entry>
+                        <entry key="state"> <!-- Control name -->
+                            <map>
+                                <entry key-ref="INPUT_CONTROL"> <!-- InputControl implementation -->
+                                    <bean parent="multiSelectQuery_inputControl">
+                                        <property name="name" value="state"/>
+                                        <property name="mandatory" value="true"/>
+                                        <property name="query" ref="queryRefState"/>
+                                        <property name="queryValueColumn" value="state"/>
+                                        <property name="queryVisibleColumnsList">
+                                            <list><value>country</value><value>state</value></list>
+                                        </property>
+                                    </bean>
+                                </entry>
+                                <entry key-ref="CONTROL_INFO"> <!-- ReportInputControlInformation -->
+                                    <bean parent="state_controlInfo"/>
+                                </entry>
+                            </map>
+                        </entry>
+                    </map>
+                </entry>
+                <entry key-ref="PARAMETER_TYPES">
+                    <bean id="parameterTypes" class="java.util.HashMap">
+                        <constructor-arg>
+                            <map>
+                                <entry key="country"><value type="java.lang.Class">java.util.Collection</value></entry>
+                                <entry key="state"><value type="java.lang.Class">java.util.Collection</value></entry>
+                            </map>
+                        </constructor-arg>
+                    </bean>
+                </entry>
+                <!-- Query Executor related data -->
+                <entry key-ref="QUERY_EXECUTOR">
+                    <map>
+                        <entry key="state">
+                            <map>
+                                <entry key="{}" value-ref="statesForUSA_queryResult"/>
+                                <entry key="{country:['USA']}" value-ref="statesForUSA_queryResult"/>
+                            </map>
+                        </entry>
+                    </map>
+                </entry>
+                <!-- Query Executor related data -->
+                <entry key-ref="TYPED_PARAMS_MAP">
+                    <map>
+                        <entry key="country">
+                            <list>
+                                <value>USA</value>
+                            </list>
+                        </entry>
+                        <entry key="state">
+                            <list>
+                                <value>CA</value>
+                            </list>
+                        </entry>
+                    </map>
+                </entry>
+                <entry key-ref="EXPECTED_RESULT">
+                    <bean class="com.jaspersoft.jasperserver.dto.reports.inputcontrols.InputControlState">
+                        <property name="value"><null/></property>
+                        <property name="error"><null/></property>
+                        <property name="id" value="state"/>
+                        <property name="uri" value="/state"/>
+                        <property name="options">
+                            <list>
+                                <bean class="com.jaspersoft.jasperserver.dto.reports.inputcontrols.InputControlOption">
+                                    <property name="label" value="USA | CA"/>
+                                    <property name="value" value="CA"/>
+                                    <property name="selected" value="true"/>
+                                </bean>
+                                <bean class="com.jaspersoft.jasperserver.dto.reports.inputcontrols.InputControlOption">
+                                    <property name="label" value="USA | WA"/>
+                                    <property name="value" value="WA"/>
+                                    <property name="selected" value="false"/>
+                                </bean>
+                                <bean class="com.jaspersoft.jasperserver.dto.reports.inputcontrols.InputControlOption">
+                                    <property name="label" value="USA | BA"/>
+                                    <property name="value" value="BA"/>
+                                    <property name="selected" value="false"/>
+                                </bean>
+                            </list>
+                        </property>
+                    </bean>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <!-- input controls -->
+    <bean id="multiSelectQuery_inputControl" class="com.jaspersoft.jasperserver.war.cascade.utils.InputControlMock">
+        <property name="inputControlType" ref="TYPE_MULTI_SELECT_QUERY"/>
+    </bean>
+
+    <bean id="query" class="com.jaspersoft.jasperserver.api.metadata.common.domain.client.QueryImpl"/>
+
+    <bean id="queryCountry" parent="query">
+        <property name="sql" value=""/>
+    </bean>
+    <bean id="queryRefCountry" class="com.jaspersoft.jasperserver.api.metadata.common.domain.ResourceReference">
+        <constructor-arg ref="queryCountry"/>
+    </bean>
+
+    <bean id="queryState" parent="query">
+        <property name="sql" value="country"/>
+    </bean>
+    <bean id="queryRefState" class="com.jaspersoft.jasperserver.api.metadata.common.domain.ResourceReference">
+        <constructor-arg ref="queryState"/>
+    </bean>
+
+    <!-- control infos -->
+    <bean id="country_controlInfo" class="com.jaspersoft.jasperserver.war.cascade.utils.ReportInputControlInformationMock">
+        <property name="parameterName" value="country"/>
+        <property name="promptLabel" value="country"/>
+        <property name="valueType" value="java.util.Collection"/>
+        <property name="nestedType" value="java.lang.String"/>
+        <property name="defaultValue">
+            <list value-type="java.lang.String">
+                <value>USA</value>
+                <value>Canada</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="state_controlInfo" class="com.jaspersoft.jasperserver.war.cascade.utils.ReportInputControlInformationMock">
+        <property name="parameterName" value="state"/>
+        <property name="promptLabel" value="state"/>
+        <property name="valueType" value="java.util.Collection"/>
+        <property name="nestedType" value="java.lang.String"/>
+        <property name="defaultValue">
+            <list value-type="java.lang.String">
+                <value>CA</value>
+                <value>WA</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- query results -->
+    <bean id="statesForUSA_queryResult" class="com.jaspersoft.jasperserver.war.cascade.utils.OrderedMapMock">
+        <constructor-arg>
+            <map>
+                <entry key="CA">
+                    <list><value>USA</value><value>CA</value></list>
+                </entry>
+                <entry key="WA">
+                    <list><value>USA</value><value>WA</value></list>
+                </entry>
+                <entry key="BA">
+                    <list><value>USA</value><value>BA</value></list>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+</beans>
+
+
+
+

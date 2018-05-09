@@ -1,0 +1,233 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+<suite name="Jasperserver-CE-Production-Tests-Test-Suite">
+
+	<!-- =============================================== -->
+	<!-- Demonstration Tests showing the power of TestNG -->
+	<!-- =============================================== -->
+
+    <!-- this class executes just one small test for the simple spring test -->
+	<!-- (it demonstrates how you can pass a parameter into a test)         -->
+    <test name="TheSimpleSpringTest">
+        <parameter name="simple-spring-test-input" value="simpleSpringTestParam-1" />
+        <classes>
+           <class name="com.jaspersoft.jasperserver.test.SimpleSpringTest" />
+        </classes>
+    </test>
+
+	<!-- ============================================= -->
+	<!-- Tests to create and export CE production data -->
+	<!-- ============================================= -->
+
+    <!-- this class creates the core CE data -->
+    <test name="CoreDataCreateTestNG test">
+       <classes>
+          <class name="com.jaspersoft.jasperserver.test.CoreDataCreateTestNG" />
+       </classes>
+    </test>
+
+    <!-- this class exports the core CE data -->
+    <test name="ExportResourcesCoreTestNG">
+       <classes>
+          <class name="com.jaspersoft.jasperserver.test.ExportResourcesCoreTestNG" />
+       </classes>
+    </test>
+
+    <!-- this class creates the full CE data -->
+    <test name="FullDataCreateTestNG test">
+       <classes>
+          <class name="com.jaspersoft.jasperserver.test.FullDataCreateTestNG" />
+       </classes>
+    </test>
+
+    <!-- this class exports the full CE data -->
+    <test name="ExportResourcesFullTestNG">
+       <classes>
+          <class name="com.jaspersoft.jasperserver.test.ExportResourcesFullTestNG" />
+       </classes>
+    </test>
+	
+	<!-- ===================================================== -->
+	<!-- Pure Integration Tests - the following tests assume   -->
+	<!-- that CE production data has been created and exported -->
+	<!-- ===================================================== -->
+
+    <!-- This class creates test resources for the integration-tests to use               -->
+    <!-- These resources are later deleted using the DeleteExtraTestResourcesTestNG class -->
+    <!-- The reports used to be sample reports included in the released product. Now they -->
+    <!-- are just test resources.                                                         -->
+    <test name="CreateExtraTestResourcesTestNG">
+        <classes>
+            <class name="com.jaspersoft.jasperserver.test.CreateExtraTestResourcesTestNG" />
+        </classes>
+    </test>
+
+    <!-- this class tests the search service -->
+    <test name="SearchServiceTestNG">
+        <classes>
+            <class name="com.jaspersoft.jasperserver.test.SearchServiceTestNG" />
+        </classes>
+    </test>
+
+    <!-- this class tests moving and copying repository objects -->
+    <test name="RepositoryMoveAndCopyTestsTestNG">
+        <classes>
+            <class name="com.jaspersoft.jasperserver.test.RepositoryMoveAndCopyTestsTestNG" />
+        </classes>
+    </test>
+
+    <!-- this class tests repository load resources with FilterCriteria -->
+    <test name="RepositoryFilterCriteriaTestsTestNG">
+        <classes>
+            <class name="com.jaspersoft.jasperserver.test.RepositoryFilterCriteriaTestsTestNG"/>
+        </classes>
+    </test>
+
+    <!-- this class tests the engine service -->
+    <test name="EngineServiceTestsTestNG">
+        <classes>
+            <class name="com.jaspersoft.jasperserver.test.EngineServiceTestsTestNG" />
+        </classes>
+    </test>
+
+    <!-- this class tests the report scheduling service -->
+    <test name="ReportSchedulingTestTestNG">
+        <classes>
+            <class name="com.jaspersoft.jasperserver.test.ReportSchedulingTestTestNG" />
+        </classes>
+    </test>
+
+    <!-- this class tests the content repository service -->
+    <test name="ContentRepositoryTestTestNG">
+        <classes>
+            <class name="com.jaspersoft.jasperserver.test.ContentRepositoryTestTestNG" />
+        </classes>
+    </test>
+
+    <!-- this class tests the object permission service -->
+    <test name="ObjectPermissionServiceTestTestNG">
+        <classes>
+            <class name="com.jaspersoft.jasperserver.test.ObjectPermissionServiceTestTestNG" />
+        </classes>
+    </test>
+
+    <!-- this class tests the object permission service -->
+    <test name="PermissionsServiceTestTestNG">
+        <classes>
+            <class name="com.jaspersoft.jasperserver.test.PermissionsServiceTestTestNG" />
+        </classes>
+    </test>
+
+    <!-- this class tests the profile attribute service -->
+    <test name="ProfileAttributeServiceTestTestNG">
+        <classes>
+            <class name="com.jaspersoft.jasperserver.test.ProfileAttributeServiceTestTestNG" />
+        </classes>
+    </test>
+
+    <!-- this class tests the user authority service -->
+    <test name="UserAuthorityServiceTestTestNG">
+        <classes>
+            <class name="com.jaspersoft.jasperserver.test.UserAuthorityServiceTestTestNG" />
+        </classes>
+    </test>
+
+    <!-- this class tests the exporting of core objects -->
+    <test name="ExportCoreObjectsTestTestNG">
+        <classes>
+            <class name="com.jaspersoft.jasperserver.test.ExportCoreObjectsTestTestNG" />
+        </classes>
+    </test>
+
+    <!-- this class tests the exporting of various objects -->
+    <test name="ExportTestTestNG">
+        <classes>
+            <class name="com.jaspersoft.jasperserver.test.ExportTestTestNG" />
+        </classes>
+    </test>
+
+    <!-- this class tests the exporting of OLAP objects -->
+    <test name="ExportOlapTestTestNG">
+        <classes>
+            <class name="com.jaspersoft.jasperserver.test.ExportOlapTestTestNG" />
+        </classes>
+    </test>
+
+    <!-- this class tests the exporting of User and Role objects -->
+    <test name="ExportUsersRolesTestTestNG">
+        <classes>
+            <class name="com.jaspersoft.jasperserver.test.ExportUsersRolesTestTestNG" />
+        </classes>
+    </test>
+
+    <!-- this class tests the importing of Sample Data -->
+    <test name="SampleDataImportTestTestNG">
+        <classes>
+            <class name="com.jaspersoft.jasperserver.test.SampleDataImportTestTestNG" />
+        </classes>
+    </test>
+
+    <!-- Import/Export test -->
+    <test name="ImportExportServiceTestNG">
+        <classes>
+            <class name="com.jaspersoft.jasperserver.test.ImportExportServiceTestNG" />
+        </classes>
+    </test>
+
+    <test name="RepositoryServiceDependentResourcesTest">
+        <parameter name="simple-spring-test-input" value="simpleSpringTestParam-1" />
+        <classes>
+           <class name="com.jaspersoft.jasperserver.repository.test.RepositoryServiceDependentResourcesTest" />
+        </classes>
+    </test>
+
+    <test name="ResourceServiceTestNG">
+        <classes>
+            <class name="com.jaspersoft.jasperserver.repository.test.ResourceServiceTestNG" />
+        </classes>
+    </test>
+
+    <test name="DeleteExtraTestResourcesTestNG">
+        <classes>
+            <class name="com.jaspersoft.jasperserver.test.DeleteExtraTestResourcesTestNG" />
+        </classes>
+    </test>
+
+    <!-- ============================================= -->
+	<!-- Tests to delete all the CE production data    -->
+	<!-- ============================================= -->
+
+    <!-- this class deletes the full CE data -->
+    <test name="FullDataDeleteTestNG test">
+       <classes>
+          <class name="com.jaspersoft.jasperserver.test.FullDataDeleteTestNG" />
+       </classes>
+    </test>
+
+    <!-- this class deletes the core CE data -->
+    <test name="CoreDataDeleteTestNG test">
+       <classes>
+          <class name="com.jaspersoft.jasperserver.test.CoreDataDeleteTestNG" />
+       </classes>
+    </test>
+
+</suite>
+
+

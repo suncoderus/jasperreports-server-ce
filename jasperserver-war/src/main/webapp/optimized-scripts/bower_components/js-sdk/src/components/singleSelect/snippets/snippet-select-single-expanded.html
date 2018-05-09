@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>Single-Select</title>
+    <meta content="text/html; charset=UTF-8"http-equiv="Content-Type">
+    <link type="text/css" href="../../../../demos/css/jasper-ui-dev.css" rel="stylesheet">
+</head>
+
+<body class="jr">
+
+<div class="jr-mSingleselect jr-uWidth-350px jr">
+    <a class="jr-mSingleselect-input jr-isOpen jr">
+        <span class="jr-mSingleselect-input-placeholder jr">Click to select item...</span>
+        <span class="jr-mSingleselect-input-selection jr"></span>
+        <div class="jr-mSingleselect-input-expander jr"></div>
+    </a>
+
+    <div class="jr-mSingleselect-search jr-isOpen jr">
+        <input type="text" placeholder="Search list..." class="jr-mInput-search jr j-search">
+    </div>
+
+    <div class="jr-mSingleselect-dropdown jr" style="top:6em; left:0; right:0;">
+
+        <div class="jr-mScalablelist j-scalable-list jr" draggable="false" ondragstart="return false" unselectable="on" onselectstart="return false" style="visibility: visible; display: block;">
+            <div class="j-view-port-chunk"><!-- NOTE 3 -->
+                <ul class="jr-mSelectlist jr" style="position: relative; top: 0px;">
+                    <li title="Alameda" data-index="0" class="jr-mSelectlist-item jr">
+                        <div class="jr-mSelectlist-item-wrapper jr">
+                            <a class="jr-mSelectlist-item-text jr">Alameda</a>
+                        </div>
+                    </li>
+                    <li title="Berkeley" data-index="1" class="jr-mSelectlist-item jr">
+                        <div class="jr-mSelectlist-item-wrapper jr">
+                            <a class="jr-mSelectlist-item-text jr">Berkeley</a>
+                        </div>
+                    </li>
+                    <li title="Dublin" data-index="2" class="jr-mSelectlist-item jr-isHovered jr">
+                        <div class="jr-mSelectlist-item-wrapper jr">
+                            <a class="jr-mSelectlist-item-text jr">Dublin - hovered</a>
+                        </div>
+                    </li>
+                    <li title="Hayward" data-index="3" class="jr-mSelectlist-item jr">
+                        <div class="jr-mSelectlist-item-wrapper jr">
+                            <a class="jr-mSelectlist-item-text jr">Hayward</a>
+                        </div>
+                    </li>
+                    <li title="Mountain View" data-index="4" class="jr-mSelectlist-item jr-isSelected jr">
+                        <div class="jr-mSelectlist-item-wrapper jr">
+                            <a class="jr-mSelectlist-item-text jr">Mountain View - selected</a>
+                        </div>
+                    </li>
+                    <li title="Palo Alto" data-index="5" class="jr-mSelectlist-item jr-isSelected jr-isHovered jr">
+                        <div class="jr-mSelectlist-item-wrapper jr">
+                            <a class="jr-mSelectlist-item-text jr">Palo Alto - selected and hovered</a>
+                        </div>
+                    </li>
+                    <li title="San Mateo" data-index="6" class="jr-mSelectlist-item jr">
+                        <div class="jr-mSelectlist-item-wrapper jr">
+                            <a class="jr-mSelectlist-item-text jr">San Mateo</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

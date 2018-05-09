@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>Dialog</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+    <link type="text/css" href="../../../../demos/css/jasper-ui-dev.css" rel="stylesheet">
+    <link type="text/css" href="../../../../themes/default/jquery-ui/jquery-ui.css" rel="stylesheet">
+
+    <script type="text/javascript" src="../../requireSnippetsConfig.js"></script>
+    <script type="text/javascript" src="../../../bower_components/requirejs/require.js"></script>
+    <script type="text/javascript" src="../../../../config.js"></script>
+
+</head>
+
+<body>
+
+<div id="myDialog" class="jr-mDialog jr-isHidden jr-uWidth-400px jr">
+    <div class="jr-mDialog-header jr jr-jDialogDraggable">
+        <h1 class="jr-mDialog-header-title jr jr-jDialogTitle">Some Title Here</h1>
+        <button class="jr-mDialog-header-close jr jr-jDialogClose">
+            <span class="jr-mButton-icon jr-mIcon jr-cancel jr"></span>
+        </button>
+    </div>
+
+    <div class="jr-mDialog-body jr">
+        <div class="jr-mDialog-body-wrapper jr jr-jDialogContent">
+            <p class="jr testParagraph">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vehicula diam in lectus bibendum malesuada. Proin sed erat adipiscing diam eleifend imperdiet. Ut tincidunt felis nec ultrices lobortis. Nulla bibendum lobortis purus, sed porttitor sem faucibus ut. Integer vehicula purus felis, eu vehicula est tristique a. Morbi vitae tortor eget ipsum mollis ullamcorper. Pellentesque et faucibus metus, sit amet euismod neque. Fusce venenatis nunc vitae nisl egestas semper quis ut lectus. Curabitur viverra elit eget pretium tristique. Curabitur ultrices accumsan nunc, id viverra arcu facilisis sit amet. Vivamus egestas est id turpis faucibus pulvinar. Vivamus semper ullamcorper est ac laoreet. Maecenas sollicitudin tristique velit in molestie.</p>
+        </div>
+    </div>
+
+    <div class="jr-mDialog-footer jr">
+        <button class="jr-mButton jr-mButtonText jr-mButtonPrimary jr jr-jDialogClose">
+            <span class="jr-mButton-label jr">OK</span>
+        </button>
+        <button class="jr-mButton jr-mButtonText jr-mButtonDefault jr jr-jDialogClose">
+            <span class="jr-mButton-label jr">Cancel</span>
+        </button>
+        <div class="jr-mDialog-footer-sizer jr jr-jDialogResizer"></div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+
+    require(["components/dialog/Dialog", "jquery"], function(Dialog, $){
+
+        var dialog = new Dialog({
+            el: "#myDialog"
+        });
+
+        dialog.open();
+
+    });
+
+</script>
+
+</body>
+</html>

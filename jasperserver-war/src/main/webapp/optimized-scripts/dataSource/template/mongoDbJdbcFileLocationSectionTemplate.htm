@@ -1,0 +1,41 @@
+<div name="fileLocationContainer" class="">
+
+	{{ if (_.keys(fileSourceTypeOptions).length > 1) { }}
+	<div class="">
+		<label title="{{- i18n['resource.datasource.mongoJdbc.fileLocation.source'] }}" class="control select">
+			<span class="wrap">{{- i18n['resource.datasource.mongoJdbc.fileLocation.source'] }}:</span>
+			<select id="fileSourceSelect" name="fileSourceType" {{- (isEditMode || modelAttributes.autoSchemaDefinition) ? 'disabled="disabled"' : ''}}>
+			{{ _.each(fileSourceTypeOptions, function(item) { }}
+				<option value="{{- item.name }}" {{- (item.name == modelAttributes.fileSourceType) ? "selected='selected'" : "" }} > {{- i18n[item.label] }}</option>
+			{{ }); }}
+			</select>
+			<span class="message warning"></span>
+		</label>
+	</div>
+    {{ } }}
+
+	{{ if (modelAttributes.fileSourceType === "repository") { }}
+
+	<div id="repositoryInput" class="">
+		<label title="{{- i18n['resource.datasource.mongoJdbc.fileLocation.repository.fileLocation']}}" class="control input text">
+			<span class="wrap">{{- i18n['resource.datasource.mongoJdbc.fileLocation.repository.fileLocation']}}{{ if (!modelAttributes.autoSchemaDefinition) { }} ({{- i18n['required.field']}}){{ } }}:</span>
+			<input type="text" value="{{- modelAttributes.repositoryFileName }}" name="repositoryFileName" {{- (isEditMode || modelAttributes.autoSchemaDefinition) ? 'disabled="disabled"' : ''}}>
+			<button class="button action" type="button" name="repositoryBrowserButton"  {{- isEditMode || modelAttributes.autoSchemaDefinition ? 'disabled="disabled"' : ''}}>
+			       <span class="wrap">{{- i18n['dialog.file.browse'] }}...<span class="icon"></span></span>
+			</button>
+			<span class="message warning"></span>
+		</label>
+	</div>
+
+	{{ } else { }}
+
+	<div id="serverInput" class="">
+		<label title="{{- i18n['resource.datasource.mongoJdbc.fileLocation.serverFileSystem.fileLocation']}}" class="control browser">
+			<span class="wrap">{{- i18n['resource.datasource.mongoJdbc.fileLocation.serverFileSystem.fileLocation']}}{{ if (!modelAttributes.autoSchemaDefinition) { }} ({{- i18n['required.field']}}){{ } }}:</span>
+			<input type="text" value="{{- modelAttributes.serverFileName }}" name="serverFileName" {{- (isEditMode || modelAttributes.autoSchemaDefinition) ? 'disabled="disabled"' : ''}}>
+			<span class="message warning"></span>
+		</label>
+	</div>
+
+	{{ } }}
+</div>

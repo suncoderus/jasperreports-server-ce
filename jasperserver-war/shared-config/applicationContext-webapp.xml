@@ -1,0 +1,845 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+    <context:component-scan base-package="com.jaspersoft.jasperserver.war.httpheaders"/>
+  <!-- Tiles 2 integration. -->
+  <bean class="com.jaspersoft.jasperserver.war.tiles2.SpringTilesConfigurer" />
+
+  <!-- pull in properties -->
+  <bean id="propertyConfigurer" class="com.jaspersoft.jasperserver.api.common.properties.DecryptingPropertyPlaceholderConfigurer">
+    <property name="locations">
+      <list>
+        <value>/WEB-INF/hibernate.properties</value>
+        <value>/WEB-INF/js.quartz.properties</value>
+        <value>/WEB-INF/js.spring.properties</value>
+        <value>/WEB-INF/js.scheduling.properties</value>
+        <value>/WEB-INF/mondrian.connect.string.properties</value>
+        <value>/WEB-INF/js.diagnostic.properties</value>
+        <value>/WEB-INF/js.aws.datasource.properties</value>
+        <value>/WEB-INF/js.externalAuth.properties</value>
+        <value>/WEB-INF/js.config.properties</value>
+          <value>/WEB-INF/classes/relativedate.properties</value>
+      </list>
+    </property>
+    <property name="properties">
+      <props>
+        <prop key="resource.root">/WEB-INF</prop>
+        <prop key="bean.olapCacheManager">olapCacheManager</prop>
+      </props>
+    </property>
+  </bean>
+
+    
+  <!-- define datasource for repository -->
+  <bean id="dataSource" class="com.jaspersoft.jasperserver.api.engine.jasperreports.service.impl.JndiObjectFactoryBeanWrapper">
+    <property name="jndiName" value="java:comp/env/${metadata.hibernate.dataSource.jndiName}"/>
+  </bean>
+
+
+  <!-- repositoryService bean: moved from applicationContext.xml                         -->
+  <!-- the bean definition here is unchanged. bean was moved to accommodate non-standard -->
+  <!-- definition that is found for for import-export.                                   -->
+  <alias name="repositoryService" alias="repositoryServiceForAclUpdate"/>
+  <bean id="repositoryService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <!--<property name="proxyInterfaces"><value>com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService</value></property>-->
+    <property name="interceptorNames">
+      <list>
+        <idref bean="hibernateRepoServiceSecurity"/>
+        <idref bean="permissionsPrefetcher"/>
+        <idref bean="hibernateRepositoryService"/>
+      </list>
+    </property>
+  </bean>
+
+  <bean id="awsDataSourceService" class="com.jaspersoft.jasperserver.war.amazon.client.AwsDataSourceServiceImpl">
+      <property name="jdbcConnectionMap" ref="${bean.jdbcConnectionMap}"/>
+      <property name="awsDataSourceActiveStatus" value="available"/>
+      <property name="messageSource" ref="messageSource"/>
+  </bean>
+
+    <util:map id="jdbcBasicConnectionMap" map-class="java.util.LinkedHashMap">
+      <entry key="mysql">
+        <util:map>
+            <entry key="label" value="MySQL"/>
+            <entry key="jdbcUrl" value="jdbc:mysql://$[dbHost]:$[dbPort]/$[dbName]?tinyInt1isBit=false"/>
+            <entry key="jdbcDriverClass" value="org.mariadb.jdbc.Driver"/>
+            <entry key="defaultValues">
+                <util:map>
+                    <entry key="dbHost" value="localhost"/>
+                    <entry key="dbPort" value="3306"/>
+                    <entry key="dbName" value="dbname"/>
+                </util:map>
+            </entry>
+        </util:map>
+      </entry>
+      <entry key="mysql_oracle">
+        <util:map>
+            <entry key="label" value="MySQL"/>
+            <entry key="jdbcUrl" value="jdbc:mysql://$[dbHost]:$[dbPort]/$[dbName]?tinyInt1isBit=false"/>
+            <entry key="jdbcDriverClass" value="com.mysql.jdbc.Driver"/>
+            <entry key="defaultValues">
+                <util:map>
+                    <entry key="dbHost" value="localhost"/>
+                    <entry key="dbPort" value="3306"/>
+                    <entry key="dbName" value="dbname"/>
+                </util:map>
+            </entry>
+        </util:map>
+      </entry>        
+      <entry key="postgresql">
+          <util:map>
+              <entry key="label" value="PostgreSQL"/>
+              <entry key="jdbcUrl" value="jdbc:postgresql://$[dbHost]:$[dbPort]/$[dbName]"/>
+              <entry key="jdbcDriverClass" value="org.postgresql.Driver"/>
+              <entry key="default" value="true"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="5432"/>
+                      <entry key="dbName" value="dbname"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+      <entry key="postgres">
+          <util:map>
+              <entry key="label" value="PostgreSQL"/>
+              <entry key="jdbcUrl" value="jdbc:postgresql://$[dbHost]:$[dbPort]/$[dbName]"/>
+              <entry key="jdbcDriverClass" value="org.postgresql.Driver"/>
+              <entry key="default" value="true"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="5432"/>
+                      <entry key="dbName" value="dbname"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+      <entry key="ingres">
+          <util:map>
+              <entry key="label" value="Ingres"/>
+              <entry key="jdbcUrl" value="jdbc:ingres://$[dbHost]:$[dbPort]/$[dbName]"/>
+              <entry key="jdbcDriverClass" value="com.ingres.jdbc.IngresDriver"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="117"/>
+                      <entry key="dbName" value="dbname"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+      <entry key="oracle">
+          <util:map>
+              <entry key="label" value="Oracle"/>
+              <entry key="jdbcUrl" value="jdbc:oracle:thin:@$[dbHost]:$[dbPort]:$[sName]"/>
+              <entry key="jdbcDriverClass" value="oracle.jdbc.OracleDriver"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="1521"/>
+                      <entry key="sName" value="orcl"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+      <entry key="sqlserver">
+          <util:map>
+              <entry key="label" value="MS SQL Server 2005"/>
+              <entry key="jdbcUrl" value="jdbc:sqlserver://$[dbHost]:$[dbPort];databaseName=$[dbName]"/>
+              <entry key="jdbcDriverClass" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+              <entry key="allowSpacesInDbName" value="true"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="1433"/>
+                      <entry key="dbName" value="dbname"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+      <entry key="sqlserver2000">
+          <util:map>
+              <entry key="label" value="MS SQL Server 2000"/>
+              <entry key="jdbcUrl" value="jdbc:microsoft:sqlserver://$[dbHost]:$[dbPort];DatabaseName=$[dbName]"/>
+              <entry key="jdbcDriverClass" value="com.microsoft.jdbc.sqlserver.SQLServerDriver"/>
+              <entry key="allowSpacesInDbName" value="true"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="1433"/>
+                      <entry key="dbName" value="dbname"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+      <entry key="db2">
+          <util:map>
+              <entry key="label" value="IBM DB2"/>
+              <entry key="jdbcUrl" value="jdbc:db2://$[dbHost]:$[dbPort]/$[dbName]:driverType=$[driverType];currentSchema=$[schemaName];"/>
+              <entry key="jdbcDriverClass" value="com.ibm.db2.jcc.DB2Driver"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="50000"/>
+                      <entry key="driverType" value="4"/>
+                      <entry key="dbName" value="dbname"/>
+                      <entry key="schemaName" value="schemaname"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+      <entry key="vertica">
+          <util:map>
+              <entry key="label" value="Vertica"/>
+              <entry key="jdbcUrl" value="jdbc:vertica://$[dbHost]:$[dbPort]/$[dbName]"/>
+              <entry key="jdbcDriverClass" value="com.vertica.jdbc.Driver"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="5433"/>
+                      <entry key="dbName" value="dbname"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+      <entry key="informix">
+          <util:map>
+              <entry key="label" value="Informix"/>
+              <entry key="jdbcUrl" value="jdbc:informix-sqli://$[dbHost]:$[dbPort]/$[dbName]:INFORMIXSERVER=$[informixServerName]"/>
+              <entry key="jdbcDriverClass" value="com.informix.jdbc.IfxDriver"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="1526"/>
+                      <entry key="dbName" value="dbname"/>
+                      <entry key="informixServerName" value="informixServerName"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+        <entry key="SYBASE">
+            <util:map>
+                <entry key="label" value="Sybase jConnect"/>
+                <entry key="jdbcUrl" value="jdbc:sybase:Tds:$[dbHost]:$[dbPort]?ServiceName=$[sName]"/>
+                <entry key="jdbcDriverClass" value="com.sybase.jdbc4.jdbc.SybDriver"/>
+                <entry key="defaultValues">
+                    <util:map>
+                        <entry key="dbHost" value="localhost"/>
+                        <entry key="dbPort" value="5433"/>
+                        <entry key="sName" value="serviceName"/>
+                    </util:map>
+                </entry>
+            </util:map>
+        </entry>
+   </util:map>
+
+    <util:map id="jdbcTibcoConnectionMap" map-class="java.util.LinkedHashMap">
+      <entry key="mysql">
+        <util:map>
+            <entry key="label" value="MySQL"/>
+            <entry key="jdbcUrl" value="jdbc:mysql://$[dbHost]:$[dbPort]/$[dbName]?tinyInt1isBit=false"/>
+            <entry key="jdbcDriverClass" value="org.mariadb.jdbc.Driver"/>
+            <entry key="defaultValues">
+                <util:map>
+                    <entry key="dbHost" value="localhost"/>
+                    <entry key="dbPort" value="3306"/>
+                    <entry key="dbName" value="dbname"/>
+                </util:map>
+            </entry>
+        </util:map>
+      </entry>
+      <entry key="postgresql">
+          <util:map>
+              <entry key="label" value="PostgreSQL"/>
+              <entry key="jdbcUrl" value="jdbc:postgresql://$[dbHost]:$[dbPort]/$[dbName]"/>
+              <entry key="jdbcDriverClass" value="org.postgresql.Driver"/>
+              <entry key="default" value="true"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="5432"/>
+                      <entry key="dbName" value="dbname"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+      <entry key="postgres">
+          <util:map>
+              <entry key="label" value="PostgreSQL"/>
+              <entry key="jdbcUrl" value="jdbc:postgresql://$[dbHost]:$[dbPort]/$[dbName]"/>
+              <entry key="jdbcDriverClass" value="org.postgresql.Driver"/>
+              <entry key="default" value="true"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="5432"/>
+                      <entry key="dbName" value="dbname"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+      <entry key="ingres">
+          <util:map>
+              <entry key="label" value="Ingres"/>
+              <entry key="jdbcUrl" value="jdbc:ingres://$[dbHost]:$[dbPort]/$[dbName]"/>
+              <entry key="jdbcDriverClass" value="com.ingres.jdbc.IngresDriver"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="117"/>
+                      <entry key="dbName" value="dbname"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+      <entry key="oracle">
+          <util:map>
+              <entry key="label" value="Oracle"/>
+              <entry key="jdbcUrl" value="jdbc:tibcosoftware:oracle://$[dbHost]:$[dbPort];SID=$[sName]"/>
+              <entry key="jdbcDriverClass" value="tibcosoftware.jdbc.oracle.OracleDriver"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="1521"/>
+                      <entry key="sName" value="ORCL"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+      <entry key="sqlserver">
+          <util:map>
+              <entry key="label" value="MS SQL Server"/>
+              <entry key="jdbcUrl" value="jdbc:tibcosoftware:sqlserver://$[dbHost]:$[dbPort];databaseName=$[dbName]"/>
+              <entry key="jdbcDriverClass" value="tibcosoftware.jdbc.sqlserver.SQLServerDriver"/>
+              <entry key="allowSpacesInDbName" value="true"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="1433"/>
+                      <entry key="dbName" value="dbname"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+
+      <entry key="db2">
+          <util:map>
+              <entry key="label" value="IBM DB2"/>
+              <entry key="jdbcUrl" value="jdbc:tibcosoftware:db2://$[dbHost]:$[dbPort];databaseName=$[dbName]"/>
+
+              <entry key="jdbcDriverClass" value="tibcosoftware.jdbc.db2.DB2Driver"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="50000"/>
+                      <entry key="dbName" value="dnname"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+      <entry key="hive">
+          <util:map>
+              <entry key="label" value="Hive"/>
+              <entry key="jdbcUrl" value="jdbc:tibcosoftware:hive://$[dbHost]:$[dbPort];TransactionMode=ignore"/>
+              <entry key="jdbcDriverClass" value="tibcosoftware.jdbc.hive.HiveDriver"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="10001"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+      <!--  entry key="impala">
+          <util:map>
+              <entry key="label" value="Impala"/>
+              <entry key="jdbcUrl" value="jdbc:tibcosoftware:impala://$[dbHost]:$[dbPort];TransactionMode=ignore"/>
+              <entry key="jdbcDriverClass" value="tibcosoftware.jdbc.impala.ImpalaDriver"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="21050"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry -->
+        <entry key="sparksql">
+            <util:map>
+                <entry key="label" value="SparkSQL"/>
+                <entry key="jdbcUrl" value="jdbc:tibcosoftware:sparksql://$[dbHost]:$[dbPort];TransactionMode=ignore"/>
+                <entry key="jdbcDriverClass" value="tibcosoftware.jdbc.sparksql.SparkSQLDriver"/>
+                <entry key="defaultValues">
+                    <util:map>
+                        <entry key="dbHost" value="localhost"/>
+                        <entry key="dbPort" value="10000"/>
+                    </util:map>
+                </entry>
+            </util:map>
+        </entry>
+        <entry key="cassandra_simba">
+            <util:map>
+                <entry key="label" value="Cassandra"/>
+                <entry key="jdbcUrl" value="jdbc:cassandra://$[dbHost]:$[dbPort];DefaultKeyspace=$[defaultKeySpace]"/>
+                <entry key="jdbcDriverClass" value="com.simba.cassandra.jdbc4.Driver"/>
+                <entry key="defaultValues">
+                    <util:map>
+                        <entry key="dbHost" value="localhost"/>
+                        <entry key="dbPort" value="9042"/>
+                        <entry key="defaultKeySpace" value=""/>
+                    </util:map>
+                </entry>
+            </util:map>
+        </entry>
+        <entry key="impala_simba">
+            <util:map>
+                <entry key="label" value="Impala"/>
+                <entry key="jdbcUrl" value="jdbc:impala://$[dbHost]:$[dbPort]/$[schemaName]"/>
+                <entry key="jdbcDriverClass" value="com.simba.impala.jdbc4.Driver"/>
+                <entry key="defaultValues">
+                    <util:map>
+                        <entry key="dbHost" value="localhost"/>
+                        <entry key="dbPort" value="21050"/>
+                        <entry key="schemaName" value="default"/>
+                    </util:map>
+                </entry>
+            </util:map>
+        </entry>
+        <!-- entry key="spark_simba">
+            <util:map>
+                <entry key="label" value="SparkSQL"/>
+                <entry key="jdbcUrl" value="jdbc:spark://$[dbHost]:$[dbPort]"/>
+                <entry key="jdbcDriverClass" value="com.simba.spark.jdbc4.Driver"/>
+                <entry key="defaultValues">
+                    <util:map>
+                        <entry key="dbHost" value="localhost"/>
+                        <entry key="dbPort" value="10000"/>
+                    </util:map>
+                </entry>
+            </util:map>
+        </entry -->
+        <!-- entry key="googlebigquery_simba">
+            <util:map>
+                <entry key="label" value="Google BigQuery"/>
+                <entry key="jdbcUrl" value="jdbc:bigquery://$[serverAddress]:$[dbPort];OAuthType=0;QueryDialect=SQL;Timeout=60;ProjectId=$[projectId];OAuthServiceAcctEmail=$[oAuthServiceAcctEmail];OAuthPvtKeyPath=$[oAuthPvtKeyPath]"/>
+                <entry key="jdbcDriverClass" value="com.simba.googlebigquery.jdbc41.Driver"/>
+                <entry key="defaultValues">
+                    <util:map>
+                        <entry key="serverAddress" value="https://www.googleapis.com/oauth2/v2"/>
+                        <entry key="dbPort" value="443"/>
+                        <entry key="projectId" value=""/>
+                        <entry key="oAuthServiceAcctEmail" value=""/>
+                        <entry key="oAuthPvtKeyPath" value=""/>
+                    </util:map>
+                </entry>
+            </util:map>
+        </entry -->
+        <entry key="salesforce">
+            <util:map>
+                <entry key="label" value="Salesforce"/>
+                <entry key="jdbcUrl" value="jdbc:tibcosoftware:sforce://$[dbHost];SecurityToken=$[securityToken];TransactionMode=ignore;StmtCallLimit=$[stmtCallLimit];databaseName=[TMPDIR/]Salesforce"/>
+                <entry key="jdbcDriverClass" value="tibcosoftware.jdbc.sforce.SForceDriver"/>
+                <entry key="defaultValues">
+                    <util:map>
+                        <entry key="dbHost" value=""/>
+                        <entry key="securityToken" value=""/>
+                        <entry key="stmtCallLimit" value="1000"/>
+                    </util:map>
+                </entry>
+            </util:map>
+        </entry>
+        <!--  entry key="cassandra">
+            <util:map>
+                <entry key="label" value="Cassandra"/>
+                <entry key="jdbcUrl" value="jdbc:tibcosoftware:cassandra://$[dbHost]:$[dbPort];TransactionMode=ignore;KeyspaceName=$[defaultKeySpace];SchemaMap=[TMPDIR/]cass_$[dbHost]_$[dbPort]_$[defaultKeySpace].config"/>
+                <entry key="jdbcDriverClass" value="tibcosoftware.jdbc.cassandra.CassandraDriver"/>
+                <entry key="defaultValues">
+                    <util:map>
+                        <entry key="dbHost" value="localhost"/>
+                        <entry key="dbPort" value="9042"/>
+                        <entry key="defaultKeySpace" value=""/>
+                    </util:map>
+                </entry>
+            </util:map>
+        </entry  -->
+
+      <entry key="redshift">
+          <util:map>
+              <entry key="label" value="Redshift"/>
+              <entry key="jdbcUrl" value="jdbc:tibcosoftware:redshift://$[dbHost]:$[dbPort];databaseName=$[dbName];TransactionMode=ignore"/>
+              <entry key="jdbcDriverClass" value="tibcosoftware.jdbc.redshift.RedshiftDriver"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="5439"/>
+                      <entry key="dbName" value="dbname"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+      <entry key="mysql_oracle">
+        <util:map>
+            <entry key="label" value="MySQL"/>
+            <entry key="jdbcUrl" value="jdbc:mysql://$[dbHost]:$[dbPort]/$[dbName]?tinyInt1isBit=false"/>
+            <entry key="jdbcDriverClass" value="com.mysql.jdbc.Driver"/>
+            <entry key="defaultValues">
+                <util:map>
+                    <entry key="dbHost" value="localhost"/>
+                    <entry key="dbPort" value="3306"/>
+                    <entry key="dbName" value="dbname"/>
+                </util:map>
+            </entry>
+        </util:map>
+      </entry>
+      <entry key="oracle_standard">
+          <util:map>
+              <entry key="label" value="Oracle"/>
+              <entry key="jdbcUrl" value="jdbc:oracle:thin:@$[dbHost]:$[dbPort]:$[sName]"/>
+              <entry key="jdbcDriverClass" value="oracle.jdbc.OracleDriver"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="1521"/>
+                      <entry key="sName" value="orcl"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+     <entry key="sqlserver_standard">
+          <util:map>
+              <entry key="label" value="MS SQL Server 2005"/>
+              <entry key="jdbcUrl" value="jdbc:sqlserver://$[dbHost]:$[dbPort];databaseName=$[dbName]"/>
+              <entry key="jdbcDriverClass" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+              <entry key="allowSpacesInDbName" value="true"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="1433"/>
+                      <entry key="dbName" value="dbname"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+      <entry key="sqlserver2000_standard">
+          <util:map>
+              <entry key="label" value="MS SQL Server 2000"/>
+              <entry key="jdbcUrl" value="jdbc:microsoft:sqlserver://$[dbHost]:$[dbPort];DatabaseName=$[dbName]"/>
+              <entry key="jdbcDriverClass" value="com.microsoft.jdbc.sqlserver.SQLServerDriver"/>
+              <entry key="allowSpacesInDbName" value="true"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="1433"/>
+                      <entry key="dbName" value="dbname"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+      <entry key="db2_standard">
+          <util:map>
+              <entry key="label" value="IBM DB2"/>
+              <entry key="jdbcUrl" value="jdbc:db2://$[dbHost]:$[dbPort]/$[dbName]:driverType=$[driverType];currentSchema=$[schemaName];"/>
+              <entry key="jdbcDriverClass" value="com.ibm.db2.jcc.DB2Driver"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="50000"/>
+                      <entry key="driverType" value="4"/>
+                      <entry key="dbName" value="dbname"/>
+                      <entry key="schemaName" value="schemaname"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+      <entry key="vertica">
+          <util:map>
+              <entry key="label" value="Vertica"/>
+              <entry key="jdbcUrl" value="jdbc:vertica://$[dbHost]:$[dbPort]/$[dbName]"/>
+              <entry key="jdbcDriverClass" value="com.vertica.jdbc.Driver"/>
+              <entry key="defaultValues">
+                  <util:map>
+                      <entry key="dbHost" value="localhost"/>
+                      <entry key="dbPort" value="5433"/>
+                      <entry key="dbName" value="dbname"/>
+                  </util:map>
+              </entry>
+          </util:map>
+      </entry>
+   </util:map>
+
+  <bean id="jdbcConnectionMap" parent="${bean.jdbcConnectionMap}"></bean>
+
+  <bean id="hibernateCompositeDeleteListenerListeners" class="java.util.ArrayList">
+     <constructor-arg>
+        <list>
+            <ref bean="hibernateReportJobsUserDeleteListener"/>
+            <ref bean="hibernateLoggingServiceUserDeleteListener"/>
+            <ref bean="hibernateAccessEventDeleteListener"/>
+            <ref bean="hibernateRoleDeleteListener"/>
+        </list>
+     </constructor-arg>
+    </bean>
+
+  <bean id="hibernateCompositeSaveOrUpdateListeners" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <ref bean="dataSnapshotReportUnitListener" />
+                <ref bean="hibernateRoleSaveOrUpdateListener"/>
+            </list>
+        </constructor-arg>
+   </bean>
+
+  <bean id="hibernateCompositePostUpdateListeners" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                  <ref bean="olapConnectionRepositoryPostUpdateListener"/>
+                  <ref bean="ehcacheEngineServicePostUpdateListener"/>
+            </list>
+        </constructor-arg>
+  </bean>
+
+    <bean id="xmlaContentFinder" class="com.jaspersoft.jasperserver.war.xmla.XmlaContentFinderImpl">
+        <property name="repository" ref="${bean.repositoryService}"/>
+        <property name="tenantService" ref="${bean.tenantService}"/>
+        <property name="olapConnectionService" ref="olapConnectionService"/>
+    </bean>
+
+    <bean id="xmlaRepository" class="com.jaspersoft.jasperserver.war.xmla.XmlaRepositoryImpl">
+        <property name="xmlaContentFinder" ref="${bean.xmlaContentFinder}"/>
+        <!--cache timeout in seconds-->
+        <property name="cacheTimeout" value="30"/>
+        <!--if current user is superuser then сatalog name will be consist of original catalog name + Delimiter+TenantId,
+         TenantId where catalog is located -->
+        <property name="catalogDelimiter" value=";"/>
+    </bean>
+
+    <alias name="${bean.xmlaRepository}" alias="concreteXmlaRepository"/>
+
+    <bean id="mondrianOlap4jMeasureHelper" class="mondrian.olap4j.MondrianOlap4jMemberHelper" factory-method="getInstance" scope="singleton">
+        <!--
+           rolapAnnotationGroupMarker - rolap annotations marker, which will be used for represent measure group
+           rolap annotation.
+
+           For example if customer want measure "Unit Sales" to be in group "MEASURE GROUP" he has to
+           define:
+
+           <Measure name="Unit Sales" column="unit_sales" formatString="Standard" aggregator="sum">
+             <Annotations>
+                <Annotation name="JRSBusinessGroup">
+                      <![CDATA[MEASURE_GROUP]]>
+                  </Annotation>
+              </Annotations>
+           </Measure>
+        -->
+        <property name="rolapAnnotationGroupMarker" value="AnalyzerBusinessGroup"/>
+    </bean>
+
+    <!--
+    This rules to apply HTTP headers to the response. The rule it self consist of HTTP method together with regexp pattern of the URL.
+    Most specific rules should be first. Only headers from first matching rule will be applied to the response.
+    -->
+    <bean id="staticResourcesExpiresHeader" p:maxAge="31536000" class="com.jaspersoft.jasperserver.war.httpheaders.JRSExpiresHeader" />
+    <bean id="thumbnailsExpiresHeader" p:maxAge="86400" class="com.jaspersoft.jasperserver.war.httpheaders.JRSExpiresHeader" />
+    <bean id="thumbnailsListExpiresHeader" p:maxAge="300000" class="com.jaspersoft.jasperserver.war.httpheaders.JRSExpiresHeader" />
+
+    <bean id="resourceHTTPHeadersFilter" class="com.jaspersoft.jasperserver.war.httpheaders.ResourceHTTPHeadersFilter">
+        <property name="headersRules">
+            <list>
+                <bean p:method="GET" p:urlPattern="/index\.htm" class="com.jaspersoft.jasperserver.war.httpheaders.HeadersRule">
+                    <property name="headers">
+                        <list>
+                            <bean class="org.apache.http.message.BasicHeader">
+                                <constructor-arg value="Cache-Control"/>
+                                <constructor-arg value="private"/>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean p:method="GET" p:urlPattern="/rest_v2/export/[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}/state\??.*" class="com.jaspersoft.jasperserver.war.httpheaders.HeadersRule">
+                    <property name="headers">
+                        <list>
+                            <bean class="org.apache.http.message.BasicHeader">
+                                <constructor-arg value="Cache-Control"/>
+                                <constructor-arg value="no-cache,no-store"/>
+                            </bean>
+                            <bean class="org.apache.http.message.BasicHeader">
+                                <constructor-arg value="Pragma"/>
+                                <constructor-arg value="no-cache"/>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean p:method="GET" p:urlPattern="/rest_v2/import/[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}/state\??.*" class="com.jaspersoft.jasperserver.war.httpheaders.HeadersRule">
+                    <property name="headers">
+                        <list>
+                            <bean class="org.apache.http.message.BasicHeader">
+                                <constructor-arg value="Cache-Control"/>
+                                <constructor-arg value="no-cache,no-store"/>
+                            </bean>
+                            <bean class="org.apache.http.message.BasicHeader">
+                                <constructor-arg value="Pragma"/>
+                                <constructor-arg value="no-cache"/>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean p:method="GET" p:urlPattern="(/runtime/[0-9ABCDEF]*)*/rest_v2/bundles(/.+|\?.*&amp;?expanded=true)" class="com.jaspersoft.jasperserver.war.httpheaders.HeadersRule">
+                    <property name="headers">
+                        <list>
+                            <bean class="org.apache.http.message.BasicHeader">
+                                <constructor-arg value="Cache-Control"/>
+                                <constructor-arg value="no-transform,max-age=#{staticResourcesExpiresHeader.maxAge}"/>
+                            </bean>
+                            <bean class="org.apache.http.message.BasicHeader">
+                                <constructor-arg value="Pragma"/>
+                                <constructor-arg value=""/>
+                            </bean>
+                            <bean class="org.apache.http.message.BasicHeader">
+                                <constructor-arg value="Vary"/>
+                                <constructor-arg value="Accept-Language"/>
+                            </bean>
+                            <ref local="staticResourcesExpiresHeader" />
+                        </list>
+                    </property>
+                </bean>
+                <bean p:method="GET" p:urlPattern="(/runtime/[0-9ABCDEF]*)*/rest_v2/settings/.*" class="com.jaspersoft.jasperserver.war.httpheaders.HeadersRule">
+                    <property name="headers">
+                        <list>
+                            <bean class="org.apache.http.message.BasicHeader">
+                                <constructor-arg value="Cache-Control"/>
+                                <constructor-arg value="no-transform,max-age=#{staticResourcesExpiresHeader.maxAge}"/>
+                            </bean>
+                            <bean class="org.apache.http.message.BasicHeader">
+                                <constructor-arg value="Pragma"/>
+                                <constructor-arg value=""/>
+                            </bean>
+                            <bean class="org.apache.http.message.BasicHeader">
+                                <constructor-arg value="Vary"/>
+                                <constructor-arg value="Accept-Language"/>
+                            </bean>
+                            <ref local="staticResourcesExpiresHeader" />
+                        </list>
+                    </property>
+                </bean>
+                <bean p:method="GET" p:urlPattern="/rest_v2/thumbnails/.+" class="com.jaspersoft.jasperserver.war.httpheaders.HeadersRule">
+                    <property name="headers">
+                        <list>
+                            <bean class="org.apache.http.message.BasicHeader">
+                                <constructor-arg value="Cache-Control"/>
+                                <constructor-arg value="private,no-cache,no-store,max-age=0,must-revalidate"/>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean p:method="POST" p:urlPattern="/rest_v2/thumbnails" class="com.jaspersoft.jasperserver.war.httpheaders.HeadersRule">
+                    <property name="headers">
+                        <list>
+                            <bean class="org.apache.http.message.BasicHeader">
+                                <constructor-arg value="Cache-Control"/>
+                                <constructor-arg value="max-age=#{thumbnailsListExpiresHeader.maxAge},public"/>
+                            </bean>
+                            <bean class="org.apache.http.message.BasicHeader">
+                                <constructor-arg value="Pragma"/>
+                                <constructor-arg value=""/>
+                            </bean>
+                            <ref local="thumbnailsListExpiresHeader" />
+                        </list>
+                    </property>
+                </bean>
+                <bean p:method="GET" p:urlPattern="/.*?\.([hH][tT][mM]|[jJ][sS]|[cC][sS][sS]|[pP][nN][gG]|[gG][iI][fF])$"
+                      class="com.jaspersoft.jasperserver.war.httpheaders.HeadersRule">
+                    <property name="headers">
+                        <list>
+                            <bean class="org.apache.http.message.BasicHeader">
+                                <constructor-arg value="Cache-Control"/>
+                                <constructor-arg value="max-age=#{staticResourcesExpiresHeader.maxAge},public"/>
+                            </bean>
+                            <bean class="org.apache.http.message.BasicHeader">
+                                <constructor-arg value="Pragma"/>
+                                <constructor-arg value=""/>
+                            </bean>
+                            <ref local="staticResourcesExpiresHeader" />
+                        </list>
+                    </property>
+                </bean>
+                <bean p:method="GET" p:urlPattern=".*/JavaScriptServlet$" class="com.jaspersoft.jasperserver.war.httpheaders.HeadersRule">
+                    <property name="headers">
+                        <list>
+                            <bean class="org.apache.http.message.BasicHeader">
+                                <constructor-arg value="Cache-Control"/>
+                                <constructor-arg value="private,max-age=#{staticResourcesExpiresHeader.maxAge}"/>
+                            </bean>
+                            <bean class="org.apache.http.message.BasicHeader">
+                                <constructor-arg value="Pragma"/>
+                                <constructor-arg value=""/>
+                            </bean>
+                            <ref local="staticResourcesExpiresHeader" />
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="proxyUrlFilter" class="com.jaspersoft.jasperserver.war.ProxyUrlFilter">
+        <description>
+            Either specify the load balancer headers passed to JRS node (forwardedForProtoHeaderName, forwardedForPortHeaderName)
+            OR
+            specify the url pointing to load balancer in the proxyUrl property
+
+            proxyUrl, if specified correctly, trumps the headers.
+
+            The default header config is for AWS ELB to work out of the box.
+        </description>
+
+        <property name="proxyUrl" value="[[Set up proxy url if LB does not send headers.  Eg. https://LB_Host:8443]]"/>
+
+        <property name="forwardedForProtoHeaderName" value="X-Forwarded-Proto">
+            <description>
+                header in which LB specifies its HTTP protocol.
+                If this property is absent from the bean config and proxyUrl is not set correctly, request.getScheme() is used.
+            </description>
+        </property>
+        <property name="forwardedForPortHeaderName" value="X-Forwarded-Port">
+            <description>
+                forwardedForPortHeaderName - header in which LB specifies its port.
+                If this property is absent from the bean config and proxyUrl is not set correctly, request.getPort() is used.
+            </description>
+        </property>
+    </bean>
+
+    <bean id="JavascriptOptimizationSettings" class="com.jaspersoft.jasperserver.war.common.JavascriptOptimizationSettings">
+        <property name="useOptimizedJavascript" value="false"/>
+        <property name="optimizedJavascriptPath" value="optimized-scripts"/>
+    </bean>
+
+
+</beans>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <bean id="emailValidator" class="com.jaspersoft.jasperserver.core.util.validators.EmailInputValidator">
+
+    </bean>
+    <bean id="customEmailValidator" class="com.jaspersoft.jasperserver.core.util.validators.EmailInputValidator">
+        <property name="pattern">
+            <bean class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg>
+                    <value><![CDATA[^[^\~\`\(\)\[\]\{\}\:"\;'/\?\<\>\+\=\\|\!\@\#\$\%\^\&\*]+@([\w+\-]+\.)+(\w+)]]></value>
+                </constructor-arg>
+            </bean>
+        </property>
+    </bean>
+    <bean id="ESAPIRegExWhitelistPatternEmailAddressesValidator" class="com.jaspersoft.jasperserver.core.util.validators.EmailInputValidator">
+        <property name="pattern">
+            <bean class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg>
+                    <value><![CDATA[^[\p{L}\p{M}\p{N}._%'-]+@[\p{L}\p{M}\p{N}.-]+$]]></value>
+                </constructor-arg>
+            </bean>
+        </property>
+    </bean>
+</beans>

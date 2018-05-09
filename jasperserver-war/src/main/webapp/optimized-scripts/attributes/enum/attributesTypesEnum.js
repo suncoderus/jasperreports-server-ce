@@ -1,0 +1,1 @@
+define([],function(){return{USER:"user",TENANT:"tenant",SERVER:"server"}});

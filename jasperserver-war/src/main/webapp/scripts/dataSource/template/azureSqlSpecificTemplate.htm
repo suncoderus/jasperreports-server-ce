@@ -1,0 +1,113 @@
+<fieldset class="group">
+
+    <legend><span>{{- i18n['resource.dataSource.azureSql.settings.title']}}</span></legend>
+
+    <fieldset class="group shortFields" id="aws_settings">
+
+        <label title="{{- i18n['resource.dataSource.azureSql.setting.subscriptionId.title']}}" class="control input text ">
+            <span class="wrap">{{- i18n['resource.dataSource.azureSql.setting.subscriptionId']}} ({{- i18n['required.field']}}):</span>
+            <input type="text" value="{{- modelAttributes.subscriptionId }}" name="subscriptionId">
+            <span class="message warning"></span>
+            <span class="message hint"></span>
+        </label>
+
+        <label title="{{- i18n['resource.dataSource.azureSql.setting.keyStoreUri.title']}}" class="control input text">
+            <span class="wrap">{{- i18n['resource.dataSource.azureSql.setting.keyStoreUri']}} ({{- i18n['required.field']}}):</span>
+            <input type="text" value="{{- modelAttributes.keyStoreUri }}" name="keyStoreUri">
+            <button class="button action" type="button" name="repositoryBrowserButton">
+                <span class="wrap">{{- i18n['dialog.file.browse'] }}...<span class="icon"></span></span>
+            </button>
+            <span class="message warning"></span>
+            <span class="message hint">{{- i18n['resource.dataSource.azureSql.optional.keyStoreUri']}}</span>
+        </label>
+
+        <label title="{{- i18n['resource.dataSource.azureSql.setting.keyStorePassword.title']}}" class="control input password ">
+            <span class="wrap">{{- i18n['resource.dataSource.azureSql.setting.keyStorePassword']}} ({{- i18n['required.field']}}):</span>
+            <input type="password" autocomplete="off" value="{{- modelAttributes.keyStorePassword }}" name="keyStorePassword">
+            <span class="message warning"></span>
+            <span class="message hint"></span>
+        </label>
+
+    </fieldset>
+
+</fieldset>
+
+<fieldset class="group">
+
+    <legend><span>{{- i18n['resource.dataSource.azureSql.tree']}}</span></legend>
+
+    <button class="button action" id="updateDatabaseTree">
+        <span class="wrap">{{- i18n['resource.dataSource.azureSql.updateTree']}}<span class="icon"></span></span>
+    </button>
+
+</fieldset>
+
+<fieldset class="group">
+
+    <div class="control groupBox" style="height: 150px; margin: 0; width: 538px;">
+        <div class="content">
+            <div class="header">
+                <div class="title"></div>
+            </div>
+            <div class="body" style="height: 137px; overflow: auto; padding: 6px;">
+                <ul class="list collapsible folders hideRoot" id="azureSqlDataSourceTree" style="position: relative; height: 137px; overflow: auto; padding: 6px;"></ul>
+            </div>
+        </div>
+    </div>
+
+</fieldset>
+
+<fieldset class="group shortFields">
+
+    <label title="{{- i18n['resource.dataSource.azureSql.server.name.title']}}" class="control input text">
+        <span class="wrap">{{- i18n['resource.dataSource.azureSql.server.name']}} ({{- i18n['required.field']}}):</span>
+        <input type="text" value="{{- modelAttributes.serverName }}" name="serverName">
+        <span class="message warning"></span>
+        <span class="message hint"></span>
+    </label>
+
+    <label title="{{- i18n['resource.dataSource.azureSql.database.name.title']}}" class="control input text">
+        <span class="wrap">{{- i18n['resource.dataSource.azureSql.database.name']}} ({{- i18n['required.field']}}):</span>
+        <input type="text" value="{{- modelAttributes.dbName }}" name="dbName">
+        <span class="message warning"></span>
+        <span class="message hint"></span>
+    </label>
+
+    <label title="{{- i18n['resource.dataSource.jdbc.username']}}" class="control input text ">
+        <span class="wrap">{{- i18n['resource.dataSource.jdbc.username']}} ({{- i18n['required.field']}}):</span>
+        <input type="text" value="{{- modelAttributes.username }}" name="username">
+        <span class="message warning"></span>
+        <span class="message hint">{{- i18n['resource.dataSource.azureSql.database.username.hint']}}</span>
+    </label>
+
+    <label title="{{- i18n['resource.dataSource.jdbc.password']}}" class="control input password ">
+        <span class="wrap">{{- i18n['resource.dataSource.jdbc.password']}}:</span>
+        <input type="password" value="{{- modelAttributes.password }}" name="password">
+        <span class="message warning"></span>
+        <span class="message hint"></span>
+    </label>
+
+    <label title="{{- i18n['resource.dataSource.azureSql.useMicrosoftDriver']}}" class="control input checkBox">
+        <span class="wrap">{{- i18n['resource.dataSource.azureSql.useMicrosoftDriver']}}
+            {{ if (!modelAttributes.microsoftDriverAvailable) { }}
+                ({{- i18n["resource.dataSource.azureSql.microsoftDriverMissing"] }})
+            {{ } }}
+            </span>
+        <input type="checkbox" name="useMicrosoftDriver" value="{{- modelAttributes.useMicrosoftDriver }}"
+            {{ if (modelAttributes.useMicrosoftDriver) { }}checked="checked"{{ } }} 
+            {{ if (!modelAttributes.microsoftDriverAvailable) { }}disabled="disabled"{{ } }}>
+    </label>
+
+
+</fieldset>
+
+<fieldset class="group mediumFields">
+
+    <label title="{{- i18n['resource.analysisConnection.requiredURL']}}" class="control input text">
+        <span class="wrap">{{- i18n['resource.dataSource.jdbc.url']}} ({{- i18n['required.field']}}):</span>
+        <input type="text" value="{{- modelAttributes.connectionUrl }}" name="connectionUrl">
+        <span class="message warning"></span>
+        <span class="message hint">{{- i18n['resource.dataSource.azureSql.connectionUrl.hint']}}</span>
+    </label>
+
+</fieldset>

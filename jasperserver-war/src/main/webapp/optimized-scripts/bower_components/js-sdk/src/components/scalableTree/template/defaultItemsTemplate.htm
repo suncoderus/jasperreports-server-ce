@@ -1,0 +1,9 @@
+<ul class="list collapsible folders" style="top: {{= top}}px; position: relative;">
+    {{ _.each(items, function(item){ }}
+        {{ if(item) { }}
+            <li class="{{= item.node ? 'node' : 'leaf'}} {{= item.expanded ? 'open' : 'closed' }} {{= item.selected ? 'jr-isSelected' : ''}}" data-id="{{= item.id }}" data-expanded="{{= item.expanded }}" data-index="{{= item.index }}" tabindex="-1">
+                <p class="wrap item" style="padding-left: {{= item.padding }}px;" ><b class="icon jr-jTreeCollapser"/>{{- item.label }}</p>
+            </li>
+        {{ } }}
+    {{ }) }}
+</ul>

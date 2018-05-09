@@ -1,0 +1,9 @@
+<div class="jr-mMessage jr-mMessage{{- type }} jr {{ if (!icon) print('jr-mMessagePlain'); }} {{ if (!visible) print('jr-isHidden'); }}">
+    <div class="jr-mMessage-iconContainer jr">
+        <span class="jr-mMessage-icon jr"></span>
+    </div>
+    <div class="jr-mMessage-textContainer jr">
+        <p class="jr-mMessage-title jr">{{- title }}</p>
+        <p class="jr-mMessage-text jr">{{- text }}</p>
+    </div>
+</div>

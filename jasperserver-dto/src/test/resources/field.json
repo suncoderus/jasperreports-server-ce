@@ -1,0 +1,25 @@
+[
+    {
+        "id": "ShippedDate",
+        "alias": "DateShipped",
+        "label": "Date shipped",
+        "type": "java.sql.Timestamp",
+        "kind": "DIMENSION"
+    },
+    {
+        "id": "ShipCountry",
+        "alias": "Country",
+        "label": "Country",
+        "type": "java.lang.String",
+        "kind": "DIMENSION"
+    },
+    {
+        "id": "field_2",
+        "alias": "aNewField",
+        "label": "a new field",
+        "type": null,
+        "expression": "Freight * EmployeeID",
+        "aliasedExpression": "ShippingCharge * EmployeeID",
+        "kind": "DIMENSION"
+    }
+]

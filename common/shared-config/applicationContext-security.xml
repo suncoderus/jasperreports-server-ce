@@ -1,0 +1,982 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+       http://www.springframework.org/schema/security
+       http://www.springframework.org/schema/security/spring-security-3.2.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd">
+       
+    
+    <!-- ======================== AUTHENTICATION ======================= -->
+    <bean id="authenticationManager" class="org.springframework.security.authentication.ProviderManager">
+        <constructor-arg name="providers">
+            <list>
+                <ref bean="${bean.daoAuthenticationProvider}"/>
+                <!-- anonymousAuthenticationProvider only needed if filterInvocationInterceptor.alwaysReauthenticate is set to true
+                    <ref bean="anonymousAuthenticationProvider"/> -->
+                <!--ref local="jaasAuthenticationProvider"/-->
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="anonymousUserDescriptor" class="org.springframework.security.core.userdetails.memory.UserAttribute">
+        <property name="password" value="anonymousUser"/>
+        <property name="authoritiesAsString">
+            <list>
+                <value type="java.lang.String">ROLE_ANONYMOUS</value>
+            </list>
+        </property>
+
+    </bean>
+
+<!-- anonymousAuthenticationProvider only needed if filterInvocationInterceptor.alwaysReauthenticate is set to true
+    <bean id="anonymousAuthenticationProvider" class="org.springframework.security.providers.anonymous.AnonymousAuthenticationProvider">
+        <property name="key"><value>foobar</value></property>
+    </bean>
+-->
+
+    <bean id="daoAuthenticationProvider" class="com.jaspersoft.jasperserver.api.security.internalAuth.InternalDaoAuthenticationProvider">
+        <!-- jdbcDaoImpl -->
+        <!-- <property name="userDetailsService"><ref bean="inMemoryDaoImpl"/></property> -->
+        <property name="userDetailsService"><ref bean="${bean.internalUserAuthorityService}"/></property>
+        <property name="passwordEncoder"><ref local="passwordEncoder"/></property>
+    </bean>
+    
+    <bean id="passwordEncoder" class="com.jaspersoft.jasperserver.api.common.crypto.PasswordCipherer" lazy-init="false">
+        <property name="allowEncoding"><value>true</value></property>
+        <property name="keyInPlainText"><value>false</value></property>
+        <property name="secretKey"><value>0xC8 0x43 0x29 0x49 0xAE 0x25 0x2F 0xA1 0xC1 0xF2 0xC8 0xD9 0x31 0x01 0x2C 0x52 0x54 0x0B 0x5E 0xEA 0x9E 0x37 0xA8 0x61</value></property>
+        <property name="secretKeyAlgorithm"><value>DESede</value></property>
+        <property name="cipherTransformation"><value>DESede/CBC/PKCS5Padding</value></property>
+    </bean>
+    
+    <!-- NOTE: Only AES-128 (key size 128 bits) would be available in the default java installation: key in this bean
+    should be 16 bytes.  In order to achieve AES-256, you will need to install
+    “Unlimited Strength Jurisdiction Policy Files” off the oracle site for your Java version.  To install the files:
+    AFTER backing up the old files, extract US_export_policy.jar and local_policy.jar into %JAVA_HOME%\\jre\lib\security
+    directory.
+
+    Alternatively, you may download one of the reputable providers such as Bouncy Castle (ships in JRS).
+    You would need to add the Bouncy Castle provider to %JAVA_HOME%\jre\lib\security\java.security file
+    as a line security.provider.<seq number>=org.bouncycastle.jce.provider.BouncyCastleProvider
+
+    NOTE.1: plain text key functionality was removed as insecure via dictionary attacks.
+     -->
+    <bean id="importExportCipher" class="com.jaspersoft.jasperserver.api.common.crypto.Cipherer">
+        <property name="keyBytes"><value>0x1b 0xd4 0xa6 0x10 0x44 0x42 0x6f 0xb5 0x15 0xda 0xd3 0xf2 0x1f 0x18 0xaa 0x57</value></property>
+        <property name="keyAlgorithm"><value>AES</value></property>
+        <property name="cipherTransformation"><value>AES/CBC/PKCS5Padding</value></property>
+    </bean>
+
+    <bean id="diagnosticDataCipherer" class="com.jaspersoft.jasperserver.api.common.crypto.DiagnosticDataCipherer" parent="importExportCipher">
+        <property name="keyInPlainText" value="false"/>
+        <property name="encryptedFileExtension" value="jsEncrypted"/>
+        <property name="allowEncryption" value="true"/>
+    </bean>
+
+    <!--
+    <bean id="jaasAuthenticationProvider" class="org.springframework.security.providers.jaas.JaasAuthenticationProvider">
+        <property name="loginConfig">
+            <value>/WEB-INF/login.conf</value>
+        </property>
+        <property name="loginContextName">
+            <value>FileLogin</value>
+        </property>
+        <property name="callbackHandlers">
+            <list>
+                <bean class="org.springframework.security.providers.jaas.JaasNameCallbackHandler"/>
+                <bean class="org.springframework.security.providers.jaas.JaasPasswordCallbackHandler"/>
+            </list>
+        </property>
+        <property name="authorityGranters">
+            <list>
+                <bean class="org.appfuse.web.JaasAuthorityGranter"/>
+            </list>
+        </property>
+    </bean>
+    -->
+    <!--
+    <bean id="inMemoryDaoImpl" class="org.springframework.security.core.userdetails.memory.InMemoryDaoImpl">
+        <property name="userMap">
+            <value>
+                tomcat=536c0b339345616c1b33caf454454d8b8a190d6c,ROLE_USER
+                springlive=2a9152cff1d25b5bbaa3e5fbc7acdc6905c9f251,ROLE_USER
+            </value>
+        </property>
+    </bean>
+    -->
+
+    <!-- ########### For LDAP authentication in JasperReport Server 4.7. In JRS > 5.1, all configuration is included in a single file (see sample's) ##############
+
+    <bean id="ldapContextSource" class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
+    <constructor-arg value="ldap://scopeserv1:389/dc=panscopic,dc=com"/>
+    -->
+    <!--
+         You may not need the next properties
+         <property name="userDn"><value>uid=admin,ou=system</value></property>
+         <property name="password"><value>secret</value></property>
+         -->
+    <!--
+       </bean>
+         -->
+
+    <!--
+       For LDAP authentication
+       This bean is not used by default
+
+       <bean id="userSearch"
+                class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
+         <constructor-arg index="0">
+           <value></value>
+         </constructor-arg>
+         <constructor-arg index="1">
+           <value>(uid={0})</value>
+         </constructor-arg>
+         <constructor-arg index="2">
+           <ref local="ldapContextSource" />
+         </constructor-arg>
+         <property name="searchSubtree">
+           <value>true</value>
+         </property>
+       </bean>
+
+       <bean id="ldapAuthenticationProvider" class="org.springframework.security.providers.ldap.LdapAuthenticationProvider">
+         <constructor-arg>
+           <bean class="org.springframework.security.providers.ldap.authenticator.BindAuthenticator">
+              <constructor-arg><ref local="ldapContextSource"/></constructor-arg>
+              <!- -property name="userDnPatterns"><list><value>uid={0}</value></list></property- ->
+              <property name="userSearch" ref="userSearch"/>
+           </bean>
+         </constructor-arg>
+         <constructor-arg>
+           <bean class="org.springframework.security.ldap.populator.DefaultLdapAuthoritiesPopulator">
+              <constructor-arg index="0"><ref local="ldapContextSource"/></constructor-arg>
+              <constructor-arg index="1"><value></value></constructor-arg>
+              <property name="groupRoleAttribute"><value>cn</value></property>
+              <property name="groupSearchFilter"><value>(&amp;(uniqueMember={0})(objectclass=groupofuniquenames))</value></property>
+              <property name="searchSubtree"><value>true</value></property>
+           </bean>
+         </constructor-arg>
+       </bean>
+       ############################################################-->
+
+    <!-- Automatically receives AuthenticationEvent messages -->
+    <bean id="loggerListener" class="org.springframework.security.authentication.event.LoggerListener"/>
+
+    <bean id="userLocalesList" class="com.jaspersoft.jasperserver.war.common.LocalesListImpl">
+        <property name="locales">
+            <list>
+                <value type="java.util.Locale">en</value>
+                <value type="java.util.Locale">de</value>
+                <value type="java.util.Locale">es</value>
+                <value type="java.util.Locale">fr</value>
+                <value type="java.util.Locale">it</value>
+                <value type="java.util.Locale">ja</value>
+                <value type="java.util.Locale">pt_BR</value>
+                <value type="java.util.Locale">zh_CN</value>
+            </list>
+        </property>
+    </bean>
+
+   <!--
+   <bean id="rememberMeProcessingFilter" class="org.springframework.security.ui.rememberme.RememberMeProcessingFilter">
+      <property name="authenticationManager"><ref local="authenticationManager"/></property>
+      <property name="rememberMeServices"><ref local="rememberMeServices"/></property>
+   </bean>
+
+   <bean id="rememberMeServices" class="org.springframework.security.ui.rememberme.TokenBasedRememberMeServices">
+      <property name="externalUserDetailsService"><ref local="inMemoryDaoImpl"/></property>
+      <property name="key"><value>springRocks</value></property>
+   </bean>
+   
+   <bean id="rememberMeAuthenticationProvider" class="org.springframework.security.providers.rememberme.RememberMeAuthenticationProvider">
+      <property name="key"><value>springRocks</value></property>
+   </bean>
+   -->     
+    
+    <!--
+    <bean id="runAsManager" class="org.springframework.security.runas.RunAsImplAuthenticationProvider">
+    <property name="key"><value>my_run_as_password</value></property>
+    </bean>
+    -->
+    
+    <bean id="requestMethodsFilter" class="org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter"/>
+
+    <!-- Optionally, you can specify a "rolePrefix" property to change 
+         (or remove) the ROLE_ prefix for role names. -->
+    <bean id="roleVoter" class="org.springframework.security.access.vote.RoleVoter"/>
+
+    <!-- ===================== ACL-BASED SECURITY ==================== -->
+    
+     <!-- ACL permission masks used by this application -->
+    <util:constant id="JasperServerPermission.ADMINISTRATION" static-field="com.jaspersoft.jasperserver.api.metadata.security.JasperServerPermission.ADMINISTRATION"/>
+    <util:constant id="JasperServerPermission.READ_WRITE" static-field="com.jaspersoft.jasperserver.api.metadata.security.JasperServerPermission.READ_WRITE"/>
+    <util:constant id="JasperServerPermission.READ" static-field="com.jaspersoft.jasperserver.api.metadata.security.JasperServerPermission.READ"/>
+    <util:constant id="JasperServerPermission.DELETE" static-field="com.jaspersoft.jasperserver.api.metadata.security.JasperServerPermission.DELETE"/>
+    <util:constant id="JasperServerPermission.EXECUTE" static-field="com.jaspersoft.jasperserver.api.metadata.security.JasperServerPermission.EXECUTE"/>
+    <util:constant id="JasperServerPermission.NOTHING" static-field="com.jaspersoft.jasperserver.api.metadata.security.JasperServerPermission.NOTHING"/>
+
+    <bean id="repositoryOIRetrievalStrategy" class="com.jaspersoft.jasperserver.api.metadata.user.service.impl.ResourceObjectIdentityRetrievalStrategyImpl"/>
+    <bean id="sidRetrievalStrategy" class="com.jaspersoft.jasperserver.api.metadata.user.service.impl.JasperServerSidRetrievalStrategyImpl"/>
+    <bean id="permissionGrantingStrategy" class="com.jaspersoft.jasperserver.api.metadata.security.JasperServerPermissionGrantingStrategy"/>
+
+    <!--Helper bean which can be used to check permissions on resources, uses same approach as Spring Security -->
+    <bean id="aclSecurityCheckerCE" class="com.jaspersoft.jasperserver.api.metadata.user.service.impl.AclPermissionsSecurityChecker">
+        <property name="aclService" ref="internalAclServiceCE"/>
+        <property name="sidRetrievalStrategy" ref="sidRetrievalStrategy"/>
+        <property name="permissionGrantingStrategy" ref="permissionGrantingStrategy"/>
+        <property name="objectIdentityRetrievalStrategy" ref="repositoryOIRetrievalStrategy"/>
+    </bean>
+
+    <alias name="${bean.AclPermissionsSecurityChecker}" alias="aclSecurityChecker"/>
+
+    <bean id="ehCacheBasedJasperServerAclCache" class="com.jaspersoft.jasperserver.api.security.EhCacheBasedJasperServerAclCache">
+        <constructor-arg name="cache" ref="aclCache"/>
+        <constructor-arg name="permissionGrantingStrategy" ref="permissionGrantingStrategy"/>
+    </bean>
+    <bean id="ehCacheAclService" class="com.jaspersoft.jasperserver.api.security.EhCacheAclServiceImpl">
+        <constructor-arg name="nonMutableAclCache" ref="ehCacheBasedJasperServerAclCache"/>
+    </bean>
+    <!-- An access decision voter that reads ACL_USER_ADMIN settings -->
+    <bean id="aclUserAdminVoter" class="org.springframework.security.acls.AclEntryVoter">
+        <constructor-arg name="aclService" ref="internalAclServiceCE"/>
+        <constructor-arg name="processConfigAttribute" type="java.lang.String" value="ACL_USER_ADMIN"/>
+        <constructor-arg name="requirePermission">
+            <list>
+                <ref local="JasperServerPermission.ADMINISTRATION"/>
+            </list>
+        </constructor-arg>
+        <property name="processDomainObjectClass">
+            <value>com.jaspersoft.jasperserver.api.metadata.common.domain.Resource</value>
+        </property>
+        <property name="objectIdentityRetrievalStrategy" ref="repositoryOIRetrievalStrategy"/>
+        <property name="sidRetrievalStrategy" ref="sidRetrievalStrategy"/>
+    </bean>
+    
+    <!-- An access decision voter that reads ACL_USER_READ settings  -->
+    <bean id="aclUserReadVoter" class="com.jaspersoft.jasperserver.api.metadata.security.ContextSensitiveAclEntryVoter">
+        <constructor-arg name="aclService" ref="internalAclServiceCE"/>
+        <constructor-arg name="processConfigAttribute" type="java.lang.String" value="ACL_USER_READ"/>
+        <constructor-arg name="requirePermission">
+            <list>
+                <ref local="JasperServerPermission.NOTHING"/>
+            </list>
+        </constructor-arg>
+
+        <property name="processDomainObjectClass">
+            <value>java.lang.String</value>
+        </property>
+        <property name="requiredPermissionsMap">
+			<map>
+				<entry key="default">
+					<list>
+						<ref local="JasperServerPermission.ADMINISTRATION"/>
+						<ref local="JasperServerPermission.READ"/>
+					</list>
+				</entry>
+				<entry key="execute">
+					<list>
+						<ref local="JasperServerPermission.ADMINISTRATION"/>
+						<ref local="JasperServerPermission.READ"/>
+						<ref local="JasperServerPermission.EXECUTE"/>
+					</list>
+				</entry>
+			</map>
+        </property>
+        <property name="objectIdentityRetrievalStrategy" ref="repositoryOIRetrievalStrategy"/>
+        <property name="sidRetrievalStrategy" ref="sidRetrievalStrategy"/>
+    </bean>
+    
+    <!-- An access decision voter that reads ACL_USER_UPDATE settings  -->
+    <bean id="aclUserUpdateVoter" class="org.springframework.security.acls.AclEntryVoter">
+        <constructor-arg name="aclService" ref="internalAclServiceCE"/>
+        <constructor-arg name="processConfigAttribute" type="java.lang.String" value="ACL_USER_UPDATE"/>
+        <constructor-arg name="requirePermission">
+            <array>
+                <ref local="JasperServerPermission.ADMINISTRATION"/>
+                <ref local="JasperServerPermission.READ_WRITE"/>
+            </array>
+        </constructor-arg>
+
+        <property name="processDomainObjectClass">
+            <value>com.jaspersoft.jasperserver.api.metadata.common.domain.Resource</value>
+        </property>
+        <property name="objectIdentityRetrievalStrategy" ref="repositoryOIRetrievalStrategy"/>
+        <property name="sidRetrievalStrategy" ref="sidRetrievalStrategy"/>
+    </bean>
+     
+    <!-- An access decision voter that reads ACL_USER_READ settings -->
+    <bean id="aclUserDeleteVoter" class="org.springframework.security.acls.AclEntryVoter">
+        <constructor-arg name="aclService" ref="internalAclServiceCE"/>
+        <constructor-arg name="processConfigAttribute" type="java.lang.String" value="ACL_USER_DELETE"/>
+        <constructor-arg name="requirePermission">
+            <array>
+                <ref local="JasperServerPermission.ADMINISTRATION"/>
+                <ref local="JasperServerPermission.DELETE"/>
+            </array>
+        </constructor-arg>
+        <property name="processDomainObjectClass">
+            <value>java.lang.String</value>
+        </property>
+        <property name="objectIdentityRetrievalStrategy" ref="repositoryOIRetrievalStrategy"/>
+        <property name="sidRetrievalStrategy" ref="sidRetrievalStrategy"/>
+    </bean>
+    
+    
+    <!-- An access decision manager used by the business objects -->
+    <bean id="aclAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+        <constructor-arg name="decisionVoters">
+            <list>
+                <ref local="roleVoter"/>
+                <ref local="aclUserAdminVoter"/>
+                <ref local="aclUserUpdateVoter"/>
+                <!-- <ref local="aclUserCreateVoter"/> -->
+                <ref local="aclUserDeleteVoter"/>
+                <ref local="aclUserReadVoter"/>
+                <ref local="aclUserMoveVoter"/>
+                <ref local="aclUserCopyVoter"/>
+                <ref local="aclUserMultiCopyVoter"/>
+            </list>
+        </constructor-arg>
+        <property name="allowIfAllAbstainDecisions"><value>true</value></property>
+    </bean>
+    
+
+    <!-- ===================== METHOD-LEVEL SECURITY ==================== 
+    Read methods:  
+           getResource
+           getResourceData - Does not return a resource
+           getContentResourceData - Does not return a resource
+           getFolder
+           getAllFolders
+           getSubFolders
+           findResource
+           loadResourcesList*
+           loadClientResources*
+           getChildrenFolderName - Does not return a resource
+        Write methods:
+               saveFolder - Problems handling not existent objects...
+               saveResource - Problems handling not existent objects...
+               newResource - Not useful....
+        Delete methods:
+               deleteResource
+               deleteFolder
+               delete - Not useful....
+    -->
+    <bean id="hibernateRepoServiceSecurity"
+        class="org.springframework.security.access.intercept.aopalliance.MethodSecurityInterceptor">
+        <property name="authenticationManager"><ref local="authenticationManager"/></property>
+        <property name="accessDecisionManager"><ref local="aclAccessDecisionManager"/></property>
+        <property name="afterInvocationManager"><ref local="afterInvocationManager"/></property>
+        <property name="securityMetadataSource"><ref local="repositoryServiceSecurityMetadataSource"/></property>
+    </bean>
+
+
+    <security:method-security-metadata-source id="repositoryServiceSecurityMetadataSource">
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.getResource" access="ACL_USER_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.findResource" access="AFTER_ACL_COLLECTION_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.saveResource" access="ACL_USER_ADMIN,ACL_USER_UPDATE"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.deleteResource" access="ACL_USER_DELETE"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.deleteFolder" access="ACL_USER_DELETE"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.delete" access="ACL_USER_DELETE"/>
+        <!-- Rest of methods are missing in HibernateRepositoryService interface -->
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.getResources" access="AFTER_ACL_COLLECTION_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.getFolder" access="ACL_USER_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.loadResourcesList" access="AFTER_ACL_COLLECTION_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.getResourcesByIdList" access="AFTER_ACL_COLLECTION_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.loadClientResources" access="AFTER_ACL_COLLECTION_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.getAllFolders" access="AFTER_ACL_COLLECTION_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.getAllSubfolders" access="AFTER_ACL_COLLECTION_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.getSubFolders" access="AFTER_ACL_COLLECTION_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.findResources" access="AFTER_ACL_COLLECTION_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.saveFolder" access="ACL_USER_ADMIN,ACL_USER_UPDATE"/>
+        <!--<security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.moveFolder" access="ACL_USER_MOVE"/>-->
+        <!--<security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.moveResource" access="ACL_USER_MOVE"/>-->
+        <!--<security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.copyResource" access="ACL_USER_COPY"/>-->
+        <!--<security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.copyResources" access="ACL_USER_MULTI_COPY"/>-->
+        <!--<security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.copyFolder" access="ACL_USER_COPY"/>-->
+
+
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.getResource" access="ACL_USER_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.getResources" access="AFTER_ACL_COLLECTION_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.getFolder" access="ACL_USER_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.loadResourcesList" access="AFTER_ACL_COLLECTION_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.getResourcesByIdList" access="AFTER_ACL_COLLECTION_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.loadClientResources" access="AFTER_ACL_COLLECTION_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.getAllFolders" access="AFTER_ACL_COLLECTION_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.getAllSubfolders" access="AFTER_ACL_COLLECTION_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.getSubFolders" access="AFTER_ACL_COLLECTION_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.findResource" access="AFTER_ACL_COLLECTION_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.findResources" access="AFTER_ACL_COLLECTION_READ"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.saveFolder" access="ACL_USER_ADMIN,ACL_USER_UPDATE"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.saveResource" access="ACL_USER_ADMIN,ACL_USER_UPDATE"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.deleteResource" access="ACL_USER_DELETE"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.deleteFolder" access="ACL_USER_DELETE"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.delete" access="ACL_USER_DELETE"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.moveFolder" access="ACL_USER_MOVE"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.moveResource" access="ACL_USER_MOVE"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.copyResource" access="ACL_USER_COPY"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.copyRenameResource" access="ACL_USER_COPY"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.copyResources" access="ACL_USER_MULTI_COPY"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.copyFolder" access="ACL_USER_COPY"/>
+        <security:protect method="com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.copyRenameFolder" access="ACL_USER_COPY"/>
+        <!--
+                   For comparison, this is the analogous configuration defined inline under aclUpdateMethodSecurityInterceptor
+
+                      com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.getResource=ACL_USER_UPDATE
+                      com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.getResources=AFTER_ACL_COLLECTION_UPDATE
+                      com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.getFolder=ACL_USER_UPDATE
+                      com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.loadResourcesList=AFTER_ACL_COLLECTION_UPDATE
+                      com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.getResourcesByIdList=AFTER_ACL_COLLECTION_UPDATE
+                      com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.loadClientResources=AFTER_ACL_COLLECTION_UPDATE
+                      com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.getAllFolders=AFTER_ACL_COLLECTION_UPDATE
+                      com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.getAllSubfolders=AFTER_ACL_COLLECTION_UPDATE
+                      com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.getSubFolders=AFTER_ACL_COLLECTION_UPDATE
+                      com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.saveFolder=ACL_USER_UPDATE
+                      com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.saveResource=ACL_USER_UPDATE
+                      com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.deleteResource=ACL_USER_DELETE
+                      com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.deleteFolder=ACL_USER_DELETE
+                      com.jaspersoft.jasperserver.api.metadata.common.service.RepositoryService.delete=ACL_USER_DELETE
+
+        -->
+
+    </security:method-security-metadata-source>
+
+    <!--
+    
+    Not used
+    
+    <bean id="hibernateRepoServiceSecurity" 
+        class="org.springframework.security.intercept.method.aspectj.AspectJSecurityInterceptor">
+        <property name="authenticationManager"><ref local="authenticationManager"/></property>
+        <property name="accessDecisionManager"><ref local="aclAccessDecisionManager"/></property>
+        <property name="afterInvocationManager"><ref local="afterInvocationManager"/></property>
+        <property name="objectDefinitionSource">
+            <value>
+                com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.getRepoResource=ROLE_PermissionTestRoleAgain,AFTER_ACL_READ
+                com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryService.loadResourcesList=ROLE_PermissionTestRole,ROLE_PermissionTestRoleAgain,AFTER_ACL_COLLECTION_READ
+            </value>
+        </property>
+    </bean>
+    
+    <bean id="domainObjectInstanceSecurityAspect" 
+        class="com.jaspersoft.jasperserver.api.metadata.user.service.impl.ObjectSecurityAspect"
+        factory-method="aspectOf">
+        <property name="securityInterceptor"><ref local="hibernateRepoServiceSecurity"/></property>
+    </bean>
+    -->
+    
+    <!-- ============== "AFTER INTERCEPTION" AUTHORIZATION =========== -->
+    
+    <bean id="afterInvocationManager" class="org.springframework.security.access.intercept.AfterInvocationProviderManager">
+        <property name="providers">
+            <list>
+                <ref local="afterAclRead"/>
+                <ref local="afterAclCollectionRead"/>
+            </list>
+        </property>
+    </bean>
+    
+    <!-- Processes AFTER_ACL_COLLECTION_READ configuration settings -->
+
+    <bean id="afterAclCollectionRead"
+        class="org.springframework.security.acls.afterinvocation.AclEntryAfterInvocationCollectionFilteringProvider">
+        <constructor-arg name="aclService" ref="internalAclServiceCE"/>
+        <constructor-arg name="requirePermission">
+            <list>
+                <ref local="JasperServerPermission.ADMINISTRATION"/>
+                <ref local="JasperServerPermission.READ"/>
+            </list>
+        </constructor-arg>
+        <property name="objectIdentityRetrievalStrategy" ref="repositoryOIRetrievalStrategy"/>
+        <property name="sidRetrievalStrategy" ref="sidRetrievalStrategy"/>
+
+    </bean>
+       
+    <!-- Processes AFTER_ACL_READ configuration settings -->
+
+    <bean id="afterAclRead" class="org.springframework.security.acls.afterinvocation.AclEntryAfterInvocationProvider">
+        <constructor-arg name="aclService" ref="internalAclServiceCE"/>
+        <constructor-arg name="requirePermission">
+            <list>
+                <ref local="JasperServerPermission.ADMINISTRATION"/>
+                <ref local="JasperServerPermission.READ"/>
+            </list>
+        </constructor-arg>
+        <property name="objectIdentityRetrievalStrategy" ref="repositoryOIRetrievalStrategy"/>
+        <property name="sidRetrievalStrategy" ref="sidRetrievalStrategy"/>
+
+    </bean>
+    
+    <!--Processes AFTER_ACL_COLLECTION_UPDATE configuration settings-->
+    <bean id="afterAclCollectionUpdate" class="org.springframework.security.acls.afterinvocation.AclEntryAfterInvocationCollectionFilteringProvider" >
+        <constructor-arg name="aclService" ref="internalAclServiceCE"/>
+        <constructor-arg name="requirePermission">
+            <list>
+                <ref local="JasperServerPermission.ADMINISTRATION"/>
+                <ref local="JasperServerPermission.READ_WRITE"/>
+            </list>
+        </constructor-arg>
+        <property name="objectIdentityRetrievalStrategy" ref="repositoryOIRetrievalStrategy"/>
+        <property name="sidRetrievalStrategy" ref="sidRetrievalStrategy"/>
+
+        <!--<property name="processConfigAttribute">-->
+            <!--<value>AFTER_ACL_COLLECTION_UPDATE</value>-->
+        <!--</property>-->
+    </bean>
+    
+    
+    <bean id="customEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+        <property name="customEditors">
+            <map>
+                <entry key="com.jaspersoft.jasperserver.api.security.FlowDefinitionSource">
+                    <bean class="com.jaspersoft.jasperserver.api.security.FlowDefinitionSourceEditor"/>
+                </entry>
+                <entry key="org.springframework.security.access.ConfigAttribute">
+                    <bean class="com.jaspersoft.jasperserver.api.metadata.security.ConfigAttributeEditor"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+    
+<!--
+TODO: SSU - Seems this bean is not needed
+    <bean id="flowAclManager" class="org.springframework.security.acl.AclProviderManager">
+        <property name="providers">
+            <list>
+                <ref bean="${bean.objectPermissionServiceInternal}"/>
+            </list>
+        </property>
+    </bean>
+-->
+
+    <bean id="flowVoter" class="com.jaspersoft.jasperserver.api.security.FlowRoleAccessVoter">
+        <property name="flowAccessAttribute" value="FLOW_ACCESS"/>
+        <property name="flowDefinitionSource">
+            <value>
+                repoAdminFlow=ROLE_ADMINISTRATOR
+                userListFlow=ROLE_ADMINISTRATOR
+                roleListFlow=ROLE_ADMINISTRATOR
+                editFolderFlow=ROLE_ADMINISTRATOR
+                fileResourceFlow=ROLE_USER,ROLE_ADMINISTRATOR
+                listOfValuesFlow=ROLE_USER,ROLE_ADMINISTRATOR
+                reportDataSourceFlow=ROLE_USER,ROLE_ADMINISTRATOR
+                inputControlsFlow=ROLE_USER,ROLE_ADMINISTRATOR
+                tenantFlow=ROLE_ADMINISTRATOR
+                createSLDatasourceFlow=ROLE_ADMINISTRATOR
+                addDataSourceFlow=ROLE_ADMINISTRATOR
+                userEditFlow=ROLE_ADMINISTRATOR
+                roleEditFlow=ROLE_ADMINISTRATOR
+                queryReferenceFlow=ROLE_ADMINISTRATOR
+                searchFlow=ROLE_USER,ROLE_ADMINISTRATOR
+                *=ROLE_USER,ROLE_ADMINISTRATOR
+            </value>
+        </property>
+    </bean>
+
+    <bean id="addFlowDefinitionSources" class="com.jaspersoft.jasperserver.api.common.util.spring.GenericBeanUpdaterDefinition">
+        <property name="beanName" value="flowVoter"/>
+        <property name="propertyName" value="flowDefinitionSource"/>
+        <property name="operation" value="append"/>
+    </bean>
+
+    <bean id="flowAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+        <constructor-arg name="decisionVoters">
+            <list>
+                <ref local="flowVoter"/>
+            </list>
+        </constructor-arg>
+        <property name="allowIfAllAbstainDecisions"><value>true</value></property>
+    </bean>
+    
+    <bean id="flowExecuterSecurity" class="org.springframework.security.access.intercept.aopalliance.MethodSecurityInterceptor">
+        <property name="authenticationManager"><ref local="authenticationManager"/></property>
+        <property name="accessDecisionManager"><ref local="flowAccessDecisionManager"/></property>
+        <property name="securityMetadataSource">
+            <security:method-security-metadata-source>
+                <security:protect method="org.springframework.webflow.executor.FlowExecutor.launchExecution" access="FLOW_ACCESS"/>
+            </security:method-security-metadata-source>
+        </property>
+    </bean>
+
+	<bean id="repositoryServiceSecurityChecker"
+			class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.RepositoryServiceSecurityChecker">
+        <property name="adminVoter" ref="aclUserAdminVoter"/>
+        <property name="updateVoter" ref="aclUserUpdateVoter"/>
+        <property name="deleteVoter" ref="aclUserDeleteVoter"/>
+        <property name="readVoter" ref="aclUserReadVoter"/>
+        <property name="folderReadVoter" ref="aclUserReadVoter"/>
+        <property name="interceptor" ref="hibernateRepoServiceSecurity"/>
+	</bean>
+
+
+    <bean id="securityWrappedEngineService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="interceptorNames">
+            <list>
+                <idref bean="cancelExecutionMethodSecurityInterceptor"/>
+                <idref bean="${bean.engineServiceTarget}"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="cancelExecutionMethodSecurityInterceptor"
+          class="org.springframework.security.access.intercept.aopalliance.MethodSecurityInterceptor">
+        <property name="authenticationManager">
+            <ref local="authenticationManager"/>
+        </property>
+        <property name="accessDecisionManager">
+            <ref local="cancelExecutionAccessDecisionManager"/>
+        </property>
+        <property name="securityMetadataSource">
+            <security:method-security-metadata-source>
+                <security:protect method="com.jaspersoft.jasperserver.api.engine.common.service.EngineService.cancelExecution" access="EXECUTION_OWNER,ROLE_ADMINISTRATOR,ROLE_SUPERUSER"/>
+            </security:method-security-metadata-source>
+        </property>
+    </bean>
+
+    <bean id="cancelExecutionAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+        <property name="allowIfAllAbstainDecisions"><value>true</value></property>
+        <property name="decisionVoters">
+            <list>
+                <ref local="${bean.executionRoleVoter}"/>
+                <ref local="executionOwnerVoter"/>
+            </list>
+        </property>
+    </bean>
+
+    <!--TODO: SSU - possible we can replace MultiAclEntryVoter for simplified undestandinf-->
+    <bean id="aclUserMoveVoter" class="com.jaspersoft.jasperserver.api.metadata.security.MultiAclEntryVoter">
+        <property name="configAttribute" value="ACL_USER_MOVE"/>
+        <property name="aclService" ref="internalAclServiceCE"/>
+        <property name="objectIdentityRetrievalStrategy" ref="repositoryOIRetrievalStrategy"/>
+        <property name="sidRetrievalStrategy" ref="sidRetrievalStrategy"/>
+        <property name="argumentVoters">
+            <list>
+                <bean class="com.jaspersoft.jasperserver.api.metadata.security.BasicMethodArgumentVoter">
+                    <property name="argumentType" value="java.lang.String"/>
+                    <property name="argumentIndex" value="1"/>
+                    <property name="accessPermissions">
+                        <array>
+                            <ref local="JasperServerPermission.ADMINISTRATION"/>
+                            <ref local="JasperServerPermission.DELETE"/>
+                        </array>
+                    </property>
+                </bean>
+                <bean class="com.jaspersoft.jasperserver.api.metadata.security.BasicMethodArgumentVoter">
+                    <property name="argumentType" value="java.lang.String"/>
+                    <property name="argumentIndex" value="2"/>
+                    <property name="accessPermissions">
+                        <array>
+                            <ref local="JasperServerPermission.ADMINISTRATION"/>
+                            <ref local="JasperServerPermission.READ_WRITE"/>
+                        </array>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="aclUserCopyVoter" class="com.jaspersoft.jasperserver.api.metadata.security.MultiAclEntryVoter">
+        <property name="configAttribute" value="ACL_USER_COPY"/>
+        <property name="aclService" ref="internalAclServiceCE"/>
+        <property name="objectIdentityRetrievalStrategy" ref="repositoryOIRetrievalStrategy"/>
+        <property name="sidRetrievalStrategy" ref="sidRetrievalStrategy"/>
+        <property name="argumentVoters">
+            <list>
+                <bean class="com.jaspersoft.jasperserver.api.metadata.security.BasicMethodArgumentVoter">
+                    <property name="argumentType" value="java.lang.String"/>
+                    <property name="argumentIndex" value="1"/>
+                    <property name="accessPermissions">
+                        <list>
+                            <ref local="JasperServerPermission.ADMINISTRATION"/>
+                            <ref local="JasperServerPermission.READ"/>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="com.jaspersoft.jasperserver.api.metadata.security.BasicMethodArgumentVoter">
+                    <property name="argumentType" value="java.lang.String"/>
+                    <property name="argumentIndex" value="2"/>
+                    <property name="accessPermissions">
+                        <list>
+                            <ref local="JasperServerPermission.ADMINISTRATION"/>
+                            <ref local="JasperServerPermission.READ_WRITE"/>
+                        </list>
+                    </property>
+                    <property name="argumentFunctor">
+                        <bean class="com.jaspersoft.jasperserver.api.metadata.common.util.ParentPathFunctor"/>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="aclUserMultiCopyVoter" class="com.jaspersoft.jasperserver.api.metadata.security.MultiAclEntryVoter">
+        <property name="configAttribute" value="ACL_USER_MULTI_COPY"/>
+        <property name="aclService" ref="internalAclServiceCE"/>
+        <property name="objectIdentityRetrievalStrategy" ref="repositoryOIRetrievalStrategy"/>
+        <property name="sidRetrievalStrategy" ref="sidRetrievalStrategy"/>
+
+        <property name="argumentVoters">
+            <list>
+                <bean class="com.jaspersoft.jasperserver.api.metadata.security.BasicMethodCollectionArgumentVoter">
+                    <property name="argumentType" value="java.lang.String[]"/>
+                    <property name="accessPermissions">
+                        <list>
+                             <ref local="JasperServerPermission.ADMINISTRATION"/>
+                             <ref local="JasperServerPermission.READ"/>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="com.jaspersoft.jasperserver.api.metadata.security.BasicMethodArgumentVoter">
+                    <property name="argumentType" value="java.lang.String"/>
+                    <property name="accessPermissions">
+                        <list>
+                            <ref local="JasperServerPermission.ADMINISTRATION"/>
+                            <ref local="JasperServerPermission.READ_WRITE"/>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
+
+
+    <!--OBJECT PERMISSIONS SECURITY-->
+
+    <bean id="objectPermissionServiceInterceptorNamesSecured" class="java.util.ArrayList" parent="${bean.objectPermissionServiceInterceptorNames}">
+        <constructor-arg  index="0" type="java.util.Collection">
+            <list merge="true">
+                <idref local="${bean.objectPermissionSecurityInterceptorName}"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="objectPermissionServiceMethodSecurityInterceptor"
+          class="org.springframework.security.access.intercept.aopalliance.MethodSecurityInterceptor">
+        <property name="authenticationManager">
+            <ref local="authenticationManager"/>
+        </property>
+        <property name="afterInvocationManager">
+            <ref local="getPermissionAfterInvocationProviderManager"/>
+        </property>
+        <property name="accessDecisionManager">
+            <ref local="modifyPermissionAccessDecisionManager"/>
+        </property>
+        <property name="securityMetadataSource">
+            <security:method-security-metadata-source>
+                <security:protect method="com.jaspersoft.jasperserver.api.metadata.user.service.ObjectPermissionService.putObjectPermission" access="NOT_PERMISSION_OWNER,NOT_RECIPIENT_ADM"/>
+                <security:protect method="com.jaspersoft.jasperserver.api.metadata.user.service.ObjectPermissionService.deleteObjectPermission" access="NOT_PERMISSION_OWNER,NOT_RECIPIENT_ADM"/>
+                <security:protect method="com.jaspersoft.jasperserver.api.metadata.user.service.ObjectPermissionService.deleteObjectPermissionForObject" access="ROLE_ADMINISTRATOR,ROLE_SUPERUSER"/>
+                <security:protect method="com.jaspersoft.jasperserver.api.metadata.user.service.ObjectPermissionService.deleteObjectPermissionsForRecipient" access="ROLE_ADMINISTRATOR,ROLE_SUPERUSER"/>
+                <security:protect method="com.jaspersoft.jasperserver.api.metadata.user.service.ObjectPermissionService.getObjectPermissionsForObject" access="NOT_PERMISSION_OWNER,NOT_RECIPIENT_ADM,CAN_ADMINISTER"/>
+                <security:protect method="com.jaspersoft.jasperserver.api.metadata.user.service.ObjectPermissionService.getEffectivePermissionsForObject" access="NOT_PERMISSION_OWNER,NOT_RECIPIENT_ADM,CAN_ADMINISTER"/>
+            </security:method-security-metadata-source>
+        </property>
+    </bean>
+
+    <bean id="modifyPermissionAccessDecisionManager" class="org.springframework.security.access.vote.UnanimousBased">
+        <constructor-arg name="decisionVoters" type="java.util.List">
+            <list>
+                <ref bean="roleVoter"/>
+                <ref bean="notPermissionOwnerPermissionArgumentVoter"/>
+                <ref bean="notRecipientAdminObjectPermissionVoter"/>
+            </list>
+        </constructor-arg>
+        <property name="allowIfAllAbstainDecisions">
+            <value>true</value>
+        </property>
+    </bean>
+
+    <bean id="getPermissionAfterInvocationProviderManager" class="org.springframework.security.access.intercept.AfterInvocationProviderManager">
+        <property name="providers">
+            <list>
+                <ref bean="notPermissionOwnerPermissionArgumentVoter"/>
+                <ref bean="notRecipientAdminObjectPermissionVoter"/>
+                <ref bean="isAdministrableObjectPermissionArgumentVoter"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="roleAdministrator" class="java.lang.String">
+        <constructor-arg type="java.lang.String">
+            <value>ROLE_ADMINISTRATOR</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="configurationAllowedRolesCe" class="java.util.ArrayList">
+        <!--This bean is used to specify roles, which are permitted configure JRS (server settings)-->
+        <!-- It is used to secure output of the com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.data.UserWorkflowStorage-->
+        <constructor-arg  index="0" type="java.util.Collection">
+            <list merge="true" value-type="java.lang.String">
+                <value>ROLE_ADMINISTRATOR</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="administrationAllowedRolesCe" class="java.util.ArrayList">
+        <!--This bean is used to specify roles, which are permitted administrate JRS (users, roles etc.)-->
+        <!-- It is used to secure output of the com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.data.UserWorkflowStorage-->
+        <constructor-arg  index="0" type="java.util.Collection">
+            <list merge="true" value-type="java.lang.String">
+                <value>ROLE_ADMINISTRATOR</value>
+            </list>
+        </constructor-arg>
+    </bean>
+    <bean name="repositoryAclService" class="com.jaspersoft.jasperserver.api.metadata.user.service.impl.RepositoryAclServiceImpl">
+        <property name="permissionService" ref="${bean.objectPermissionServiceInternal}"/>
+        <property name="sidRetrievalStrategy" ref="sidRetrievalStrategy"/>
+        <property name="aclLookupStrategy" ref="internalAclServiceCE"/>
+    </bean>
+
+    <!--This Aliases are used only for AnnotationBased injection-->
+    <alias name="${bean.internalAclService}" alias="internalAclService"/>
+    <alias name="${bean.externalAclService}" alias="externalAclService"/>
+
+    <bean name="internalAclServiceCE" class="com.jaspersoft.jasperserver.api.security.AclLookupStrategyImpl">
+        <property name="aclServices">
+            <list>
+                <ref bean="ehCacheAclService"/>
+                <ref bean="repositoryAclService"/>
+            </list>
+        </property>
+        <property name="nonMutableAclCache" ref="ehCacheBasedJasperServerAclCache"/>
+    </bean>
+
+    <!--Profile Attributes SECURITY-->
+    <bean id="profileAttributeServiceInterceptorNamesSecured" class="java.util.ArrayList">
+        <constructor-arg  index="0" type="java.util.Collection">
+            <list merge="true">
+                <idref local="profileAttributesServiceServiceMethodSecurityInterceptor"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="profileAttributesServiceServiceMethodSecurityInterceptor"
+          class="org.springframework.security.access.intercept.aopalliance.MethodSecurityInterceptor">
+        <property name="authenticationManager">
+            <ref local="authenticationManager"/>
+        </property>
+        <property name="afterInvocationManager">
+            <ref local="getProfileAttributesAfterInvocationProviderManager"/>
+        </property>
+        <property name="accessDecisionManager">
+            <ref local="modifyProfileAttributesAccessDecisionManager"/>
+        </property>
+        <property name="securityMetadataSource">
+            <security:method-security-metadata-source>
+                <security:protect method="com.jaspersoft.jasperserver.api.metadata.user.service.ProfileAttributeService.getProfileAttributesForPrincipal" access="ACL_ATTRIBUTE_USER_READ"/>
+                <security:protect method="com.jaspersoft.jasperserver.api.metadata.user.service.ProfileAttributeService.putProfileAttribute" access="ROLE_ADMINISTRATOR, ACL_ATTRIBUTE_USER_ADMIN"/>
+                <security:protect method="com.jaspersoft.jasperserver.api.metadata.user.service.ProfileAttributeService.deleteProfileAttribute" access="ROLE_ADMINISTRATOR, ACL_ATTRIBUTE_USER_ADMIN"/>
+                <security:protect method="com.jaspersoft.jasperserver.api.metadata.user.service.ProfileAttributeService.getCurrentUserProfileAttributes" access="ACL_ATTRIBUTE_USER_READ"/>
+            </security:method-security-metadata-source>
+        </property>
+    </bean>
+    
+     <bean id="modifyProfileAttributesAccessDecisionManager" class="org.springframework.security.access.vote.UnanimousBased">
+        <constructor-arg name="decisionVoters" type="java.util.List">
+            <list>
+                <ref bean="roleVoter"/>
+                <ref bean="aclAttributeUserAdminVoter"/>
+            </list>
+        </constructor-arg>
+        <property name="allowIfAllAbstainDecisions">
+            <value>true</value>
+        </property>
+    </bean>
+
+    <bean id="getProfileAttributesAfterInvocationProviderManager" class="org.springframework.security.access.intercept.AfterInvocationProviderManager">
+        <property name="providers">
+            <list>
+                <ref bean="aclAttributeUserReadVoter"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="aclAttributeUserAdminVoter" class="com.jaspersoft.jasperserver.api.metadata.security.AttributeArgumentVoter">
+        <property name="configAttribute"  value="ACL_ATTRIBUTE_USER_ADMIN"/>
+        <property name="requiredPermissions">
+            <list>
+                <ref local="JasperServerPermission.ADMINISTRATION"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="aclAttributeUserReadVoter" class="com.jaspersoft.jasperserver.api.metadata.security.ContextSensitiveAttributeArgumentVoter">
+        <property name="configAttribute"  value="ACL_ATTRIBUTE_USER_READ"/>
+        <property name="requiredPermissionsMap">
+            <map>
+                <entry key="default">
+                    <list>
+                        <ref local="JasperServerPermission.ADMINISTRATION"/>
+                        <ref local="JasperServerPermission.READ"/>
+                    </list>
+                </entry>
+                <entry key="execute">
+                    <list>
+                        <ref local="JasperServerPermission.ADMINISTRATION"/>
+                        <ref local="JasperServerPermission.READ"/>
+                        <ref local="JasperServerPermission.EXECUTE"/>
+                    </list>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <util:list id="defaultAttributePermissions">
+        <bean class="com.jaspersoft.jasperserver.api.metadata.user.domain.client.ObjectPermissionImpl">
+            <property name="permissionMask" value="1"/>
+            <property name="permissionRecipient" ref="roleAdministratorBean"/>
+            <property name="URI" value="attr:/"/>
+        </bean>
+    </util:list>
+
+    <bean id="roleAdministratorBean" class="com.jaspersoft.jasperserver.api.metadata.user.domain.client.RoleImpl">
+        <property name="roleName" ref="roleAdministrator"/>
+    </bean>
+
+    <bean name="exceptionOutputManager" class="com.jaspersoft.jasperserver.api.common.error.handling.ExceptionOutputManagerImpl">
+        <property name="outputControlMap">
+            <map>
+                <entry key="ERROR_UID">
+                    <list>
+                        <value>ROLE_USER</value>
+                    </list>
+                </entry>
+                <entry key="STACKTRACE">
+                    <list>
+                        <value>ROLE_SUPERUSER</value>
+                    </list>
+                </entry>
+                <entry key="MESSAGE">
+                    <list>
+                        <value>ROLE_SUPERUSER</value>
+                    </list>
+                </entry>
+            </map>
+        </property>
+    </bean>
+</beans>

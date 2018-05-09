@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>Visualization Title</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+    <link type="text/css" href="../../../../demos/css/jasper-ui-dev.css" rel="stylesheet">
+    <link type="text/css" href="../../../../themes/default/jquery-ui/jquery-ui.css" rel="stylesheet">
+
+    <script type="text/javascript" src="../../requireSnippetsConfig.js"></script>
+    <script type="text/javascript" src="../../../bower_components/requirejs/require.js"></script>
+    <script type="text/javascript" src="../../../../config.js"></script>
+
+</head>
+<body>
+
+
+
+
+<div id="adhocContainer">
+
+
+</div>
+
+
+<script type="text/javascript">
+
+    require([
+        "jquery",
+        "backbone",
+        "components/visualization/Visualization_more_events",
+        "components/datatable/Datatable",
+        "components/datatable/DatatableCrosstab"
+    ], function($, Backbone,  Visualization, Datatable, DatatableCrosstab){
+
+        var     myTitle = "My Title",
+                $inAppContainer = $("#adhocContainer"),
+                datatable =  new Datatable(),
+                datatableCrosstab =  new DatatableCrosstab(),
+                isTitleAvailable  = true;
+
+
+        //TODO: provide with event to create sub-views
+
+        var MySampleView = Backbone.View.extend({
+
+            initialize: function (options) {
+
+                this.views = [];
+                this.views = [datatable, datatableCrosstab];
+
+                this.visualization = new Visualization({
+                    props: {
+                        title : options.title
+                    },
+                    //we need it only for particular case with chart
+                    evts: {
+                        "canvas:ready" : this._appendView.bind(this)
+                    }
+
+                });
+
+                this.render();
+
+                 //it doesn't work because too late for subscription
+                // this.listenTo(this.visualization, "canvas:ready", this._appendView.bind(this));
+                this.listenTo(this.visualization, "switcher:activated", this.switchCurrentView.bind(this));
+
+            },
+
+            render: function () {
+                this.$el.append(this.visualization.$el);
+                return this;
+            },
+
+            _appendView : function($canvas){
+                $canvas.append(this.views[0].$el);
+            },
+
+            switchCurrentView: function(){
+                this.views.reverse();
+                this.visualization.trigger("canvas:switch", this.views[0].$el);
+                //this.visualization.switchCanvasTo(this.views[0].$el);
+                return this;
+            }
+
+        });
+
+
+        var app = new MySampleView({
+            title: "Foooooo",
+            el: $inAppContainer[0]
+        });
+
+
+        setInterval(function(){
+
+            app.visualization.props.title = isTitleAvailable ?  false : myTitle;
+
+            app.switchCurrentView();
+
+            isTitleAvailable = !isTitleAvailable;
+
+        }, 30000);
+
+        window.app = app.visualization;
+
+
+    });
+
+</script>
+
+</body>
+</html>

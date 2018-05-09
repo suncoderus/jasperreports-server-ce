@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+  <class table="JIRole" name="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoRole" batch-size="1000">
+    <id type="long" column="id" name="id">
+      <generator class="native"/>
+    </id>
+    <natural-id mutable="true">
+      <property name="roleName" not-null="true" length="100" type="string" column="rolename"/>
+      <many-to-one name="tenant" column="tenantId" not-null="true"
+        class="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoTenant"/>
+    </natural-id>
+    <property name="externallyDefined" type="boolean" column="externallyDefined"/>
+    <set table="JIUserRole" inverse="false" name="users"  batch-size="1000"> 
+      <key column="roleId" />
+      <many-to-many column="userId" class="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoUser" outer-join="auto"/>
+    </set>
+  </class>
+
+<!-- create index JIRole_tenantId_index on JIRole (tenantId); -->
+<database-object>
+	<create>create index JIRole_tenantId_index on JIRole (tenantId)</create>
+	<drop>DROP INDEX JIRole_tenantId_index ON JIRole</drop>
+</database-object>
+
+<!-- create index JIUserRole_roleId_index on JIUserRole (roleId); -->
+<database-object>
+	<create>create index JIUserRole_roleId_index on JIUserRole (roleId)</create>
+	<drop>DROP INDEX JIUserRole_roleId_index ON JIUserRole</drop>
+</database-object>
+
+<!-- create index JIUserRole_userId_index on JIUserRole (userId); -->
+<database-object>
+	<create>create index JIUserRole_userId_index on JIUserRole (userId)</create>
+	<drop>DROP INDEX JIUserRole_userId_index ON JIUserRole</drop>
+</database-object>
+
+</hibernate-mapping>

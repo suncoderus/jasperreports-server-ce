@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+    <!-- resources beans for configuration settings persistence service -->
+	<bean id="propertiesManagementService" class="com.jaspersoft.jasperserver.api.common.properties.PropertiesManagementServiceImpl">
+        <!-- use unsecured profile attributes service to load -->
+        <property name="profileAttributeService" ref="profileAttributeServiceTarget"/>
+        <property name="resourceFactory" ref="mappingResourceFactory"/>
+	</bean>
+
+    <bean id="propertyChangersCe" class="java.util.HashMap">
+        <constructor-arg index="0" type="java.util.Map">
+            <map>
+                <entry key="log4j" value="log4jPropertyChanger"/>
+                <entry key="mondrian" value="mondrianPropertyChanger"/>
+                <entry key="aws" value="awsPropertyChanger"/>
+                <entry key="jdbc" value="jdbcDriverServicePropertyChanger"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+	<!-- log4j changers manages settings read and apply from and to log4j subsystem -->
+	<bean id="log4jPropertyChanger"
+			class="com.jaspersoft.jasperserver.api.common.properties.Log4jPropertyChanger">
+        <property name="log4jSettingsService" ref="log4jSettingsService"/>
+    </bean>
+
+    <bean id="log4jSettingsService" class="com.jaspersoft.jasperserver.api.common.properties.Log4jSettingsService">
+        <property name="loggerDescriptionFiles" ref="${loggerDescriptionFiles}"/>
+        <property name="messageSource" ref="messageSource"/>
+    </bean>
+
+    <bean id="loggerDescriptionFilesCe" class="java.util.ArrayList">
+        <constructor-arg index="0" type="java.util.Collection">
+            <list>
+                <value>WEB-INF/bundles/logger_descriptions</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <!-- mondrian changer manages settings read and apply from and to mondrian subsystem -->
+	<bean id="mondrianPropertyChanger" class="com.jaspersoft.jasperserver.api.metadata.common.util.MondrianPropertyChanger">
+	</bean>
+
+    <!-- AWS changer manages settings read and apply to AwsDataSourceRecovery -->
+    <bean id="awsPropertyChanger" class="com.jaspersoft.jasperserver.api.engine.jasperreports.util.AwsPropertyChanger" >
+        <property name="awsProperties" ref="awsProperties" />
+    </bean>
+
+    <bean id="jdbcDriverServicePropertyChanger" class="com.jaspersoft.jasperserver.api.common.util.JdbcDriverServicePropertyChanger">
+        <property name="jdbcDriverService" ref="jdbcDriverService"/>
+    </bean>
+
+    <bean id="globalPropertiesListUpgradeListener" class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.GlobalPropertiesListUpgradeListener">
+        <property name="globalPropertiesListUpgradeExecutor" ref="globalPropertiesListUpgradeExecutor"/>
+    </bean>
+
+    <bean id="serverSettings" class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.ServerSettingsInitialization">
+        <property name="profileAttributeService" ref="profileAttributeServiceTarget"/>
+    </bean>
+
+    <bean id="globalPropertiesListUpgradeExecutor" class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.GlobalPropertiesListUpgradeExecutor">
+        <property name="repositoryService" ref="${bean.unsecureRepositoryService}"/>
+        <property name="profileAttributeService" ref="profileAttributeServiceTarget"/>
+        <property name="resourceFactory" ref="mappingResourceFactory"/>
+        <property name="objectPermissionService" ref="objectPermissionServiceTarget"/>
+        <property name="defaultAttributesRootPermission" ref="defaultAttributePermissions"/>
+        <property name="userAuthorityPersistenceService" ref="${bean.internalUserAuthorityService}"/>
+    </bean>
+</beans>

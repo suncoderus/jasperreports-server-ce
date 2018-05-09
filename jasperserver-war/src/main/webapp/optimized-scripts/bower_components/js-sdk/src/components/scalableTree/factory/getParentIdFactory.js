@@ -1,0 +1,1 @@
+define(["require","underscore","../util/pathUtil"],function(e){function r(e,r){var t=a.split(r,e.escapeCharacter,e.separator,!1).slice(1),n=t.length;return t.splice(n-1,1),t.length?"/"+t.join("/"):"/"}var t=e("underscore"),a=e("../util/pathUtil");return{create:function(e,a){return t.partial(r,{escapeCharacter:e,separator:a})}}});

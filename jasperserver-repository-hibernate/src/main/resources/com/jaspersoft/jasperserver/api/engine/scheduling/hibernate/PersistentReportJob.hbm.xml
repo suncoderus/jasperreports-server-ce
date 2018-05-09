@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class table="JIReportJob" name="com.jaspersoft.jasperserver.api.engine.scheduling.hibernate.PersistentReportJob">
+		<id name="id" type="long">
+			<generator class="native"/>
+		</id>
+		<version column="version" unsaved-value="negative" name="version"/>
+		<many-to-one column="owner" name="owner" 
+			class="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoUser" 
+			not-null="true"/>
+		<property name="label" column="label" type="string" length="100" not-null="true"/>
+		<property name="description" column="description" type="string" length="2000"/>
+        <property name="creationDate" column="creation_date" type="timestamp"/>
+		<component name="source" class="com.jaspersoft.jasperserver.api.engine.scheduling.hibernate.PersistentReportJobSource">
+			<property name="reportUnitURI" column="report_unit_uri" not-null="true" type="string" length="250"/>
+			<map name="parametersMap" table="JIReportJobParameter" fetch="subselect">
+				<key column="job_id"/>
+				<map-key column="parameter_name" type="string" length="255"/>
+				<element column="parameter_value" type="serializable" length="20971520"/>
+			</map>
+		</component>
+        <!-- reference to report (or other resource) replaces URI in source component -->
+        <many-to-one column="scheduledResource" name="scheduledResource" class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoResourceLight" fetch="join" not-null="true"/>
+		<many-to-one column="job_trigger" name="trigger" class="com.jaspersoft.jasperserver.api.engine.scheduling.hibernate.PersistentReportJobTrigger" not-null="true" cascade="all"/>
+		<property name="baseOutputFilename" column="base_output_name" type="string" length="100" not-null="true"/>
+		<set name="outputFormats" table="JIReportJobOutputFormat" fetch="subselect">
+			<key column="report_job_id"/>
+			<element type="byte" column="output_format" not-null="true"/>
+		</set>
+		<property name="outputLocale" column="output_locale" type="string" length="20"/>
+		<many-to-one column="content_destination" name="contentRepositoryDestination" class="com.jaspersoft.jasperserver.api.engine.scheduling.hibernate.PersistentReportJobRepositoryDestination"/>
+		<many-to-one column="mail_notification" name="mailNotification" class="com.jaspersoft.jasperserver.api.engine.scheduling.hibernate.PersistentReportJobMailNotification"/>
+        <many-to-one column="alert" name="alert" class="com.jaspersoft.jasperserver.api.engine.scheduling.hibernate.PersistentReportJobAlert"/>
+	</class>
+
+<!-- create index JIReportJob_alert_index on JIReportJob (alert); -->
+<database-object>
+	<create>create index JIReportJob_alert_index on JIReportJob (alert)</create>
+	<drop>DROP INDEX JIReportJob_alert_index ON JIReportJob</drop>
+</database-object>
+
+<!-- create index JIReportJob_content_destination_index on JIReportJob (content_destination); -->
+<!-- replacing JIReportJob_content_destination_index with idx25_content_destination_idx -->
+<database-object>
+	<create>create index idx25_content_destination_idx on JIReportJob (content_destination)</create>
+	<drop>DROP INDEX idx25_content_destination_idx ON JIReportJob</drop>
+</database-object>
+
+<!-- create index JIReportJob_job_trigger_index on JIReportJob (job_trigger); -->
+<database-object>
+	<create>create index JIReportJob_job_trigger_index on JIReportJob (job_trigger)</create>
+	<drop>DROP INDEX JIReportJob_job_trigger_index ON JIReportJob</drop>
+</database-object>
+
+<!-- create index JIReportJob_mail_notification_index on JIReportJob (mail_notification); -->
+<!-- replacing JIReportJob_mail_notification_index with idx26_mail_notification_idx -->
+<database-object>
+	<create>create index idx26_mail_notification_idx on JIReportJob (mail_notification)</create>
+	<drop>DROP INDEX idx26_mail_notification_idx ON JIReportJob</drop>
+</database-object>
+
+<!-- create index JIReportJob_owner_index on JIReportJob (owner); -->
+<database-object>
+	<create>create index JIReportJob_owner_index on JIReportJob (owner)</create>
+	<drop>DROP INDEX JIReportJob_owner_index ON JIReportJob</drop>
+</database-object>
+
+</hibernate-mapping>

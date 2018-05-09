@@ -1,0 +1,139 @@
+<div name="filePropertiesContainer" class="section">
+	
+	<h4 class="title">{{- i18n['resource.datasource.text.fileProperties.title']}}</h4>
+
+    <div class="inlineControls">
+        <div class="group first inputRow">
+            <div class="group">
+                <label class="control select">
+                    <span class="wrap">{{- i18n['resource.datasource.text.fileProperties.fieldDelimiter']}}:</span>
+
+                    <select name="fieldDelimiter">
+                        {{ _.each(fieldDelimiterOptions, function(delimeter) {
+                        var value = delimeter.value, label = delimeter.label;
+                        }}
+                        <option value="{{- value }}" {{- (value == modelAttributes.fieldDelimiter) ? "selected='selected'" : "" }} > {{- i18n[label] }}</option>
+                        {{ }); }}
+                    </select>
+
+                    <span class="message warning"></span>
+                </label>
+            </div>
+            <div name="fieldDelimiterRegexInput" class="">
+                <label class="control input password">
+                    <span class="wrap">{{- i18n['resource.datasource.text.fileProperties.regularExpression']}}:</span>
+                    <input type="text" name="fieldDelimiterRegex" value="{{- modelAttributes.fieldDelimiterRegex }}">
+                    <span class="message warning"></span>
+                </label>
+            </div>
+            <div name="fieldDelimiterPluginInput" class="">
+                <label title="Define a path in the repository" class="control browser">
+                    <span class="wrap">{{- i18n['resource.datasource.text.fileProperties.delimiter.plugin']}}:</span>
+                    <input type="text" name="fieldDelimiterPlugin" value="{{- modelAttributes.fieldDelimiterPlugin }}">
+                    <button type="button" name="browser_button"><span class="wrap">{{- i18n['SEARCH_BROWSE_REPOSITORY']}}<span class="icon"></span></span></button>
+                    <span class="message warning"></span>
+                </label>
+            </div>
+            <div name="fieldDelimiterOtherInput" class="group">
+                <label class="control input password">
+                    <span class="wrap">{{- i18n['resource.datasource.text.fileProperties.other']}}:</span>
+                    <input type="text" name="fieldDelimiterOther" value="{{- modelAttributes.fieldDelimiterOther }}">
+                    <span class="message warning"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="inlineControls">
+        <div class="group inputRow">
+            <div class="group">
+                <label class="control select">
+                    <span class="wrap">{{- i18n['resource.datasource.text.fileProperties.rowDelimiter']}}:</span>
+                    <select name="rowDelimiter">
+                        {{ _.each(rowDelimiterOptions, function(delimeter) {
+                        var value = delimeter.value, label = delimeter.label;
+                        }}
+                        <option value="{{- value }}" {{- (value == modelAttributes.rowDelimiter) ? "selected='selected'" : "" }} > {{- i18n[label] }}</option>
+                        {{ }); }}
+                    </select>
+                    <span class="message warning"></span>
+                </label>
+            </div>
+            <div name="rowDelimiterRegexInput" class="group">
+                <label class="control input password">
+                    <span class="wrap">{{- i18n['resource.datasource.text.fileProperties.regularExpression']}}:</span>
+                    <input type="text" name="rowDelimiterRegex" value="{{- modelAttributes.rowDelimiterRegex }}">
+                    <span class="message warning"></span>
+                </label>
+            </div>
+            <div name="rowDelimiterPluginInput" class="group">
+                <label title="Define a path in the repository" class="control browser">
+                    <span class="wrap">{{- i18n['resource.datasource.text.fileProperties.delimiter.plugin']}}:</span>
+                    <input type="text" name="rowDelimiterPlugin" value="{{- modelAttributes.rowDelimiterPlugin }}">
+                    <button type="button" name="browser_button"><span class="wrap">{{- i18n['SEARCH_BROWSE_REPOSITORY']}}<span class="icon"></span></span></button>
+                    <span class="message warning"></span>
+                </label>
+            </div>
+            <div name="rowDelimiterOtherInput" class="group">
+                <label class="control input password">
+                    <span class="wrap">{{- i18n['resource.datasource.text.fileProperties.other']}}:</span>
+                    <input type="text" name="rowDelimiterOther" value="{{- modelAttributes.rowDelimiterOther }}">
+                    <span class="message warning"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+	<div class="group">
+		<label class="control select">
+			<span class="wrap">{{- i18n['resource.datasource.text.fileProperties.encoding']}}:</span>
+			<select name="encodingType">
+				{{ _.each(encodingOptions, function(encoding) {
+                var value = encoding.value, label = encoding.label;
+				}}
+				<option value="{{- value }}" {{- (value == modelAttributes.encodingType) ? "selected='selected'" : "" }} > {{- i18n[label] }}</option>
+				{{ }); }}
+			</select>
+			<span class="message warning"></span>
+		</label>
+	</div>
+
+
+
+	<div name="datePatternInput" class="group">
+		<label class="control input text">
+			<span class="wrap">{{- i18n['resource.datasource.text.fileProperties.datePattern']}}:</span>
+			<input type="text" name="datePattern" value="{{- modelAttributes.datePattern }}">
+			<div class="warning message"></div>
+		</label>
+	</div>
+	<div name="numberPatternInput" class="group">
+		<label class="control input text">
+			<span class="wrap">{{- i18n['resource.datasource.text.fileProperties.numberPattern']}}:</span>
+			<input type="text" name="numberPattern" value="{{- modelAttributes.numberPattern }}">
+			<div class="warning message"></div>
+		</label>
+	</div>
+	<div class="group">
+		<div class="control checkBox toggle">
+			<label for="__jrs_firstRowFieldNames" class="wrap">{{- i18n['resource.datasource.text.fileProperties.firstRow']}}</label>
+			<input type="checkbox" id="__jrs_firstRowFieldNames" name="useFirstRowAsHeader" {{- modelAttributes.useFirstRowAsHeader ? "checked='checked'" : "" }}>
+		</div>
+	</div>
+	<div class="group hidden">
+		<fieldset>
+			<span class="button action up" name="previewDataSource">
+			<span class="wrap">{{- i18n['resource.datasource.text.fileProperties.previewSource']}}</span></span>
+		</fieldset>
+	</div>
+
+</div>
+
+<div name="previewDataSourceContainer" class="section hidden">
+
+    <h4 class="title">{{- i18n['resource.datasource.text.dataPreview']}}</h4>
+
+    <div class="group">
+        <div name="previewDataSourceHolder"></div>
+    </div>
+</div>

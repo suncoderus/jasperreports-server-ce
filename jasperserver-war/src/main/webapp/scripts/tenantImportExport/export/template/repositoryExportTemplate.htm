@@ -1,0 +1,23 @@
+<div class="section resources">
+    <p>{{- i18n["export.dialog.options"] }}</p>
+    <div class="group">
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.report.jobs"] }}</label>
+            <input class="includeScheduledReportJobs" name="includeScheduledReportJobs" type="checkbox" data-bind="checked:includeScheduledReportJobs">
+        </div>
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.include.permissions"] }}</label>
+            <input class="includeRepositoryPermissions" name="includeRepositoryPermissions" type="checkbox" data-bind="checked:includeRepositoryPermissions">
+        </div>
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.include.dependencies"] }} </label>
+            <input class="includeDependencies" name="includeDependencies" type="checkbox" data-bind="checked:includeDependencies">
+        </div>
+        {{ if (isSubOrgLevel) { }}
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.include.full.repo.path"] }}</label>
+            <input class="includeFullResourcePath" name="includeFullResourcePath" type="checkbox" data-bind="checked:includeFullResourcePath">
+        </div>
+        {{ } }}
+    </div>
+</div>

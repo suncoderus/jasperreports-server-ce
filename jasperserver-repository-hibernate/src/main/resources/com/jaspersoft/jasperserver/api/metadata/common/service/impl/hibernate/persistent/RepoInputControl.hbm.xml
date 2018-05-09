@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<joined-subclass 
+			name="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoInputControl"
+			extends="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoResource"
+			table="JIInputControl">
+		<key column="id"/>                                                                       
+		<property name="type"/>
+		<property name="mandatory"/>
+		<property name="readOnly"/>
+		<property name="visible"/>
+		<many-to-one column="data_type" name="dataType"/>
+		<many-to-one column="list_of_values" name="listOfValues"/>
+		<many-to-one column="list_query" name="query"/>
+		<list table="JIInputControlQueryColumn" name="queryVisibleColumns">
+			<key column="input_control_id"/>
+			<list-index column="column_index"/>
+			<element type="string" column="query_column" not-null="true" length="200"/>
+		</list>
+		<property name="queryValueColumn" length="200" type="string" column="query_value_column"/>
+		<property name="defaultValue" type="serializable"/>
+	</joined-subclass>
+
+<!-- create index JIInputControl_data_type_index on JIInputControl (data_type); -->
+<database-object>
+	<create>create index JIInputControl_data_type_index on JIInputControl (data_type)</create>
+	<drop>DROP INDEX JIInputControl_data_type_index ON JIInputControl</drop>
+</database-object>
+
+<!-- create index JIInputControl_list_of_values_index on JIInputControl (list_of_values); -->
+<!-- replacing JIInputControl_list_of_values_index with JIInputCtrl_list_of_values_idx -->
+<database-object>
+	<create>create index JIInputCtrl_list_of_values_idx on JIInputControl (list_of_values)</create>
+	<drop>DROP INDEX JIInputCtrl_list_of_values_idx ON JIInputControl</drop>
+</database-object>
+
+<!-- create index JIInputControl_list_query_index on JIInputControl (list_query); -->
+<!-- replacing JIInputControl_list_query_index with JIInputControl_list_query_idx -->
+<database-object>
+	<create>create index JIInputControl_list_query_idx on JIInputControl (list_query)</create>
+	<drop>DROP INDEX JIInputControl_list_query_idx ON JIInputControl</drop>
+</database-object>
+
+<!-- create index JIInputControlQueryColumn_input_control_id_index on JIInputControlQueryColumn (input_control_id); -->
+<!-- replacing JIInputControlQueryColumn_input_control_id_index with idx15_input_ctrl_id_idx -->
+<database-object>
+	<create>create index idx15_input_ctrl_id_idx on JIInputControlQueryColumn (input_control_id)</create>
+	<drop>DROP INDEX idx15_input_ctrl_id_idx ON JIInputControlQueryColumn</drop>
+</database-object>
+
+</hibernate-mapping>

@@ -1,0 +1,5 @@
+<div class="jr-mTooltip jr-mTooltip{{ print(_.str.capitalize(placement)) }} jr {{ if (!visible) print('jr-isInvisible'); }}"
+     aria-hidden="true" role="tooltip" style="position:absolute;">
+    <p class="jr-mTooltip-label jr jr-jTooltipLabel">{{- content.label ? content.label : "" }}</p>
+    <p class="jr-mTooltip-text jr jr-jTooltipText">{{- content.text ? content.text : "" }}</p>
+</div>

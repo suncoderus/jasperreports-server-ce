@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:util="http://www.springframework.org/schema/util"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+    <import resource="../base-fixtures-config.xml"/>
+
+    <bean id="verifyNullSubstitutionWhenNoInputParamsAndDefaultIsNull" class="java.util.HashMap" parent="baseTestCaseMap">
+        <constructor-arg index="0">
+            <map merge="true">
+                <entry key-ref="CONTROLS" value-ref="inputControls"/>
+                <entry key-ref="RAW_PARAMS_ARRAY"><null/></entry>
+                <entry key-ref="EXPECTED_RESULT"><null/></entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="inputControls" class="java.util.HashMap">
+        <constructor-arg index="0">
+            <map>
+                <entry key="String"> <!-- Control name -->
+                    <bean parent="stringControlDefinition"/>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="stringControlDefinition" class="java.util.HashMap">
+        <constructor-arg index="0">
+            <map>
+                <entry key-ref="INPUT_CONTROL">
+                    <bean parent="stringInputControl"/>
+                </entry>
+                <entry key-ref="CONTROL_INFO">
+                    <bean parent="stringControlInfo"/>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="stringInputControl" class="com.jaspersoft.jasperserver.war.cascade.utils.InputControlMock">
+        <property name="inputControlType" ref="TYPE_SINGLE_VALUE"/>
+        <property name="name" value="String"/>
+        <property name="label" value="String"/>
+    </bean>
+
+    <bean id="stringControlInfo" parent="stringCollectionInputControlInfo">
+        <property name="valueType" value="java.lang.String"/>
+        <property name="parameterName" value="String"/>
+        <property name="promptLabel" value="String"/>
+        <property name="defaultValue"><null/></property>
+    </bean>
+
+    <bean id="stringCollectionInputControlInfo" class="com.jaspersoft.jasperserver.war.cascade.utils.ReportInputControlInformationMock">
+        <property name="valueType" value="java.util.Collection"/>
+        <property name="nestedType" value="java.lang.Integer"/>
+    </bean>
+
+</beans>

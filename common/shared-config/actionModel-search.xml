@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<actions>
+
+    <context name="folder_mutton">
+        <simpleAction labelKey="SEARCH_CREATE_FOLDER" action="invokeFolderAction" actionArgs="CreateFolder"
+                      clientTest="canCreateFolder" className="up"/>
+
+        <condition test="checkAuthenticationRoles" testArgs="ROLE_USER,ROLE_ADMINISTRATOR">
+            <condition test="isSupportedDevice">
+                <selectAction labelKey="SEARCH_CREATE_RESOURCE"
+                              clientTest="canResourceBeCreated" className="flyout">
+                    <condition test="checkAuthenticationRoles" testArgs="ROLE_ADMINISTRATOR">
+                        <option labelKey="RM_NEW_RESOURCE_DATA_SOURCE" action="invokeCreate" actionArgs="ReportDataSource"
+                                clientTest="canResourceBeCreated" clientTestArgs="ReportDataSource" className="up"/>
+                    </condition>
+                    <option labelKey="RM_NEW_RESOURCE_DATATYPE" action="invokeCreate" actionArgs="DataType"
+                            clientTest="canResourceBeCreated" clientTestArgs="DataType" className="up"/>
+
+                    <condition test="isProVersion">
+                        <condition test="checkAuthenticationRoles" testArgs="ROLE_ADMINISTRATOR">
+                            <condition test="isSupportedDevice">
+                                <option labelKey="RM_NEW_DOMAIN" action="invokeCreate"
+                                        actionArgs="SemanticLayerDataSource"
+                                        clientTest="canResourceBeCreated" clientTestArgs="SemanticLayerDataSource"
+                                        className="up"/>
+                            </condition>
+                        </condition>
+                    </condition>
+
+                    <selectAction labelKey="RM_NEW_RESOURCE_FILE" className="flyout"
+                                  clientTest="canResourceBeCreated" clientTestArgs="FileResource">
+                        <condition test="isProVersion">
+                            <option labelKey="resourceTypes.access.grant.schema" action="invokeCreate"
+                                    actionArgs="FileResource@@accessGrantSchema"
+                                    className="up"/>
+                        </condition>
+                        <option labelKey="RM_NEW_RESOURCE_CONTENT_RESOURCE" action="invokeCreate"
+                                actionArgs="FileResource@@contentResource"
+                                clientTest="canResourceBeCreated" clientTestArgs="ReportUnit" className="up"/>
+                        <option labelKey="resourceTypes.font" action="invokeCreate" actionArgs="FileResource@@font"
+                                className="up"/>
+                        <option labelKey="resourceTypes.image" action="invokeCreate" actionArgs="FileResource@@img"
+                                className="up"/>
+                        <option labelKey="resourceTypes.css.file" action="invokeCreate" actionArgs="FileResource@@css"
+                                className="up"/>
+                        <option labelKey="resourceTypes.jar" action="invokeCreate" actionArgs="FileResource@@jar"
+                                className="up"/>
+                        <option labelKey="resourceTypes.jrxml" action="invokeCreate" actionArgs="FileResource@@jrxml"
+                                className="up"/>
+                        <option labelKey="resourceTypes.olap.schema" action="invokeCreate"
+                                actionArgs="FileResource@@olapMondrianSchema"
+                                className="up"/>
+                        <option labelKey="resourceTypes.resource.bundle" action="invokeCreate"
+                                actionArgs="FileResource@@prop"
+                                className="up"/>
+                        <option labelKey="resourceTypes.style.template" action="invokeCreate"
+                                actionArgs="FileResource@@jrtx"
+                                className="up"/>
+                        <option labelKey="resourceTypes.xml.file" action="invokeCreate" actionArgs="FileResource@@xml"
+                                className="up"/>
+                        <option labelKey="resourceTypes.mongodb.jdbc.config" action="invokeCreate" actionArgs="FileResource@@config"
+                                className="up"/>
+                        <option labelKey="resourceTypes.azure.certificate.file" action="invokeCreate" actionArgs="FileResource@@cer"
+                                className="up"/>
+                        <option labelKey="resourceTypes.secure.file" action="invokeCreate" actionArgs="FileResource@@secureFile"
+                                className="up"/>
+                    </selectAction>
+
+                    <option labelKey="RM_NEW_RESOURCE_INPUT_CONTROL" action="invokeCreate" actionArgs="InputControl"
+                            clientTest="canResourceBeCreated" clientTestArgs="InputControl" className="up"/>
+
+                    <option labelKey="RM_NEW_RESOURCE_JS_REPORT" action="invokeCreate" actionArgs="ReportUnit"
+                            clientTest="canResourceBeCreated" clientTestArgs="ReportUnit" className="up"/>
+
+                    <option labelKey="RM_NEW_RESOURCE_CONTENT_RESOURCE" action="invokeCreate" actionArgs="FileResource@@contentResource"
+                            clientTest="canResourceBeCreated" clientTestArgs="ReportUnit" className="up"/>
+                    <option labelKey="RM_NEW_RESOURCE_LIST_OF_VALUES" action="invokeCreate" actionArgs="ListOfValues"
+                            clientTest="canResourceBeCreated" clientTestArgs="ListOfValues" className="up"/>
+
+                    <option labelKey="RM_NEW_RESOURCE_MONDRIAN_XMLA_SOURCE" action="invokeCreate"
+                            actionArgs="XMLAConnection"
+                            clientTest="canResourceBeCreated" clientTestArgs="XMLAConnection" className="up"/>
+
+                    <option labelKey="RM_NEW_RESOURCE_OLAP_CLIENT_CONNECTION" action="invokeCreate"
+                            actionArgs="OlapClientConnection"
+                            clientTest="canResourceBeCreated" clientTestArgs="OlapClientConnection" className="up"/>
+
+                    <option labelKey="RM_NEW_RESOURCE_ANALYSIS_VIEW" action="invokeCreate" actionArgs="OlapUnit"
+                            clientTest="canResourceBeCreated" clientTestArgs="OlapUnit" className="up"/>
+
+                    <option labelKey="RM_NEW_RESOURCE_QUERY" action="invokeCreate" actionArgs="Query"
+                            clientTest="canResourceBeCreated" clientTestArgs="Query" className="up"/>
+                </selectAction>
+            </condition>
+            <separator className="separator"/>
+        </condition>
+
+        <separator/>
+
+        <condition test="checkMode" testArgs="browse">
+            <simpleAction labelKey="RM_BUTTON_COPY_RESOURCE" action="invokeFolderAction" actionArgs="CopyFolder"
+                          clientTest="canFolderBeCopied" className="up"/>
+            <simpleAction labelKey="RM_BUTTON_MOVE_RESOURCE" action="invokeFolderAction" actionArgs="MoveFolder"
+                          clientTest="canFolderBeMoved" className="up"/>
+            <simpleAction labelKey="RM_BUTTON_PASTE" action="invokeFolderAction" actionArgs="PasteFolder"
+                          clientTest="canFolderBeCopiedOrMovedToFolder" className="up"/>
+            <simpleAction labelKey="RM_BUTTON_PASTE" action="invokeFolderAction" actionArgs="PasteResources"
+                          clientTest="canAllBeCopiedOrMovedToFolder" className="up"/>
+        </condition>
+
+        <simpleAction labelKey="RM_BUTTON_DELETE_RESOURCE" action="invokeFolderAction" actionArgs="DeleteFolder"
+                      clientTest="canFolderBeDeleted" className="up"/>
+
+        <separator/>
+
+        <condition test="checkAuthenticationRoles" testArgs="ROLE_ADMINISTRATOR">
+            <simpleAction labelKey="RM_MAKE_THEME_ACTIVE" action="invokeFolderAction" actionArgs="SetActiveThemeFolder"
+                          clientTest="isNonActiveThemeFolder" className="up"/>
+            <condition test="isSupportedDevice">
+                <simpleAction labelKey="RM_DOWNLOAD_THEME" action="invokeFolderAction" actionArgs="DownloadTheme"
+                              clientTest="isThemeFolder" className="up"/>
+            </condition>
+            <separator/>
+        </condition>
+
+        <condition test="checkAuthenticationRoles" testArgs="ROLE_ADMINISTRATOR">
+            <simpleAction labelKey="RM_UPLOAD_THEME" action="invokeFolderAction" actionArgs="UploadTheme"
+                          clientTest="isThemeRootFolder" className="up"/>
+            <separator/>
+        </condition>
+
+        <condition test="checkAuthenticationRoles" testArgs="ROLE_ADMINISTRATOR">
+            <simpleAction labelKey="RM_REUPLOAD_THEME" action="invokeFolderAction" actionArgs="ReuploadTheme"
+                          clientTest="canThemeBeReuploaded" className="up"/>
+            <separator/>
+        </condition>
+
+        <simpleAction labelKey="RM_FOLDER_POPUP_ASSIGN_PERMISSIONS" action="invokeFolderAction" actionArgs="AssignPermissions"
+                      clientTest="canFolderPermissionsBeAssigned" className="up"/>
+        <simpleAction labelKey="RM_BUTTON_PROPERTIES" action="invokeFolderAction" actionArgs="ShowFolderProperties"
+                      clientTest="canFolderPropertiesBeShowed" className="up"/>
+        <simpleAction labelKey="RM_BUTTON_PROPERTIES" action="invokeFolderAction" actionArgs="EditFolderProperties"
+                      clientTest="canFolderPropertiesBeEdited" className="up"/>
+
+        <separator/>
+
+        <condition test="isProVersion">
+            <condition test="checkAuthenticationRoles" testArgs="ROLE_SUPERUSER,ROLE_ADMINISTRATOR">
+                <simpleAction labelKey="RM_BUTTON_EXPORT" action="invokeFolderAction" actionArgs="Export" className="up" clientTest="canFolderBeExported"/>
+            </condition>
+        </condition>
+
+        <condition test="!isProVersion">
+            <condition test="checkAuthenticationRoles" testArgs="ROLE_ADMINISTRATOR">
+                <simpleAction labelKey="RM_BUTTON_EXPORT" action="invokeFolderAction" actionArgs="Export" className="up" clientTest="canFolderBeExported"/>
+            </condition>
+        </condition>
+    </context>
+
+    <context name="resource_menu">
+        <condition test="checkMode" testArgs="browse,search,library">
+            <simpleAction labelKey="RM_BUTTON_RUN" action="invokeRedirectAction" actionArgs="RunResourceAction"
+                          clientTest="canBeRun" className="up"/>
+        </condition>
+
+
+        <condition test="checkMode" testArgs="browse,search,library">
+            <simpleAction labelKey="RM_BUTTON_RUN_IN_NEW_TAB" action="invokeRedirectAction" actionArgs="RunResourceInNewTabAction"
+                          clientTest="canBeRun" className="up"/>
+        </condition>
+
+        <condition test="checkMode" testArgs="browse,search">
+            <simpleAction labelKey="RM_BUTTON_CONVERT" action="invokeResourceAction" actionArgs="ConvertResourceAction"
+                          clientTest="canBeConverted" className="up"/>
+        </condition>
+
+        <condition test="checkModeAndDevice" testArgs="browse,search">
+            <simpleAction labelKey="RM_BUTTON_RUN_IN_BACKGROUND" action="invokeRedirectAction" actionArgs="RunInBackgroundResourceAction"
+                          clientTest="canBeRunInBackground" className="up"/>
+        </condition>
+
+        <condition test="checkModeAndDevice" testArgs="browse,search,library">
+            <simpleAction labelKey="RM_BUTTON_SCHEDULE_REPORT" action="invokeRedirectAction" actionArgs="ScheduleAction"
+                          clientTest="canBeScheduled" className="up"/>
+        </condition>
+
+        <condition test="checkModeAndDevice" testArgs="browse,search">
+            <simpleAction labelKey="RM_BUTTON_WIZARD" action="invokeRedirectAction" actionArgs="EditResourceAction"
+                          clientTest="canResourceBeEdited" className="up"/>
+        </condition>
+        <condition test="checkMode" testArgs="browse,search,library">
+            <simpleAction labelKey="RM_BUTTON_DESIGN" action="invokeRedirectAction" actionArgs="OpenResourceAction"
+                          clientTest="canBeOpenedInDesigner" className="up"/>
+        </condition>
+        <condition test="checkMode" testArgs="browse,search,library">
+            <simpleAction labelKey="RM_BUTTON_OPEN" action="invokeRedirectAction" actionArgs="OpenResourceAction"
+                          clientTest="canBeOpened" className="up"/>
+        </condition>
+
+        <condition test="checkMode" testArgs="browse,search,library">
+            <simpleAction labelKey="RM_BUTTON_GENERATE" action="invokeResourceAction" actionArgs="GenerateResourceAction"
+                          clientTest="canBeGenerated" className="up"/>
+        </condition>
+
+        <separator/>
+
+        <condition test="checkMode" testArgs="browse">
+            <simpleAction labelKey="RM_BUTTON_COPY_RESOURCE" action="invokeResourceAction" actionArgs="Copy"
+                          clientTest="canResourceBeCopied" className="up"/>
+            <simpleAction labelKey="RM_BUTTON_MOVE_RESOURCE" action="invokeResourceAction" actionArgs="Move"
+                          clientTest="canResourceBeMoved" className="up"/>
+        </condition>
+
+        <condition test="checkMode" testArgs="browse,search">
+            <simpleAction labelKey="RM_BUTTON_DELETE_RESOURCE" action="invokeResourceAction" actionArgs="Delete"
+                          clientTest="canResourceBeDeleted" className="up"/>
+        </condition>
+
+        <separator/>
+
+        <condition test="checkMode" testArgs="browse,search">
+            <simpleAction labelKey="RM_FOLDER_POPUP_ASSIGN_PERMISSIONS" action="invokeResourceAction" actionArgs="AssignPermissionsToResourceAction"
+                          clientTest="canResourcePermissionsBeAssigned" className="up"/>
+            <simpleAction labelKey="RM_BUTTON_PROPERTIES" action="invokeResourceAction" actionArgs="ShowProperties"
+                          clientTest="canResourcePropertiesBeShowed" className="up"/>
+            <simpleAction labelKey="RM_BUTTON_PROPERTIES" action="invokeResourceAction" actionArgs="EditProperties"
+                          clientTest="canResourcePropertiesBeEdited" className="up"/>
+        </condition>
+
+        <separator/>
+
+        <condition test="isProVersion">
+            <condition test="checkAuthenticationRoles" testArgs="ROLE_SUPERUSER,ROLE_ADMINISTRATOR">
+                <simpleAction labelKey="RM_BUTTON_EXPORT" action="invokeResourceAction" actionArgs="Export" className="up"/>
+            </condition>
+        </condition>
+
+        <condition test="!isProVersion">
+            <condition test="checkAuthenticationRoles" testArgs="ROLE_ADMINISTRATOR">
+                <simpleAction labelKey="RM_BUTTON_EXPORT" action="invokeResourceAction" actionArgs="Export" className="up"/>
+            </condition>
+        </condition>
+    </context>
+
+    <context name="resource_bulk_menu">
+        <condition test="checkMode" testArgs="browse,search,library">
+            <simpleAction labelKey="RM_BUTTON_RUN" action="invokeBulkAction" actionArgs="Run"
+                          clientTest="canAllBeRun" className="up"/>
+        </condition>
+        <condition test="checkMode" testArgs="browse,search">
+            <simpleAction labelKey="RM_BUTTON_WIZARD" action="invokeBulkAction" actionArgs="Edit"
+                          clientTest="canAllBeEdited" className="up"/>
+            <simpleAction labelKey="RM_BUTTON_OPEN" action="invokeBulkAction" actionArgs="Open"
+                          clientTest="canAllBeOpened" className="up"/>
+        </condition>
+
+        <separator/>
+
+        <condition test="checkMode" testArgs="browse">
+            <simpleAction labelKey="RM_BUTTON_COPY_RESOURCE" action="invokeBulkAction" actionArgs="Copy"
+                          clientTest="canAllBeCopied" className="up"/>
+            <simpleAction labelKey="RM_BUTTON_MOVE_RESOURCE" action="invokeBulkAction" actionArgs="Move"
+                          clientTest="canAllBeMoved" className="up"/>
+
+            <!--<simpleAction labelKey="RM_BUTTON_CANCEL" action="invokeAction" actionArgs="CancelAction"-->
+                          <!--clientTest="isCopyOrMove" className="up"/>-->
+        </condition>
+
+        <condition test="checkMode" testArgs="browse,search">
+            <simpleAction labelKey="RM_BUTTON_DELETE_RESOURCE" action="invokeBulkAction" actionArgs="Delete"
+                          clientTest="canAllBeDeleted" className="up"/>
+        </condition>
+
+        <separator/>
+
+        <condition test="checkMode" testArgs="browse,search">
+            <simpleAction labelKey="RM_BUTTON_PROPERTIES" action="invokeBulkAction" actionArgs="ShowProperties"
+                          clientTest="canAllPropertiesBeShowed" className="up"/>
+            <simpleAction labelKey="RM_BUTTON_PROPERTIES" action="invokeBulkAction" actionArgs="EditProperties"
+                          clientTest="canAllPropertiesBeEdited" className="up"/>
+        </condition>
+
+        <separator/>
+
+        <condition test="isProVersion">
+            <condition test="checkAuthenticationRoles" testArgs="ROLE_SUPERUSER,ROLE_ADMINISTRATOR">
+                <simpleAction labelKey="RM_BUTTON_EXPORT" action="invokeBulkAction" actionArgs="Export" className="up"/>
+            </condition>
+        </condition>
+
+        <condition test="!isProVersion">
+            <condition test="checkAuthenticationRoles" testArgs="ROLE_ADMINISTRATOR">
+                <simpleAction labelKey="RM_BUTTON_EXPORT" action="invokeBulkAction" actionArgs="Export" className="up"/>
+            </condition>
+        </condition>
+    </context>
+
+ </actions>

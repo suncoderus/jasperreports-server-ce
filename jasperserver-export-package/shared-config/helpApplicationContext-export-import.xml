@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+       xmlns:util="http://www.springframework.org/schema/util"
+       default-lazy-init="true">
+
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:js.spring.properties</value>
+                <value>classpath:relativedate.properties</value>
+            </list>
+        </property>
+
+    </bean>
+
+    <bean id="exportImportMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="useCodeAsDefaultMessage" value="true"/>
+        <property name="basenames" ref="${bean.exportImportBasenames}"/>
+    </bean>
+
+    <bean id="exportImportBasenamesCE" class="java.util.ArrayList">
+        <constructor-arg index="0" type="java.util.Collection">
+            <list>
+                <value>bundles.ji-export-messages</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="helpPrintBean" class="com.jaspersoft.jasperserver.export.CommandHelpImpl">
+        <property name="messageSource" ref="exportImportMessageSource"/>
+        <property name="startMessage" value="ji.export.help.header"/>
+        <property name="argDescriptionMessagePrefix" value="ji.export.arg.description."/>
+        <property name="argLinePrefix" value="  "/>
+        <property name="argLineSeparator" value="  "/>
+        <property name="resourceTypes" ref="${list.exportResourceTypes}"/>
+    </bean>
+
+    <bean id="importCommandMetadata" class="com.jaspersoft.jasperserver.export.CommandMetadataImpl">
+        <property name="argumentNames" ref="${list.importCommandMetadataArgNames}" />
+    </bean>
+
+    <bean id="importCommandMetadataArgNames" class="java.util.ArrayList">
+        <constructor-arg index="0" type="java.util.Collection">
+            <list>
+                <value>help</value>
+                <value>input-dir</value>
+                <value>input-zip</value>
+                <value>update</value>
+                <value>update-core-users</value>
+                <value>skip-user-update</value>
+                <value>include-access-events</value>
+                <value>include-server-settings</value>
+                <value>broken-dependencies</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="exportCommandMetadata" class="com.jaspersoft.jasperserver.export.CommandMetadataImpl">
+        <property name="argumentNames" ref="${list.exportCommandMetadataArgNames}" />
+    </bean>
+
+    <bean id="exportCommandMetadataArgNames" class="java.util.ArrayList">
+        <constructor-arg index="0" type="java.util.Collection">
+            <list>
+                <value>help</value>
+                <value>output-dir</value>
+                <value>output-zip</value>
+                <value>everything</value>
+                <value>roles</value>
+                <value>role-users</value>
+                <value>users-roles</value>
+                <value>users</value>
+                <value>uris</value>
+                <value>repository-permissions</value>
+                <value>report-jobs</value>
+                <value>calendars</value>
+                <value>include-access-events</value>
+                <value>include-server-settings</value>
+                <value>include-attributes</value>
+                <value>skip-attribute-values</value>
+                <value>resource-types</value>
+                <value>skip-dependent-resources</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="exportResourceTypes" class="java.util.HashSet">
+        <constructor-arg index="0" type="java.util.Collection">
+            <set>
+                <value>reportUnit</value>
+                <value>beanDataSource</value>
+                <value>customDataSource</value>
+                <value>jdbcDataSource</value>
+                <value>jndiJdbcDataSource</value>
+                <value>virtualDataSource</value>
+                <value>mondrianConnection</value>
+                <value>xmlaConnection</value>
+                <value>awsDataSource</value>
+                <value>file</value>
+                <value>folder</value>
+                <value>listOfValues</value>
+                <value>inputControl</value>
+                <value>query</value>
+                <value>mondrianXmlaDefinition</value>
+                <value>dataType</value>
+                <value>olapUnit</value>
+            </set>
+        </constructor-arg>
+    </bean>
+</beans>

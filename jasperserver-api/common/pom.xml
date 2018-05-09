@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.jaspersoft.jasperserver.api.common</groupId>
+    <artifactId>jasperserver-api-common</artifactId>
+    <packaging>jar</packaging>
+    <name>Jasper Server API - Common</name>
+    <url>http://www.jaspersoft.com</url>
+    <parent>
+        <groupId>com.jaspersoft.jasperserver</groupId>
+        <artifactId>jasperserver-api</artifactId>
+        <version>7.1.0</version>
+    </parent>
+  <dependencies>
+      <dependency>
+          <groupId>org.jboss.teiid</groupId>
+          <artifactId>teiid-engine</artifactId>
+          <exclusions>
+           <exclusion>
+             <groupId>org.jboss.as</groupId>
+             <artifactId>jboss-as-cli</artifactId>
+           </exclusion>
+           <exclusion>
+             <groupId>org.jboss.as</groupId>
+             <artifactId>jboss-as-parent</artifactId>
+           </exclusion>
+              <exclusion>
+                  <groupId>com.fasterxml.jackson.core</groupId>
+                  <artifactId>jackson-core</artifactId>
+              </exclusion>
+              <exclusion>
+                  <groupId>com.fasterxml.jackson.core</groupId>
+                  <artifactId>jackson-databind</artifactId>
+              </exclusion>
+              <exclusion>
+                  <groupId>com.fasterxml.jackson.core</groupId>
+                  <artifactId>jackson-annotations</artifactId>
+              </exclusion>
+              <exclusion>
+                  <groupId>com.io7m.xom</groupId>
+                  <artifactId>xom</artifactId>
+              </exclusion>
+         </exclusions>
+      </dependency>
+      <dependency>
+          <groupId>org.jboss.teiid</groupId>
+          <artifactId>teiid-runtime</artifactId>
+          <exclusions>
+              <exclusion>
+                  <groupId>org.rhq.helpers</groupId>
+                  <artifactId>rhq-pluginAnnotations</artifactId>
+              </exclusion>
+              <exclusion>
+                  <groupId>org.jboss.as</groupId>
+                  <artifactId>jboss-as-cli</artifactId>
+              </exclusion>
+              <exclusion>
+                  <groupId>org.jboss.as</groupId>
+                  <artifactId>jboss-as-parent</artifactId>
+              </exclusion>
+              <exclusion>
+                  <groupId>org.jboss.logging</groupId>
+                  <artifactId>jboss-logging</artifactId>
+              </exclusion>
+              <exclusion>
+                  <groupId>io.netty</groupId>
+                  <artifactId>netty</artifactId>
+              </exclusion>
+              <exclusion>
+                  <groupId>org.jboss.narayana.jta</groupId>
+                  <artifactId>narayana-jta</artifactId>
+              </exclusion>
+          </exclusions>
+      </dependency>
+        <dependency>
+            <groupId>org.jboss.teiid</groupId>
+            <artifactId>teiid-admin</artifactId>
+        </dependency>
+      <dependency>
+          <groupId>org.jboss.teiid</groupId>
+          <artifactId>teiid-api</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.jboss.teiid</groupId>
+          <artifactId>teiid-common-core</artifactId>
+      </dependency>
+      <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.12</version>
+    </dependency>
+    <dependency>
+      <groupId>org.unitils</groupId>
+      <artifactId>unitils</artifactId>
+      <version>2.4</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>${spring.security.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.jaspersoft.jasperserver</groupId>
+      <artifactId>jasperserver-dto</artifactId>
+    </dependency>
+  </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- using this plugin other modules could use tests of this module as dependencies -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.3.2</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>test-jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

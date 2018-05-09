@@ -1,0 +1,1 @@
+define({REPOSITORY:{name:"repository",label:"resource.datasource.text.fileLocation.options.repository"},SERVER_FILE_SYSTEM:{name:"serverFileSystem",label:"resource.datasource.text.fileLocation.options.serverFileSystem"}});

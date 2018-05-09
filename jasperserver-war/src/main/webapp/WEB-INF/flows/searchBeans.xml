@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+    <!-- only search actions, e.g. search, filter, browse, sort -->
+    <bean id="repositorySearchAction" class="${class.repositorySearchAction}">
+        <property name="messages" ref="messageSource"/>
+        <property name="securityContextProvider" ref="${bean.securityContextProvider}"/>
+        <property name="configuration" ref="configurationBean" />
+        <property name="repositorySearchService" ref="repositorySearchService"/>
+        <property name="searchModeSettingsResolver" ref="searchModeSettingsResolver"/>
+        <property name="searchCriteriaFactory" ref="searchCriteriaFactory"/>
+        <property name="repository" ref="${bean.repositoryService}"/>
+        <property name="unsecuredRepository" ref="${bean.unsecureRepositoryService}"/>
+        <property name="navigationActionModelSupport" ref="${bean.navigationActionModelSupport}"/>
+        <property name="resourceLoadStrategy">
+            <bean class="com.jaspersoft.jasperserver.search.strategy.impl.NextPageElementsStrategy"/>
+        </property>
+    </bean>
+
+    <!-- only resource actions, e.g. create, edit, delete, update -->
+    <bean id="resourceAction" class="com.jaspersoft.jasperserver.search.action.ResourceAction">
+        <property name="resourceService" ref="resourceService"/>
+        <property name="messages" ref="messageSource"/>
+        <property name="searchModeSettingsResolver" ref="searchModeSettingsResolver"/>
+    </bean>
+
+    <!-- only folder actions, e.g. create, edit, delete, update -->
+    <bean id="folderAction" class="com.jaspersoft.jasperserver.search.action.FolderAction">
+        <property name="folderService" ref="folderService"/>
+        <property name="messages" ref="messageSource"/>
+        <property name="searchModeSettingsResolver" ref="searchModeSettingsResolver"/>
+    </bean>
+
+    <!-- only theme actions, e.g. setActiveTheme -->
+    <bean id="themeAction" class="com.jaspersoft.jasperserver.war.themes.action.ThemeAction">
+        <property name="messages" ref="messageSource"/>
+        <property name="tenantService" ref="${bean.tenantService}"/>
+        <property name="themeService" ref="themeService"/>
+        <property name="themeResolver" ref="themeResolver"/>
+        <property name="repositoryService" ref="${bean.repositoryService}"/>
+    </bean>
+
+    <bean id="ResourcePermissionsAction" class="com.jaspersoft.jasperserver.search.action.ResourcePermissionsAction">
+        <property name="repository" ref="${bean.repositoryService}"/>
+		<property name="objectPermissionService" ref="objectPermissionService"/>
+		<property name="userService" ref="${bean.userAuthorityService}"/>
+		<property name="tenantService" ref="${bean.tenantService}"/>
+		<!-- Keep the following in sync with objPermissionToRole.jsp and objPermissionToUser.jsp -->
+        <property name="configuration" ref="configurationBean" />
+        <property name="auditContext" ref="${bean.auditContext}"/>
+        <property name="permissionJSONHelper" ref="permissionJSONHelper"/> 
+        <property name="jsonHelper" ref="permissionJSONHelper"/>
+        <property name="messages" ref="messageSource"/>
+        <property name="searchModeSettingsResolver" ref="searchModeSettingsResolver"/>
+        <property name="rolesToDisablePermissionEditForEveryone">
+            <util:list>
+                <value>ROLE_SUPERUSER</value>
+            </util:list>
+        </property>
+        <property name="rolesToDisablePermissionEditForNonSuperuser">
+            <util:list>
+                <value>ROLE_ADMINISTRATOR</value>
+            </util:list>
+        </property>
+        <property name="defaultSuperuserUsername" value="superuser"/>
+        <property name="roleSuperuser" value="ROLE_SUPERUSER"/>
+    </bean>
+
+    <bean id="permissionJSONHelper" class="com.jaspersoft.jasperserver.search.helper.PermissionJSONHelper"/>
+</beans>

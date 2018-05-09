@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<jboss-web>
+
+    <resource-ref>
+        <res-ref-name>${js.jndi}</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <jndi-name>java:/${js.jndi}</jndi-name>
+    </resource-ref>
+    
+    <resource-ref>
+        <res-ref-name>${sugarcrm.jndi}</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <jndi-name>java:/${sugarcrm.jndi}</jndi-name>
+    </resource-ref>
+    
+    <resource-ref>
+        <res-ref-name>${foodmart.jndi}</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <jndi-name>java:/${foodmart.jndi}</jndi-name>
+    </resource-ref>
+    
+</jboss-web>

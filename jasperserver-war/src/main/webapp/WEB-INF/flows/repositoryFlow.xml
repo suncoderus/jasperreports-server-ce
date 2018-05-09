@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<flow xmlns="http://www.springframework.org/schema/webflow" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd" start-state="initAction">
+
+   <action-state id="initAction">
+      <evaluate expression="repositoryAction"/>
+      <transition on="success" to="defaultView"/>
+   </action-state>
+
+   <view-state id="defaultView" view="modules/repository/defaultView">
+      <on-entry>
+         <set name="flowScope.prevForm" value="'defaultView'"/>
+      </on-entry>
+      <transition on="success" to="defaultView"/>
+      <transition on="ViewReport" to="viewReport"/>
+<!--<transition on="ViewOlapModel" to="viewOlapModel"/>-->
+      <transition on="ScheduleReport" to="reportJobs"/>
+      <transition on="runReportInBackground" to="runReportInBackground"/>
+      <transition on="goToPage" to="goToPage"/>
+<!-- Handle back from SubFlows -->
+      <transition on="back" to="initAction"/>
+   </view-state>
+
+   <action-state id="goToPage">
+      <evaluate expression="repositoryAction"/>
+      <transition on="success" to="initAction"/>
+   </action-state>
+
+   <subflow-state id="viewReport" subflow="viewReportFlow">
+      <input name="reportUnit" value="requestParameters.resource"/>
+      <input name="inhibitRequestParsing" value="true"/>
+      <transition on="done" to="initAction"/>
+      <transition on="cancel" to="initAction"/>
+   </subflow-state>
+
+<!--
+	<subflow-state id="viewOlapModel" flow="viewOlapModelFlow">
+		<attribute-mapper>
+			<input-mapping as="name" value="${requestParameters.resource}"/>
+		</attribute-mapper>
+		<transition on="done" to="initAction"/>
+		<transition on="cancel" to="initAction"/>
+		<transition on="displayError" to="initAction"/>
+	</subflow-state>
+-->
+   <view-state id="displayError" view="modules/flowError">
+      <on-entry>
+         <set name="flowScope.prevForm" value="'displayError'"/>
+      </on-entry>
+      <transition on="displayError" to="initAction"/>
+   </view-state>
+
+   <subflow-state id="runReportInBackground" subflow="reportJobFlow">
+      <input name="isNewMode" value="true"/>
+      <input name="isRunNowMode" value="true"/>
+      <input name="reportUnitURI" value="requestParameters.resource"/>
+      <transition on="cancel" to="initAction"/>
+      <transition on="saved" to="initAction"/>
+   </subflow-state>
+
+   <end-state id="cancel"/>
+
+<!-- exceptions handling -->
+   <decision-state id="backFromError">
+      <if test="not (flowScope.prevForm == null or flowScope.prevForm == '')" then="${flowScope.prevForm}" else="initAction"/>
+   </decision-state>
+
+   <view-state id="errorPage" view="modules/system/errorPage">
+       <on-entry>
+           <evaluate expression="errorPageHandlerAction"/>
+       </on-entry>
+   </view-state>
+
+   <global-transitions>
+      <transition on="backFromErrorPage" to="backFromError"/>
+      <transition on-exception="java.lang.Throwable" to="errorPage"/>
+   </global-transitions>
+
+<!-- end exceptions handling -->
+   <bean-import resource="repositoryBeans.xml"/>
+
+</flow>

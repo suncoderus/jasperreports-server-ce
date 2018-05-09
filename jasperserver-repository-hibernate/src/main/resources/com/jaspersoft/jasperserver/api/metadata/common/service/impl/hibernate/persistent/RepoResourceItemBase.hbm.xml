@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class abstract="true" name="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoResourceItemBase">
+
+        <!--id name="id" column="id" type="long">
+	    </id-->
+        <composite-id>
+            <key-property name="id" />
+            <key-property name="name" />
+            <key-many-to-one name="parent" column="parent_folder"/>
+        </composite-id>
+
+
+        <version column="version" unsaved-value="negative" name="version"/>
+
+        <property name="id" not-null="true" type="long" column="id" insert="false" update="false"/>
+        <property name="name" length="200" not-null="true" type="string" column="name" insert="false" update="false"/>
+        <property name="label" not-null="true" length="200" type="string" column="label"/>
+        <property name="description" length="250" type="string" column="description"/>
+        <property name="creationDate" not-null="true" type="timestamp" column="creation_date"/>
+        <property name="updateDate" not-null="true" type="timestamp" column="update_date"/>
+
+        <many-to-one column="parent_folder" not-null="true" name="parent" insert="false" update="false"/>
+
+        <!--Workaround for search, allows to search for Resources AND Folders without introducing new table by re-using existing tables for resources and folders -->
+        <!-- See HibernateCompositeInterceptor#onPrepareStatement -->
+        <union-subclass name="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoResourceItem" table="FakeJIResource">
+            <property name="resourceType" not-null="true" length="255" type="string" column="resourceType" index="resource_type_index"/>
+        </union-subclass>
+
+        <!--Workaround for search, allows to search for Resources AND Folders without introducing new table by re-using existing tables for resources and folders -->
+        <!-- See HibernateCompositeInterceptor#onPrepareStatement -->
+        <union-subclass name="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoResourceFolderItem" table="FakeJIResourceFolder">
+            <property name="hidden" type="boolean" column="hidden"/>
+            <property name="URI" type="string" column="uri"/>
+        </union-subclass>
+
+    </class>
+</hibernate-mapping>

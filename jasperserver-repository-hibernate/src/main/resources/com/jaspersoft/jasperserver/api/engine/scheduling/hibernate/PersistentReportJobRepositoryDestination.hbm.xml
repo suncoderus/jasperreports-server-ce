@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class table="JIReportJobRepoDest" name="com.jaspersoft.jasperserver.api.engine.scheduling.hibernate.PersistentReportJobRepositoryDestination">
+        <id name="id" type="long" >
+            <generator class="native"/>
+        </id>
+        <version column="version" unsaved-value="negative" name="version"/>
+        <property name="folderURI" column="folder_uri" type="string" length="250" not-null="false"/>
+        <property name="sequentialFilenames" column="sequential_filenames" type="boolean" not-null="true"/>
+        <property name="overwriteFiles" column="overwrite_files" type="boolean" not-null="true"/>
+        <property name="saveToRepository" column="save_to_repository" type="boolean" not-null="true"/>
+        <property name="outputDescription" column="output_description" type="string" length="250"/>
+        <property name="timestampPattern" column="timestamp_pattern" type="string" length="250"/>
+        <property name="usingDefaultReportOutputFolderURI" column="using_def_rpt_opt_folder_uri" type="boolean" not-null="true"/>
+        <property name="outputLocalFolder" column="output_local_folder" type="string" length="250" not-null="false"/>
+        <component name="outputFTPInfo" class="com.jaspersoft.jasperserver.api.engine.scheduling.hibernate.PersistentFTPInfo">
+            <property name="userName" column="user_name" not-null="false" type="string" length="50"/>
+            <property name="password" column="password" not-null="false" type="string" length="250"/>
+            <property name="serverName" column="server_name" not-null="false" type="string" length="150"/>
+            <property name="folderPath" column="folder_path" not-null="false" type="string" length="250"/>
+            <!-- reference to SSH Private Key -->
+            <many-to-one name="sshPrivateKey" column="ssh_private_key" class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoResourceLight" fetch="join" not-null="false"/>
+            <map name="propertiesMap" table="JIFTPInfoProperties" fetch="subselect">
+                <key column="repodest_id"/>
+                <map-key column="property_name" type="string" length="100"/>
+                <element column="property_value" type="string" length="250"/>
+            </map>
+        </component>
+    </class>
+
+<!-- create index JIFTPInfoProperties_repodest_id_index on JIFTPInfoProperties (repodest_id); -->
+<!-- replacing JIFTPInfoProperties_repodest_id_index with idx14_repodest_id_idx -->
+<database-object>
+	<create>create index idx14_repodest_id_idx on JIFTPInfoProperties (repodest_id)</create>
+	<drop>DROP INDEX idx14_repodest_id_idx ON JIFTPInfoProperties</drop>
+</database-object>
+
+</hibernate-mapping>

@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!--suppress SpringModelInspection -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+    
+    <!--<bean id="ResourceAction" class="com.jaspersoft.jasperserver.war.action.repositoryExplorer.ResourceAction">-->
+        <!--<property name="repositoryService" ref="${bean.repositoryService}"/>-->
+        <!--<property name="repositoryServiceSecurityChecker" ref="${bean.repositoryServiceSecurityChecker}"/>-->
+        <!--<property name="objectPermissionService" ref="${bean.objectPermissionService}"/>-->
+        <!--<property name="messageSource" ref="messageSource"/>-->
+        <!--<property name="schedulingService" ref="reportSchedulingService"/>-->
+        <!--<property name="pagination" value="2000"/>-->
+        <!--<property name="showMoveCopyConfirmation" value="true"/>-->
+        <!--<property name="securityContextProvider" ref="${bean.securityContextProvider}"/>-->
+        <!--<property name="configuration" ref="configurationBean" />-->
+    <!--</bean>-->
+    
+    <bean id="RepositoryTreeAction" class="com.jaspersoft.jasperserver.war.action.tree.TreeAction">
+        <property name="treeDataProviderFactory" ref="repositoryExplorerTreeDataProviderFactory"/>
+        <property name="messageSource" ref="messageSource"/>
+        <property name="configurationBean" ref="configurationBean"/>
+    </bean>
+
+    <bean id="repositoryExplorerTreeDataProviderFactory" class="com.jaspersoft.jasperserver.war.model.impl.TreeDataProviderFactoryImpl">
+        <property name="treeProvidersMap">
+            <map>
+                <entry key="repositoryExplorerTreeDataProvider" value="repositoryExplorerTreeDataProvider"/>
+                <entry key="repositoryExplorerTreeFoldersProvider" value="repositoryExplorerTreeFoldersProvider"/>
+                <entry key="repositorySaveReportProvider" value="repositorySaveReportProvider"/>
+                <entry key="jrxmlTreeDataProvider" value="jrxmlTreeDataProvider" />
+                <entry key="queryTreeDataProvider" value="queryTreeDataProvider"/>
+                <entry key="inputControlResourceTreeDataProvider" value="inputControlResourceTreeDataProvider"/>
+                <entry key="dataSourceTreeDataProvider" value="dsTreeDataProvider"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="repositoryExplorerTreeDataProvider" class="com.jaspersoft.jasperserver.war.model.impl.RepositoryExplorerTreeDataProviderImpl">
+        <property name="repositoryService" ref="${bean.repositoryService}"/>
+        <property name="repositoryServiceSecurityChecker" ref="${bean.repositoryServiceSecurityChecker}"/>
+        <property name="themeService" ref="themeService" />
+    </bean>
+
+    <bean id="adhocRepositoryTreeFolderFilter" class="com.jaspersoft.jasperserver.war.model.impl.TypeInclusiveTreeDataFilterImpl">
+        <property name="includeTypesList">
+            <list>
+                <value>com.jaspersoft.jasperserver.api.metadata.common.domain.Folder</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="adhocRepositoryTreeAdhocTempBlockFilter" class="com.jaspersoft.jasperserver.war.model.impl.RepositoryExplorerTreeDataFilterImpl">
+        <property name="uriList">
+            <list>
+                <value>/temp</value>
+            </list>
+        </property>
+        <property name="userService"><ref bean="${property.adhocRepositoryTreeAdhocTempBlockFilter.userService}"/></property>
+        <property name="roleToShowTempFolder" value="ROLE_ADMINISTRATOR"/>
+    </bean>
+
+    <bean id="repositoryTreeRoleAccessFilter" class="com.jaspersoft.jasperserver.war.model.impl.RepositoryTreeRoleAccessFilter">
+        <property name="roleAccessUrisResolver" ref="${bean.roleAccessUrisResolver}"/>
+    </bean>
+
+    <bean id="adhocRepositorySaveAsFilter" class="com.jaspersoft.jasperserver.war.model.impl.ANDTreeDataFilterImpl">
+        <property name="filterList">
+            <list>
+                <ref bean="adhocRepositoryTreeFolderFilter"/>
+                <ref bean="adhocRepositoryTreeAdhocTempBlockFilter"/>
+                <ref bean="repositoryTreeRoleAccessFilter"/>
+            </list>
+        </property>
+    </bean>
+
+
+    <bean id="repositoryExplorerTreeFoldersProvider" parent="repositoryExplorerTreeDataProvider">
+        <property name="filter" ref="adhocRepositorySaveAsFilter"/>
+        <property name="skipResources" value="true"/>
+    </bean>
+
+    <bean id="repositorySaveReportTempBlockFilter" class="com.jaspersoft.jasperserver.war.model.impl.UriExclusiveTreeDataFilterImpl">
+        <property name="uriList">
+            <list>
+                <value>*/temp</value>
+                <value>*/themes</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="repositorySaveReportFilter" class="com.jaspersoft.jasperserver.war.model.impl.ANDTreeDataFilterImpl">
+        <property name="filterList">
+            <list>
+                <ref bean="adhocRepositoryTreeFolderFilter"/>
+                <ref bean="repositorySaveReportTempBlockFilter"/>
+                <ref bean="repositoryTreeRoleAccessFilter"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="repositorySaveReportProvider" parent="repositoryExplorerTreeDataProvider">
+        <property name="filter" ref="repositorySaveReportFilter"/>
+        <property name="skipResources" value="true"/>
+    </bean>
+
+    <bean name="dsTreeDataProvider" class="com.jaspersoft.jasperserver.war.model.impl.TypedTreeDataProvider">
+        <property name="repositoryService" ref="${bean.repositoryService}" />
+        <property name="supportedClasses">
+            <list>
+                <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JdbcReportDataSource</value>
+                <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JndiJdbcReportDataSource</value>
+                <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.VirtualReportDataSource</value>
+                <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.BeanReportDataSource</value>
+                <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.CustomReportDataSource</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="awsDataSourceTreeDataProvider" class="com.jaspersoft.jasperserver.war.model.impl.AwsDataSourceTreeDataProvider" scope="session">
+        <property name="messageSource" ref="messageSource"/>
+        <property name="repositoryService" ref="${bean.repositoryService}" />
+        <property name="awsDataSourceService" ref="awsDataSourceService" />
+        <property name="awsCredentialUtil" ref="awsCredentialUtil" />
+        <property name="amazonDBServices">
+            <list>
+                <value>RDS</value>
+                <value>Redshift</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="azureSqlDataSourceTreeDataProvider" class="com.jaspersoft.jasperserver.war.model.impl.AzureSqlDataSourceTreeDataProvider" scope="session">
+        <property name="messageSource" ref="messageSource"/>
+        <property name="repositoryService" ref="${bean.repositoryService}" />
+        <property name="azureSqlManagementService" ref="azureSqlManagementService"/>
+        <property name="defaultJdbcDriverClassName" ref="defaultAzureJdbcDriverClassName"/>
+        <property name="defaultKeyStoreType" ref="defaultAzureKeyStoreType"/>
+    </bean>
+
+
+    <bean name="joinableDsTreeDataProvider" class="com.jaspersoft.jasperserver.war.model.impl.TypedTreeDataProvider">
+        <property name="repositoryService" ref="${bean.repositoryService}" />
+        <property name="engineService" ref="engineService"/>
+        <property name="supportedClasses">
+            <list>
+                <!-- Types of DS which can be joined to virtual DS -->
+                <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JdbcReportDataSource</value>
+                <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JndiJdbcReportDataSource</value>
+                <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.CustomReportDataSource</value>
+            </list>
+        </property>
+        <property name="supportedCustomReportDataSourceServices">
+            <list>
+                <!-- Types of CustomDataSource which can be joined to virtual DS -->
+                <value>com.jaspersoft.cassandra.jasperserver.CassandraDataSourceService</value>
+                <value>com.jaspersoft.hadoop.hive.jasperserver.HiveDataSourceService</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="dataTypeTreeDataProvider" class="com.jaspersoft.jasperserver.war.model.impl.TypedTreeDataProvider">
+        <property name="repositoryService" ref="${bean.repositoryService}"/>
+        <property name="supportedClasses">
+            <list>
+                <value>com.jaspersoft.jasperserver.api.metadata.common.domain.DataType</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="listOfValuesTreeDataProvider" class="com.jaspersoft.jasperserver.war.model.impl.TypedTreeDataProvider">
+        <property name="repositoryService" ref="${bean.repositoryService}" />
+        <property name="supportedClasses">
+            <list>
+                <value>com.jaspersoft.jasperserver.api.metadata.common.domain.ListOfValues</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="OLAPTreeDataProvider" class="com.jaspersoft.jasperserver.war.model.impl.TypedTreeDataProvider">
+        <property name="repositoryService" ref="${bean.repositoryService}" />
+        <property name="supportedClasses">
+            <list>
+                <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.OlapClientConnection</value>
+            </list>
+        </property>
+    </bean>
+
+     <bean name="MondrianTreeDataProvider" class="com.jaspersoft.jasperserver.war.model.impl.TypedTreeDataProvider">
+        <property name="repositoryService" ref="${bean.repositoryService}" />
+        <property name="supportedClasses">
+            <list>
+                <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.MondrianConnection</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="XMLATreeDataProvider" class="com.jaspersoft.jasperserver.war.model.impl.TypedTreeDataProvider">
+        <property name="repositoryService" ref="${bean.repositoryService}" />
+        <property name="supportedClasses">
+            <list>
+                <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.XMLAConnection</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="queryTreeDataProvider" class="com.jaspersoft.jasperserver.war.model.impl.TypedTreeDataProvider">
+        <property name="repositoryService" ref="${bean.repositoryService}" />
+        <property name="supportedClasses">
+            <list>
+                <value>com.jaspersoft.jasperserver.api.metadata.common.domain.Query</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="jrxmlTreeDataProvider" class="com.jaspersoft.jasperserver.war.model.impl.FileResourcesTreeDataProvider">
+        <property name="repositoryService" ref="${bean.repositoryService}"/>
+        <property name="fileTypes">
+            <list>
+                <value>jrxml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="olapSchemaTreeDataProvider" class="com.jaspersoft.jasperserver.war.model.impl.FileResourcesTreeDataProvider">
+        <property name="repositoryService" ref="${bean.repositoryService}"/>
+        <property name="fileTypes">
+            <list>
+                <value>olapMondrianSchema</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="fileResourceTreeDataProvider" class="com.jaspersoft.jasperserver.war.model.impl.TypedTreeDataProvider">
+        <property name="repositoryService" ref="${fileResourceTreeDataProvider.repositoryService}"/>
+        <property name="supportedClasses">
+            <list>
+                <value>com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="inputControlResourceTreeDataProvider" class="com.jaspersoft.jasperserver.war.model.impl.TypedTreeDataProvider">
+        <property name="repositoryService" ref="${bean.repositoryService}"/>
+        <property name="supportedClasses">
+            <list>
+                <value>com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl</value>
+            </list>
+        </property>
+    </bean>
+</beans>

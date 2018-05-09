@@ -1,0 +1,11 @@
+<div class="export-options">
+    {{ if (!isRepository) { }}
+    <p class="title export-options-title">{{- i18n["export.dialog.options"] }}</p>
+    <div class="section everything">
+        <div class="control checkBox everything">
+            <label class="wrap" title="">{{- i18n["export.dialog.everything"] }}</label>
+            <input class="everything" name="everything" type="checkbox" data-bind="checked:everything">
+        </div>
+    </div>
+    {{ } }}
+</div>

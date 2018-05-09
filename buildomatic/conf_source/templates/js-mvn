@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Usage example:
+# ./js-mvn verify -o
+# ./js-mvn verify -projects=:adhoc-integration-test -o
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+export MAVEN_OPTS="-Xms128m -Xmx512m"
+
+MVN_RUN=mvn
+
+CMD_LINE_ARGS=$*
+
+$MVN_RUN -s ${currentConf}/maven_settings.xml -DskipUnitTestDir $CMD_LINE_ARGS
+
+# ant fix-webapp-name
+# Coping war folder to installer location
+echo "Buildomatic war folders maybe outdated"
+echo "    ${warDir}/${webAppNameSrcCE}"
+echo "    ${warDir}/${webAppNameSrcPro}"
+echo "Pro tip: To deploy webapp use 'ant copy-pro-war deploy-webapp-pro'"
+
+

@@ -1,0 +1,20 @@
+<div class="parametersTab">
+
+	{{ if (config.isProVersion) { }}
+	<div class="saveCurrentValuesContainer">
+		<button name="saveCurrentValuesButton" id="save" type="button" class="button options up ">
+			<span class="wrap">{{- i18n['report.scheduling.job.edit.parameters.save'] }}</span><span class="icon"></span>
+		</button>
+	</div>
+	{{ } }}
+
+	<ul class="list inputControls inputControlsContainer" id="inputControlsContainer"></ul>
+
+	<!-- The next block needed just to create standard for Scheduler behavior, when we are switching to the
+	tab where the error happened. To indicate what on this tab an error happened we introduce dummy control, which may have
+	special error class. The warning element is also dummy -->
+	<label class="hidden">
+		<input type="text" name="parametersErrorNotifierStub" class="">
+		<span class="message warning" data-field="parametersErrorNotifierStub"></span>
+	</label>
+</div>

@@ -1,0 +1,42 @@
+<!DOCTYPE HTML5>
+
+<html>
+  <head>
+    <title>Standard Navigation + JSAM Demo</title>
+    <link rel="stylesheet" type="text/css" href="css/test.css">
+    </script>
+    <script src="../lib/require-2.1.15.js"></script>
+    <script>
+      require.config(
+      {
+        baseUrl: '.',
+        paths:
+        {
+          'jquery': '../lib/jquery-1.11.1',
+//          'jsam' : '../controls/jsam/jsam',
+          'stdnav': 'stdnav',
+          'stdnavPluginJSAM': 'plugins/stdnavPluginJSAM',
+          'underscore': '../lib/lodash.compat'
+        }
+      });
+
+      require(["jquery", "jsam", "stdnav", "stdnavPluginJSAM"],
+        function($, jsam, stdnav, stdnavPluginJSAM)
+        {
+          $(document).ready(function()
+          {
+            jsam.activate();
+            stdnav.activate();
+            stdnavPluginJSAM.activate(stdnav);
+          });
+        }
+      );
+    </script>
+  </head>
+
+  <body js-stdnav="true">
+  <div class="infobubble"><a href="stdnav-demo.html">Return to the Main StdNav demo</a></div>
+  <div class="menu" role="navigation" js-jsam-menu="menu-demo"></div>
+  </body>
+</html>
+

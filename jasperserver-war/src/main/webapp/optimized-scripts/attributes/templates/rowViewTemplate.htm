@@ -1,0 +1,38 @@
+<div class="name table-column viewer" data-tooltip="true">
+    <div class="item">
+        <p data-bind="text:name"></p></div>
+</div>
+<div class="value table-column viewer"
+     data-tooltip="true">
+    <div class="item">
+        <input readonly type="password" data-bind="toggle:secure, value:encrypt"/>
+
+        <p data-bind="toggle:not(secure), text:value"></p>
+    </div>
+</div>
+<div class="secure table-column viewer">
+    <div class="item">
+        <span name="secure" data-bind="text:secure"></span>
+    </div>
+</div>
+{{ if (type !== types.SERVER) { }}
+<div class="inherited table-column viewer">
+    <div class="item">
+        <span data-bind="text:inherited"></span>
+    </div>
+</div>
+{{ } if (type !== types.USER) { }}
+<div class="permission table-column viewer">
+    <div class="item">
+        <select data-bind="value:integer(permissionEmbedded)" disabled="disabled">
+            <option value="1">{{- i18n["attributes.attribute.permissionMask.1"]}}</option>
+            <option value="2">{{- i18n["attributes.attribute.permissionMask.2"]}}</option>
+            <option value="32">{{- i18n["attributes.attribute.permissionMask.32"]}}</option>
+            <option value="0">{{- i18n["attributes.attribute.permissionMask.0"]}}</option>
+        </select>
+    </div>
+</div>
+{{ } }}
+
+
+

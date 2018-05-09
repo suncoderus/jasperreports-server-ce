@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<flow xmlns="http://www.springframework.org/schema/webflow" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+      ns0:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd"
+      start-state="lovEditForm">
+
+    <input name="masterFlow"/>
+    <input name="listOfValuesDTO"/>
+    <input name="listOfValues"/>
+    <input name="parentFolder"/>
+    <input name="isEdit"/>
+
+    <view-state id="lovEditForm" view="listOfValues/lovEditForm">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'lovEditForm'"/>
+            <evaluate expression="listOfValuesAction.setupEditForm"/>
+        </on-entry>
+        <transition on="next" to="editLovItems">
+            <evaluate expression="listOfValuesAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateResourceData"/>
+            </evaluate>
+        </transition>
+        <transition on="cancel" to="cancel"/>
+        <transition on="back" to="back"/>
+    </view-state>
+
+    <view-state id="editLovItems" view="listOfValues/lovItemsEditForm">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'editLovItems'"/>
+        </on-entry>
+        <transition on="save" to="writeLov">
+            <evaluate expression="listOfValuesAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateLovSave"/>
+            </evaluate>
+        </transition>
+        <transition on="addItem" to="addLovItem">
+            <evaluate expression="listOfValuesAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateAddValue"/>
+            </evaluate>
+        </transition>
+        <transition on="removeItem" to="removeLovItem"/>
+        <transition on="back" to="lovEditForm"/>
+        <transition on="cancel" to="cancel"/>
+    </view-state>
+
+    <action-state id="addLovItem">
+        <evaluate expression="listOfValuesAction"/>
+        <transition on="success" to="editLovItems"/>
+    </action-state>
+
+    <action-state id="removeLovItem">
+        <evaluate expression="listOfValuesAction"/>
+        <transition on="success" to="editLovItems"/>
+    </action-state>
+
+    <action-state id="writeLov">
+        <evaluate expression="listOfValuesAction"/>
+        <transition on="yes" to="backToSearch"/>
+        <transition on="success" to="saved"/>
+        <transition on="error" to="lovEditForm"/>
+    </action-state>
+
+    <end-state id="cancel"/>
+
+    <end-state id="saved"/>
+
+    <end-state id="back"/>
+
+    <end-state id="backToSearch" view="flowRedirect:searchFlow"/>
+
+    <!-- exceptions handling -->
+    <decision-state id="backFromError">
+        <if test="not (flowScope.prevForm == null or flowScope.prevForm == '')" then="${flowScope.prevForm}"
+            else="saved"/>
+    </decision-state>
+
+    <view-state id="errorPage" view="modules/system/errorPage">
+        <on-entry>
+            <evaluate expression="errorPageHandlerAction"/>
+        </on-entry>
+    </view-state>
+
+    <global-transitions>
+        <transition on="backFromErrorPage" to="backFromError"/>
+        <transition on-exception="java.lang.Throwable" to="errorPage"/>
+    </global-transitions>
+
+    <!-- end exceptions handling -->
+
+    <bean-import resource="spring-config.xml"/>
+    <bean-import resource="listOfValuesBeans.xml"/>
+
+</flow>

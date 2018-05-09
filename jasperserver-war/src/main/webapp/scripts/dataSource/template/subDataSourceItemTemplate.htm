@@ -1,0 +1,13 @@
+<li class="leaf">
+    <div class="wrap button {{ if (readOnly) { }}disabled{{ } }}">
+        <div class="column one">
+            <p class="dataSourceName">{{- name }}</p>
+        </div>
+        <div class="column two">
+            <input type="text" size="30" class="dataSourceID" value="{{- id }}" {{ if (readOnly) { }}readonly="true"{{ } }}>
+            <div class="wrap validatorMessageContainer">
+                <span class="message warning"></span>
+            </div>
+        </div>
+    </div>
+</li>

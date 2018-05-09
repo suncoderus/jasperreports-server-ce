@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>Visualization Title</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+    <link type="text/css" href="../../../../demos/css/jasper-ui-dev.css" rel="stylesheet">
+    <link type="text/css" href="../../../../themes/default/jquery-ui/jquery-ui.css" rel="stylesheet">
+
+    <script type="text/javascript" src="../../requireSnippetsConfig.js"></script>
+    <script type="text/javascript" src="../../../bower_components/requirejs/require.js"></script>
+    <script type="text/javascript" src="../../../../config.js"></script>
+
+</head>
+<body>
+
+
+
+
+<div id="adhocContainer">
+
+
+</div>
+
+
+<script type="text/javascript">
+
+    require([
+        "jquery",
+        "components/visualization/Visualization_mounting_points",
+        "components/datatable/Datatable",
+        "components/datatable/DatatableCrosstab"
+    ], function($, Visualization, Datatable, DatatableCrosstab){
+
+        var myTitle = "My Title",
+            $inAppContainer = $("#adhocContainer"),
+            isTitleAvailable  = true,
+            datatable =  new Datatable(),
+            datatableCrosstab =  new DatatableCrosstab(),
+            canvasView = datatable;
+
+        var visualization = new Visualization({
+            props: {
+                title: myTitle
+            }
+        });
+
+        //just use mount point
+        visualization.$el.appendTo($inAppContainer);
+        visualization.$canvas.append(canvasView.$el);
+
+        visualization.$switcher.on("click", function () {
+
+            if (canvasView === datatable){
+                canvasView = datatableCrosstab;
+            }else{
+                canvasView = datatable;
+            }
+
+            //it detach prev element and mount new one
+      //      visualization.switchCanvasTo(canvasView.$el);
+        });
+
+        setInterval(function(){
+
+            visualization.props.title = isTitleAvailable ?  false : myTitle;
+            visualization.switchCanvasTo(canvasView.$el);
+
+            isTitleAvailable = !isTitleAvailable;
+
+        }, 30000);
+
+        window.visualization = visualization;
+
+
+    });
+
+</script>
+
+</body>
+</html>

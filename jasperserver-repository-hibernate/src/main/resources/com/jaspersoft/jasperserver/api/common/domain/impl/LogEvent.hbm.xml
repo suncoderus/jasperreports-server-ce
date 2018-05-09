@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+  <class table="JILogEvent" name="com.jaspersoft.jasperserver.api.common.domain.impl.RepoLogEvent">
+    <id name="id"  type="long" unsaved-value="0">
+      <generator class="native"/>
+    </id>
+    <property name="occurrenceDate" column="occurrence_date" type="timestamp" not-null="true"/>
+    <property name="type" column="event_type" type="byte" not-null="true"/>
+    <property name="component" column="component" type="string" length="100"/>
+    <property name="messageCode" column="message" type="string" length="250" not-null="true"/>
+    <property name="resourceURI" column="resource_uri" type="string" length="250"/>
+    <property name="text" column="event_text" type="text" length="400000"/>
+    <property name="dataBlob" column="event_data" type="com.jaspersoft.hibernate.ByteWrappingBlobType" length="1048576"/>
+    <property name="state" column="event_state" type="byte"/>
+    <many-to-one name="user" column="userId" class="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoUser"/>
+  </class>
+
+<!-- create index JILogEvent_userId_index on JILogEvent (userId); -->
+<database-object>
+	<create>create index JILogEvent_userId_index on JILogEvent (userId)</create>
+	<drop>DROP INDEX JILogEvent_userId_index ON JILogEvent</drop>
+</database-object>
+
+</hibernate-mapping>

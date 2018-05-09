@@ -1,0 +1,47 @@
+<div class="baseTableContainer {{-type}}">
+    <div class="baseTable">
+        <div class="table-row thead">
+            <div class="name table-column">
+                <div class="item">
+                    <p>
+                        {{- i18n["attributes.name"]}}
+                    </p>
+                </div>
+            </div>
+            <div class="value table-column">
+                <div class="item">
+                    <p>
+                        {{- i18n["attributes.value"]}}
+                    </p>
+                </div>
+            </div>
+            <div class="secure table-column">
+                <div class="item">
+                    <p>
+                        {{- i18n["attributes.encrypted"]}}
+                    </p>
+                </div>
+            </div>
+            {{ if (type !== types.SERVER) { }}
+            <div class="inherited table-column">
+                <div class="item">
+                    <p>
+                        {{- i18n["attributes.inherited"]}}
+                    </p>
+                </div>
+            </div>
+            {{ } if (type !== types.USER) { }}
+            <div class="permission table-column">
+                <div class="item">
+                    <p>
+                        {{- i18n["attributes.permission"]}}
+                    </p>
+                </div>
+            </div>
+            {{ } }}
+            <div class="actions table-column"></div>
+        </div>
+        <div class="tbody"></div>
+    </div>
+    <a href="#" class="addNewItem">{{- i18n["attributes.button.add.new"]}}</a>
+</div>

@@ -1,0 +1,21 @@
+<form method="post" enctype="multipart/form-data" action="rest_v2/jdbcDrivers">
+    <input name="className" type="hidden" value="{{- className }}"/>
+    <div class="control groupBox fillParent">
+        <div class="content">
+            <div class="header">
+                <div class="title"></div>
+            </div>
+            <div class="body">
+                <ul title="Locate local file"></ul>
+                <div class="errorMessageContainer">
+                    <span class="message warning"></span>
+                </div>
+                <div class="hidden warningMessageContainer">
+                    <span class="message textAccent"></span>
+                </div>
+                <br/>
+                <a class="fsection" target="_blank" href="http://community.jaspersoft.com/wiki/downloading-and-installing-database-drivers">{{- i18n["resource.dataSource.jdbc.upload.downloading"]}}</a>
+            </div>
+        </div>
+    </div>
+</form>

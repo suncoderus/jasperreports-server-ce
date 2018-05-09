@@ -1,0 +1,1 @@
+define(["require","bi/repository/model/RepositoryResourceModel","settings!globalConfiguration"],function(o){var e=o("bi/repository/model/RepositoryResourceModel"),r=o("settings!globalConfiguration");return e.settings.NAME_NOT_SUPPORTED_SYMBOLS=r.resourceIdNotSupportedSymbols.slice(1,r.resourceIdNotSupportedSymbols.length-1),e});

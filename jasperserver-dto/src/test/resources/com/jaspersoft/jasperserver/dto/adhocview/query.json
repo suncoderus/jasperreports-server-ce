@@ -1,0 +1,57 @@
+{
+    "type" : "MULTIDIMENSIONAL_OLAP",
+    "select" : {
+      "rows" : [ {
+        "id" : "Marital Status",
+        "levels" : [ {
+          "id" : "(All)[Marital Status]",
+          "expanded" : true,
+          "levelName" : "[Marital Status].[(All)]"
+        }, {
+          "id" : "Marital Status[Marital Status]",
+          "expanded" : true,
+          "levelName" : "[Marital Status].[Marital Status]"
+        } ]
+      } ],
+      "columns" : [ {
+        "measures" : [ {
+          "id" : "Store Sales",
+          "summaryFunction" : "Sum"
+        } ]
+      }, {
+        "id" : "Gender",
+        "levels" : [ {
+          "id" : "(All)[Gender]",
+          "expanded" : true,
+          "levelName" : "[Gender].[(All)]"
+        }, {
+          "id" : "Gender[Gender]",
+          "expanded" : true,
+          "levelName" : "[Gender].[Gender]"
+        } ]
+      }, {
+        "id" : "Education Level",
+        "levels" : [ {
+          "id" : "(All)[Education Level]",
+          "expanded" : true,
+          "levelName" : "[Education Level].[(All)]"
+        }, {
+          "id" : "Education Level[Education Level]",
+          "expanded" : true,
+          "levelName" : "[Education Level].[Education Level]"
+        } ]
+      } ]
+    },
+    "from" : "/public/adhoc_test_resources/2_Sales_Mix_by_Demographic",
+    "where" : {
+      "filters" : [ {
+        "id" : "filter_2",
+        "fieldName" : "[Marital Status].[Marital Status]",
+        "operatorName" : "in",
+        "options" : [ ]
+      } ],
+      "complexExpression" : null
+    },
+    "order" : [ ],
+    "limit" : 2147483647
+}

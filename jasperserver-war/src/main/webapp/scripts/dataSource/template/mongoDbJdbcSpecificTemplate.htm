@@ -1,0 +1,55 @@
+<fieldset class="group shortFields mongoDbJdbcSpecificFields">
+
+	<legend class="offLeft"><span></span></legend>
+
+	<label title="{{- i18n['resource.datasource.mongoJdbc.host'] }}" class="control input text">
+		<span class="wrap">{{- i18n["resource.datasource.mongoJdbc.host"]}} ({{- i18n['required.field']}}):</span>
+		<input type="text" value="{{- modelAttributes.serverAddress }}" name="serverAddress">
+		<span class="message warning"></span>
+		<span class="message hint"></span>
+	</label>
+
+	<label title="{{- i18n['resource.datasource.mongoJdbc.port.number'] }}" class="control input text">
+		<span class="wrap">{{- i18n["resource.datasource.mongoJdbc.port.number"]}} ({{- i18n['required.field']}}):</span>
+		<input type="text" value="{{- modelAttributes.portNumber }}" name="portNumber">
+		<span class="message warning"></span>
+		<span class="message hint"></span>
+	</label>
+
+	<label title="{{- i18n['resource.datasource.mongoJdbc.database.name'] }}" class="control input text">
+		<span class="wrap">{{- i18n["resource.datasource.mongoJdbc.database.name"]}}:</span>
+		<input type="text" value="{{- modelAttributes.database }}" name="database">
+		<span class="message warning"></span>
+		<span class="message hint"></span>
+	</label>
+
+	<label title="{{- i18n['resource.datasource.mongoJdbc.user.name'] }}" class="control input text">
+		<span class="wrap">{{- i18n["resource.datasource.mongoJdbc.user.name"]}}:</span>
+		<input type="text" value="{{- modelAttributes.username }}" name="username">
+		<span class="message warning"></span>
+		<span class="message hint"></span>
+	</label>
+
+	<label title="{{- i18n['resource.datasource.mongoJdbc.password'] }}" class="control input text">
+		<span class="wrap">{{- i18n["resource.datasource.mongoJdbc.password"]}}:</span>
+		<input type="password" value="{{- modelAttributes.password }}" name="password">
+		<span class="message warning"></span>
+		<span class="message hint"></span>
+	</label>
+
+	<label title="{{- i18n['resource.datasource.mongoJdbc.connection.options'] }}" class="control input text">
+		<span class="wrap">{{- i18n["resource.datasource.mongoJdbc.connection.options"]}}:</span>
+		<input type="text" value="{{- modelAttributes.connectionOptions }}" name="connectionOptions">
+		<span class="message warning"></span>
+		<span class="message hint"></span>
+	</label>
+
+	<div class="control checkBox">
+		<label for="__jrs_autoSchemaDefinitionCheckbox" title="{{- i18n['resource.datasource.mongoJdbc.schema.auto.generate']}}" class="wrap">
+			{{- i18n['resource.datasource.mongoJdbc.schema.auto.generate']}}
+		</label>
+		<input type="checkbox" id="__jrs_autoSchemaDefinitionCheckbox" name="autoSchemaDefinition" {{ if (modelAttributes.autoSchemaDefinition) { }}checked{{ } }} {{- isEditMode ? 'disabled="disabled"' : ''}} >
+	</div>
+
+	<div name="fileLocationContainer" class="section"></div>
+</fieldset>

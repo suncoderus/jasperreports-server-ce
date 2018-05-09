@@ -1,0 +1,69 @@
+<fieldset name="customFieldsContainer" class="group shortFields">
+
+	<legend class="offLeft"><span>{{- i18n['resource.dataSource.accessProp']}}</span></legend>
+
+	{{
+
+	var buildAttrs = function(attrs) {
+		return _.map(attrs, function(v, k){
+			v = v.toString().replace(/"/g, "\&quot\;");
+			return k + '="' + _.xssEscape(v) + '"';
+		}).join(" ");
+	};
+
+	_.each(customFields, function(field){
+
+		var
+			attrs = {},
+			label = i18n[field.label] || field.label;
+
+		if (field.mandatory) {
+			label = label + " (" + i18n["required.field"] + ")";
+		}
+	}}
+
+		<label title="{{- label }}" class="control input text">
+			<span class="wrap">{{- label }}:</span>
+			{{
+
+				var properties = field.properties || {};
+                var value = modelAttributes[field.name] ? modelAttributes[field.name] : "";
+                if("password" === field.name && value !== ""){
+                    value = i18n['input.password.substitution']
+                }
+
+				if (properties.type === "boolean") {
+					attrs.name = field.name;
+					attrs.type = "checkbox";
+					if (value == 'on' || value == 'true') {
+						attrs.checked = "true";
+					}
+					}}
+					<input {{ print(buildAttrs(attrs)) }} />
+					{{
+				} else if (properties.displayHeight != null) {
+					attrs.name = field.name;
+					attrs.rows = properties.displayHeight;
+					attrs.cols = properties.displayWidth != null ? properties.displayWidth : 40;
+					attrs["class"] = "fnormal";
+					}}
+					<textarea {{ print(buildAttrs(attrs)) }} >{{- value }}</textarea>
+					{{
+				} else {
+					attrs.name = field.name;
+					attrs.type = field.name === "password" ? "password" : "text";
+					attrs.size = properties.displayWidth != null ? properties.displayWidth : 40;
+					attrs["class"] = "fnormal";
+					attrs.value = value;
+					}}
+					<input {{ print(buildAttrs(attrs)) }} />
+					{{
+				} }}
+
+			<span class="message hint"></span>
+			<span class="message warning"></span>
+		</label>
+
+	{{ }); }}
+
+</fieldset>

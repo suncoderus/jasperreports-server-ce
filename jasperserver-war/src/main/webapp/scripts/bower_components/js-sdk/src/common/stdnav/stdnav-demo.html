@@ -1,0 +1,210 @@
+<!DOCTYPE>
+
+<head>
+  <title>Standard Navigation Demo (jQuery + Require)</title>
+  <link rel="stylesheet" type="text/css" href="css/test.css">
+  </script>
+  <script src="../lib/require-2.1.15.js"></script>
+  <script>
+    require.config(
+    {
+      baseUrl: '.',
+      paths:
+      {
+        'jquery': '../lib/jquery-1.11.1',
+        'stdnav': 'stdnav',
+        'stdnavPluginGrid': 'plugins/stdnavPluginGrid',
+        'stdnavPluginList': 'plugins/stdnavPluginList',
+        'stdnavPluginTable': 'plugins/stdnavPluginTable',
+        'underscore': '../lib/lodash.compat'
+      }
+    });
+
+    require(["jquery", "stdnav", "stdnavPluginGrid", "stdnavPluginList", "stdnavPluginTable"],
+      function($, stdnav, stdnavPluginGrid, stdnavPluginList, stdnavPluginTable)
+      {
+        $(document).ready(function()
+        {
+          stdnav.activate();
+          stdnavPluginGrid.activate(stdnav);
+          stdnavPluginList.activate(stdnav);
+          stdnavPluginTable.activate(stdnav);
+        });
+      }
+    );
+  </script>
+</head>
+
+<body js-stdnav=true>
+
+  <div class="infobubble"><a href="stdnav-jsam-demo.html">JSAM Integration Demo</a>
+  </div>
+
+  <div class="navtype-section">
+    <h2 class="navtype-header">Standard HTML Lists</h2>
+    <div class="navtype-example">
+      <i style="font-size:75%">Keyboard scrolling in this list will NOT wrap:</i>
+      <ul tabindex="0" style="font-size:80%; padding:4px 4px 4px 32px; margin:4px;">
+        <li id="yadda" class="infobubble navigable">Mary had a little lamb</li>
+        <li class="infobubble navigable">its fleece was white as snow</li>
+        <li class="infobubble navigable">and everywhere that Mary went</li>
+        <li class="infobubble navigable">the lamb had to wait outside, because it wasn't a service animal,
+          <br> and we have health code regulations about that sort of thing.</li>
+      </ul>
+    </div>
+
+    <div class="navtype-example" js-stdnav=false>
+      <i style="font-size:75%">Keyboard scrolling in this list WILL wrap:</i>
+      <ul js-stdnav-wrap="wrap" tabindex="0" style="font-size:80%; padding:4px 4px 4px 32px; margin:4px;">
+        <li class="infobubble navigable">Jack and Jill went up the hill</li>
+        <li class="infobubble navigable">to fetch a pail of water.</li>
+        <li class="infobubble navigable">Jack fell down and broke his crown,</li>
+        <li class="infobubble navigable">and realized he'd missed Open Enrollment for that year,
+          <br> so he was pretty screwed.</li>
+      </ul>
+    </div>
+
+    <div class="navtype-example">
+      <i style="font-size:75%">
+        This list doesn't wrap, but the last entry explicitly refocuses the first<br>
+        list if you press DOWN-ARROW in the last entry.  Try ENTER and<br>
+        ESCAPE on the sublist.</i>
+      <ol tabindex="0" style="font-size:80%; padding:4px 4px 4px 32px; margin:4px;">
+        <li class="infobubble navigable">Hey diddle diddle
+          <ol>
+            <li>the cat</li>
+            and
+            <li>the fiddle</li>
+          </ol>
+        </li>
+        <li class="infobubble navigable">the cow jumped over the moon.</li>
+        <li class="infobubble navigable">The little dog laughed to see such sport,</li>
+        <li js-stdnav-down="#yadda" class="infobubble navigable">and the dish ran away with browser focus.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="navtype-section">
+    <h2 class="navtype-header">Standard HTML Tables</h2>
+    <div class="navtype-example">
+      <table border="1" tabindex="0">
+        <tr>
+          <th>Constant</th>
+          <th>Value</th>
+        </tr>
+        <tr>
+          <td>pi</td>
+          <td>3.14159...</td>
+        </tr>
+        <tr>
+          <td>cornbread</td>
+          <td>7.073073...</td>
+        </tr>
+        <tr>
+          <td>porkrinds</td>
+          <td>0</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="navtype-section">
+    <h2 class="navtype-header">Explicit Shorthand Navigation Overrides</h2>
+    <p>Used when elements appear to be siblings but are actually at different levels
+      in the DOM, or floated, etc.</p>
+
+    <div class="navtype-example">
+      <div tabindex="0">
+        <div id="div1" js-stdnav-right="#div2" class="infobubble">Div 1</div>
+        <div>
+          <div>
+            <div id="div2" js-stdnav-left="#div1" class="infobubble">Div 2 (nested, non-sibling)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="navtype-section">
+  <h2 class="navtype-header">HTML5+CSS3 Table-Like Grid of DIVs</h2>
+
+  <!-- This outer container grid is used only for layout purposes; it should NOT be navigable. -->
+  <div class="grid" style="padding:16px; background-color:#000077; border-radius:12px; width:600px; height:340px;">
+    <div class="gridrow">
+      <div class="gridcell" style="width:45%; height:100%">
+
+        <!-- This grid is being used as an interactive table, and SHOULD be navigable, so a navtype is set. -->
+        <div class="grid" tabindex="0" js-navtype="grid" js-stdnav-wrap="none" style="width:99%; height:99%">
+          <div class="gridrow">
+            <div class="gridcell">A</div>
+            <div class="gridcell">B</div>
+            <div class="gridcell">C</div>
+          </div>
+          <div class="gridrow">
+            <div class="gridcell">D</div>
+            <div class="gridcell" style="width:100px; height:33%">
+              <div class="grid" js-navtype="grid" js-stdnav-wrap="linear" style="width:98%; height:98%; margin:1%">
+                <div class="gridrow">
+                  <div class="gridcell">EA</div>
+                  <div class="gridcell">EB</div>
+                  <div class="gridcell">EC</div>
+                </div>
+                <div class="gridrow">
+                  <div class="gridcell">ED</div>
+                  <div class="gridcell">EE</div>
+                  <div class="gridcell">EF</div>
+                </div>
+                <div class="gridrow">
+                  <div class="gridcell">EG</div>
+                  <div class="gridcell">EH</div>
+                  <div class="gridcell">EI</div>
+                </div>
+              </div>
+            </div>
+            <div class="gridcell">F</div>
+          </div>
+          <div class="gridrow">
+            <div class="gridcell">G</div>
+            <div class="gridcell">
+              <div js-navtype="none">
+                <div>Ha</div>
+                <div>Hb</div>
+              </div>
+            </div>
+            <div class="gridcell">I</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="gridcell" style="width:10%; background-color:#000077; border-style:none;"></div>
+      <div class="gridcell" style="width:45%; height:100%">
+
+        <!-- This grid is being used as an interactive table, and SHOULD be navigable, so a navtype is set. -->
+        <div class="grid" tabindex="0" js-navtype="grid" navwrap="none" style="width:99%; height:99%">
+          <div class="gridrow">
+            <div class="gridcell">A</div>
+            <div class="gridcell">B</div>
+            <div class="gridcell">C</div>
+          </div>
+          <div class="gridrow">
+            <div class="gridcell">D</div>
+            <div class="gridcell" lnavinherit="false" style="width:33%; height:33%">
+              <ul>
+                <li>E1</li>
+                <li>E2</li>
+                <li>E3</li>
+              </ul>
+            </div>
+            <div class="gridcell">F</div>
+          </div>
+          <div class="gridrow">
+            <div class="gridcell">G</div>
+            <div class="gridcell">H</div>
+            <div class="gridcell">I</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</body>

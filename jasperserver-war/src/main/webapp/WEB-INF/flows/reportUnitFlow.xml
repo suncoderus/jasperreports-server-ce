@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<flow xmlns="http://www.springframework.org/schema/webflow" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+      ns0:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd"
+      start-state="checkPermissions">
+
+    <input name="parentFolder"/>
+
+    <action-state id="checkPermissions">
+        <evaluate expression="reportUnitAction"/>
+        <transition on="yes" to="start"/>
+        <transition on="no" to="cancel"/>
+    </action-state>
+
+    <decision-state id="start">
+        <if test="requestParameters.method != null" then="${requestParameters.method}" else="initAction"/>
+    </decision-state>
+
+    <decision-state id="jumpTo">
+        <if test="requestParameters.jumpToPage=='reportNaming'" then="initAction"/>
+        <if test="requestParameters.jumpToPage=='resources'" then="listResources"/>
+        <if test="requestParameters.jumpToPage=='dataSource'" then="locateDataSource"/>
+        <if test="requestParameters.jumpToPage=='query'" then="query"/>
+        <if test="requestParameters.jumpToPage=='customization'" then="displayReportAndControlForm"/>
+    </decision-state>
+
+    <action-state id="initAction">
+        <evaluate expression="reportUnitAction"/>
+        <transition on="success" to="displayNameLabelDescForm"/>
+    </action-state>
+
+    <view-state id="displayNameLabelDescForm" view="modules/addResource/reportSteps1_2">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'displayNameLabelDescForm'"/>
+        </on-entry>
+        <transition on="Cancel" to="cancel"/>
+        <transition on="finish" to="uploadJRXML">
+            <set name="requestScope.targetState" value="'saveReport'"/>
+        </transition>
+        <transition on="resources" to="uploadJRXML">
+            <set name="requestScope.targetState" value="'listResources'"/>
+        </transition>
+        <transition on="dataSource" to="uploadJRXML">
+            <set name="requestScope.targetState" value="'locateDataSource'"/>
+        </transition>
+        <transition on="query" to="uploadJRXML">
+            <set name="requestScope.targetState" value="'query'"/>
+        </transition>
+        <transition on="customization" to="uploadJRXML">
+            <set name="requestScope.targetState" value="'displayReportAndControlForm'"/>
+        </transition>
+    </view-state>
+
+    <action-state id="uploadJRXML">
+        <evaluate expression="reportUnitAction.bindAndValidate">
+            <attribute name="validatorMethod" value="validateNameLabelDesc"/>
+        </evaluate>
+        <evaluate expression="reportUnitAction.bindAndValidate">
+            <attribute name="validatorMethod" value="validateJrxmlUpload"/>
+        </evaluate>
+
+        <evaluate expression="reportUnitAction"/>
+        <evaluate expression="reportUnitAction.bindAndValidate">
+            <attribute name="validatorMethod" value="validateResources"/>
+            <attribute name="name" value="validateResources"/>
+        </evaluate>
+
+        <transition on="error" to="displayNameLabelDescForm"/>
+        <transition on="validateResources.success" to="${requestScope.targetState}"/>
+        <transition on="validateResources.error" to="listResources"/>
+    </action-state>
+
+    <action-state id="getNode">
+        <evaluate expression="RepositoryTreeAction"/>
+        <transition on="success" to="treeView"/>
+    </action-state>
+
+    <action-state id="getChildren">
+        <evaluate expression="RepositoryTreeAction"/>
+        <transition on="success" to="treeView"/>
+    </action-state>
+    <view-state id="ajaxView" view="ajax/ajaxresponse"/>
+    <view-state id="treeView" view="ajax/ajaxresponse"/>
+
+    <view-state id="ajaxError" view="ajax/ajaxerror"/>
+
+    <view-state id="listResources" view="modules/addResource/reportStep3">
+        <on-render>
+            <set name="flowScope.prevForm" value="'listResources'"/>
+            <evaluate expression="reportUnitAction.setupListResources"/>
+        </on-render>
+        <transition on="Cancel" to="cancel"/>
+        <transition on="Back" to="displayNameLabelDescForm"/>
+        <transition on="RemoveResource" to="removeResource">
+            <evaluate expression="reportUnitAction.bind"/>
+        </transition>
+        <transition on="RemoveControl" to="removeControl">
+            <evaluate expression="reportUnitAction.bind"/>
+        </transition>
+        <transition on="AddResource" to="addResource">
+            <evaluate expression="reportUnitAction.bind"/>
+        </transition>
+        <transition on="AddControl" to="addControl">
+            <evaluate expression="reportUnitAction.bind"/>
+        </transition>
+        <transition on="EditResource" to="editResource">
+            <evaluate expression="reportUnitAction.bind"/>
+        </transition>
+        <transition on="EditControl" to="editControl">
+            <evaluate expression="reportUnitAction.bind"/>
+        </transition>
+        <transition on="finish" to="saveReport">
+            <evaluate expression="reportUnitAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateResources"/>
+            </evaluate>
+        </transition>
+        <transition on="reportNaming" to="displayNameLabelDescForm"/>
+        <transition on="resources" to="listResources"/>
+        <transition on="dataSource" to="locateDataSource">
+            <evaluate expression="reportUnitAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateResources"/>
+            </evaluate>
+        </transition>
+        <transition on="query" to="query">
+            <evaluate expression="reportUnitAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateResources"/>
+            </evaluate>
+        </transition>
+        <transition on="customization" to="displayReportAndControlForm">
+            <evaluate expression="reportUnitAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateResources"/>
+            </evaluate>
+        </transition>
+    </view-state>
+
+    <action-state id="removeResource">
+        <evaluate expression="reportUnitAction"/>
+        <transition on="success" to="listResources"/>
+    </action-state>
+
+    <action-state id="removeControl">
+        <evaluate expression="reportUnitAction"/>
+        <transition on="success" to="listResources"/>
+    </action-state>
+
+    <action-state id="addResource">
+        <evaluate expression="reportUnitAction"/>
+        <transition on="success" to="fileResourceSubFlow"/>
+    </action-state>
+
+    <action-state id="editResource">
+        <evaluate expression="reportUnitAction"/>
+        <transition on="success" to="fileResourceSubFlow"/>
+    </action-state>
+
+    <subflow-state id="fileResourceSubFlow" subflow="fileResourceFlow">
+        <input name="masterFlow" value="'reportUnit'"/>
+        <input name="fileResource" value="flowScope.fileResource"/>
+        <output name="fileResource"/>
+        <transition on="finish" to="saveResource"/>
+        <transition on="cancel" to="listResources"/>
+        <transition on="back" to="listResources"/>
+        <transition on="displayError" to="displayError"/>
+        <transition on="jumpTo" to="jumpTo"/>
+        <transition on="backToSearch" to="backToSearch"/>
+    </subflow-state>
+
+    <end-state id="backToSearch" view="flowRedirect:searchFlow"/>
+
+    <action-state id="saveResource">
+        <evaluate expression="reportUnitAction"/>
+        <transition on="success" to="listResources"/>
+    </action-state>
+
+    <action-state id="addControl">
+        <evaluate expression="reportUnitAction"/>
+        <transition on="success" to="chooseControlType"/>
+    </action-state>
+
+    <action-state id="editControl">
+        <evaluate expression="reportUnitAction"/>
+        <transition on="success" to="chooseControlType"/>
+    </action-state>
+
+    <view-state id="chooseControlType" view="modules/addResource/jasperReport/locateControlResource">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'chooseControlType'"/>
+        </on-entry>
+        <transition on="Cancel" to="listResources"/>
+        <transition on="Back" to="listResources"/>
+        <transition on="Next" to="selectControlType"/>
+        <transition on="jumpTo" to="jumpTo"/>
+    </view-state>
+
+    <action-state id="selectControlType">
+        <evaluate expression="reportUnitAction"/>
+        <transition on="yes" to="controlsSubFlow"/>
+        <transition on="no" to="saveControl"/>
+    </action-state>
+
+    <subflow-state id="controlsSubFlow" subflow="addInputControlFlow">
+        <input name="masterFlow" value="'reportUnit'"/>
+        <input name="masterFlowStep" value="'resources'"/>
+        <input name="control" value="flowScope.control"/>
+        <input name="parentFolder" value="flowScope.parentFolder"/>
+        <output name="control"/>
+        <transition on="done" to="saveControl"/>
+        <transition on="cancel" to="listResources"/>
+        <transition on="back" to="chooseControlType"/>
+        <transition on="backToSearch" to="listResources"/>
+        <transition on="displayError" to="displayError"/>
+        <transition on="jumpTo" to="jumpTo"/>
+    </subflow-state>
+
+    <action-state id="saveControl">
+        <evaluate expression="reportUnitAction"/>
+        <transition on="success" to="listResources"/>
+    </action-state>
+
+    <action-state id="locateDataSource">
+        <evaluate expression="reportUnitAction"/>
+        <transition on="success" to="dataSourceChoose"/>
+        <transition on="error" to="displayError"/>
+    </action-state>
+
+    <view-state id="dataSourceChoose" view="modules/addResource/queryStep2">
+        <on-render>
+            <set name="requestScope.masterFlow" value="'reportUnit'"/>
+            <set name="requestScope.masterFlowStep" value="'dataSource'"/>
+        </on-render>
+        <transition on="next" to="decideDataSource" >
+            <evaluate expression="dataSourceAction.bind" />
+        </transition>
+        <transition on="save" to="saveDataSoureBeforeProceed">
+            <set name="requestScope.transitionAfterSaveDataSource" value="'saveReport'"/>
+            <evaluate expression="dataSourceAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateDataSourceExists"/>
+            </evaluate>
+        </transition>
+        <transition on="saveDatasource" to="saveDatasource"/>
+        <transition on="cancel" to="cancel" />
+        <transition on="error" to="displayError"/>
+        <transition on="jumpTo" to="saveDataSoureBeforeProceed">
+            <set name="requestScope.transitionAfterSaveDataSource" value="'jumpTo'"/>
+            <evaluate expression="dataSourceAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateDataSourceExists"/>
+            </evaluate>
+        </transition>
+    </view-state>
+
+    <action-state id="saveDataSoureBeforeProceed">
+        <evaluate expression="reportUnitAction.saveDatasource"/>
+        <transition on="success" to="${requestScope.transitionAfterSaveDataSource}"/>
+        <transition on="error" to="displayError"/>
+    </action-state>
+
+    <decision-state id="decideDataSource">
+        <if test="flowScope.dataResource.source == 'CONTENT_REPOSITORY' or flowScope.dataResource.source == 'NONE'"
+            then="saveDatasource" else="dataSourceSubFlow"/>
+    </decision-state>
+
+    <subflow-state id="dataSourceSubFlow" subflow="addDataSourceFlow">
+        <input name="masterFlow" value="'reportUnit'"/>
+        <input name="masterFlowStep" value="'dataSource'"/>
+        <input name="dataResource" value="flowScope.dataResource"/>
+        <input name="queryLanguage" value="flowScope.JRXMLQueryLanguage"/>
+        <output name="dataResource"/>
+        <transition on="finish" to="saveDatasourceFinish"/>
+        <transition on="done" to="saveDatasource"/>
+        <transition on="cancel" to="cancelDataSource"/>
+        <transition on="back" to="decideBackFromDataResource"/>
+        <transition on="displayError" to="displayError"/>
+        <transition on="reportNaming" to="displayNameLabelDescForm"/>
+        <transition on="resources" to="listResources"/>
+        <transition on="dataSource" to="locateDataSource"/>
+        <transition on="query" to="query"/>
+        <transition on="customization" to="displayReportAndControlForm"/>
+    </subflow-state>
+
+    <decision-state id="cancelDataSource">
+        <if test="requestParameters.mainFlow != null" then="cancel" else="locateDataSource"/>
+    </decision-state>
+
+    <action-state id="saveDatasource">
+        <evaluate expression="reportUnitAction"/>
+        <transition on="success" to="query"/>
+        <transition on="no" to="dataSourceSubFlow"/>
+        <transition on="error" to="displayError"/>
+    </action-state>
+
+    <action-state id="saveDatasourceFinish">
+        <evaluate expression="reportUnitAction.saveDatasource"/>
+        <transition on="success" to="validateReport"/>
+        <transition on="no" to="dataSourceSubFlow"/>
+        <transition on="error" to="displayError"/>
+    </action-state>
+
+    <decision-state id="decideBackFromDataResource">
+        <if test="flowScope.wrapper.datasourceIdentified" then="listResources" else="listResources"/>
+    </decision-state>
+
+    <action-state id="query">
+        <evaluate expression="reportUnitAction.prepareQuery"/>
+        <transition on="success" to="queryFlow"/>
+    </action-state>
+
+    <subflow-state id="queryFlow" subflow="queryReferenceFlow">
+        <input name="masterFlow" value="'reportUnit'"/>
+        <input name="masterFlowStep" value="'query'"/>
+        <input name="parentFlow" value="'reportUnit'"/>
+        <input name="queryReference" value="requestScope.queryReference"/>
+        <input name="allowNone" value="true"/>
+        <output name="queryReference"/>
+        <transition on="finish" to="saveReport">
+            <evaluate expression="reportUnitAction.setQueryReference"/>
+        </transition>
+        <transition on="done" to="displayReportAndControlForm">
+            <evaluate expression="reportUnitAction.setQueryReference"/>
+        </transition>
+        <transition on="back" to="locateDataSource"/>
+        <transition on="backToSearch" to="cancel"/>
+        <transition on="cancel" to="cancel"/>
+        <transition on="jumpTo" to="jumpTo">
+            <evaluate expression="reportUnitAction.setQueryReference"/>
+        </transition>
+    </subflow-state>
+
+    <decision-state id="cancelQuery">
+        <if test="requestParameters.mainFlow != null" then="cancel" else="query"/>
+    </decision-state>
+
+    <view-state id="displayReportAndControlForm" view="modules/addResource/reportStep6">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'displayReportAndControlForm'"/>
+        </on-entry>
+        <transition on="cancel" to="cancel"/>
+        <transition on="save" to="saveReport">
+            <evaluate expression="reportUnitAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateReportViewForm"/>
+            </evaluate>
+        </transition>
+        <transition on="reportNaming" to="displayNameLabelDescForm">
+            <evaluate expression="reportUnitAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateReportViewForm"/>
+            </evaluate>
+        </transition>
+        <transition on="resources" to="listResources">
+            <evaluate expression="reportUnitAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateReportViewForm"/>
+            </evaluate>
+        </transition>
+        <transition on="dataSource" to="locateDataSource">
+            <evaluate expression="reportUnitAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateReportViewForm"/>
+            </evaluate>
+        </transition>
+        <transition on="query" to="query">
+            <evaluate expression="reportUnitAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateReportViewForm"/>
+            </evaluate>
+        </transition>
+        <transition on="customization" to="displayReportAndControlForm">
+            <evaluate expression="reportUnitAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateResources"/>
+            </evaluate>
+        </transition>
+    </view-state>
+
+    <action-state id="validateReport">
+        <evaluate expression="reportUnitAction"/>
+        <transition on="displayNameLabelDescForm" to="displayNameLabelDescForm"/>
+        <transition on="listResources" to="listResources"/>
+        <transition on="success" to="locateDataSource"/>
+        <transition on="error" to="displayError"/>
+    </action-state>
+
+    <!--<view-state id="validationConfirmation" view="reportUnitFlow/validationConfirmation">-->
+        <!--<on-entry>-->
+            <!--<set name="flowScope.prevForm" value="'validationConfirmation'"/>-->
+        <!--</on-entry>-->
+        <!--<transition on="Cancel" to="cancel"/>-->
+        <!--<transition on="Back" to="displayReportAndControlForm">-->
+            <!--<evaluate expression="reportUnitAction.bindAndValidate"/>-->
+        <!--</transition>-->
+        <!--<transition on="Save" to="saveReport">-->
+            <!--<evaluate expression="reportUnitAction.bindAndValidate"/>-->
+        <!--</transition>-->
+        <!--<transition on="Jump" to="jumpTo">-->
+            <!--<evaluate expression="reportUnitAction.bindAndValidate"/>-->
+        <!--</transition>-->
+    <!--</view-state>-->
+
+    <action-state id="saveReport">
+        <evaluate expression="reportUnitAction"/>
+        <transition on="success" to="finishReport"/>
+        <transition on="error" to="displayNameLabelDescForm"/>
+    </action-state>
+
+    <end-state id="finishReport" view="flowRedirect:searchFlow?lastMode=true"/>
+    <end-state id="cancel" view="flowRedirect:searchFlow?lastMode=true"/>
+    <end-state id="cancelWithError" view="flowRedirect:searchFlow?lastMode=true&amp;errorPopupMessage=${requestScope.errorPopupMessage}"/>
+
+    <end-state id="displayError" view="reportUnitFlow/errorPage"/>
+
+    <!-- exceptions handling -->
+    <decision-state id="backFromError">
+        <if test="not (flowScope.prevForm == null or flowScope.prevForm == '')" then="${flowScope.prevForm}"
+            else="finishReport"/>
+    </decision-state>
+
+    <view-state id="errorPage" view="modules/system/errorPage">
+        <on-entry>
+            <evaluate expression="errorPageHandlerAction"/>
+        </on-entry>
+    </view-state>
+
+    <global-transitions>
+        <transition on="backFromErrorPage" to="backFromError"/>
+        <transition on-exception="com.jaspersoft.jasperserver.api.JSNotImplementedException" to="cancelWithError"/>
+        <transition on-exception="java.lang.Throwable" to="errorPage"/>
+    </global-transitions>
+
+    <!-- end exceptions handling -->
+
+    <bean-import resource="spring-config.xml"/>
+    <bean-import resource="reportUnitBeans.xml"/>
+    <bean-import resource="repositoryExplorerBean.xml"/>
+    <bean-import resource="reportDataSourceBeans.xml"/>
+</flow>

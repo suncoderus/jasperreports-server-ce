@@ -1,0 +1,34 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<resourceDescriptor name="public" wsType="folder" uriString="/public" isNew="false">
+	<label><![CDATA[Public]]></label>
+	<creationDate>1317832318985</creationDate>
+	<resourceProperty name="PROP_RESOURCE_TYPE">
+		<value><![CDATA[com.jaspersoft.jasperserver.api.metadata.common.domain.Folder]]></value>
+	</resourceProperty>
+	<resourceProperty name="PROP_PARENT_FOLDER">
+		<value><![CDATA[/]]></value>
+	</resourceProperty>
+	<resourceProperty name="PROP_VERSION">
+		<value><![CDATA[0]]></value>
+	</resourceProperty>
+	<resourceProperty name="PROP_HAS_DATA">
+		<value><![CDATA[false]]></value>
+	</resourceProperty>
+</resourceDescriptor>

@@ -1,0 +1,44 @@
+
+Usage:  js-upgrade-samedb.(sh/bat)  [option]  
+
+Description:
+
+This "samedb" upgrade shell script will perform an upgrade by modifying the existing 
+jasperserver database. 
+
+This script will carry out the following general steps:
+
+  - Validate property settings
+  - Validate database connection
+  - Run SQL script to update the jasperserver database from old schema to new schema 
+  - Import new jasperserver resources into the database
+  - Delete the existing, older jasperserver war file
+  - Deploy the new jasperserver war file
+
+An additional, optional argument can be given as described below: 
+
+  Options        Description
+
+  <empty>        Do standard, default upgrade operations as described above.
+
+  with-samples   Do standard, default upgrade operations. Also, import sample resources
+                 from the new JasperServer version.  
+
+  regen-config   If you edited your configuration, this will recreate your Buildomatic configuration
+
+  test           Run all validation steps and report on any problems. Existing instances and
+                 resources will not be modified.
+
+  help           Display this help information.
+
+
+Examples:
+
+  ./js-upgrade-samedb.sh
+
+  js-upgrade-samedb.bat
+
+  ./js-upgrade-samedb.sh with-samples
+
+  js-upgrade-samedb.bat  test
+

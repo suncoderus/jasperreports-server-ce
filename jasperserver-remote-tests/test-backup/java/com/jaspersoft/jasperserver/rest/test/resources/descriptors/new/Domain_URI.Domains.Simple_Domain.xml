@@ -1,0 +1,72 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<resourceDescriptor name="JUNIT_DOMAIN_TEST" wsType="domain" uriString="/Domains/JUNIT_DOMAIN_TEST" isNew="false">
+	<label><![CDATA[Simple Domain]]></label>
+	<description><![CDATA[Simple example of Domain]]></description>
+	<creationDate>1316549745109</creationDate>
+	<resourceProperty name="PROP_RESOURCE_TYPE">
+		<value><![CDATA[com.jaspersoft.commons.semantic.datasource.SemanticLayerDataSource]]></value>
+	</resourceProperty>
+	<resourceProperty name="PROP_PARENT_FOLDER">
+		<value><![CDATA[/Domains]]></value>
+	</resourceProperty>
+	<resourceProperty name="PROP_VERSION">
+		<value><![CDATA[0]]></value>
+	</resourceProperty>
+	<resourceDescriptor name="JUNIT_DOMAIN_TEST_schema" wsType="xml" uriString="/Domains/JUNIT_DOMAIN_TEST_files/JUNIT_DOMAIN_TEST_schema" isNew="false">
+		<label><![CDATA[JUNIT_DOMAIN_TEST_schema]]></label>
+		<description><![CDATA[JUNIT_DOMAIN_TEST_schema]]></description>
+		<creationDate>1316549745109</creationDate>
+		<resourceProperty name="PROP_RESOURCE_TYPE">
+			<value><![CDATA[com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource]]></value>
+		</resourceProperty>
+		<resourceProperty name="PROP_PARENT_FOLDER">
+			<value><![CDATA[/Domains/JUNIT_DOMAIN_TEST_files]]></value>
+		</resourceProperty>
+		<resourceProperty name="PROP_VERSION">
+			<value><![CDATA[0]]></value>
+		</resourceProperty>
+		<resourceProperty name="PROP_IS_REFERENCE">
+			<value><![CDATA[false]]></value>
+		</resourceProperty>
+		<resourceProperty name="PROP_HAS_DATA">
+			<value><![CDATA[true]]></value>
+		</resourceProperty>
+		<resourceProperty name="PROP_ATTACHMENT_ID">
+			<value><![CDATA[attachment]]></value>
+		</resourceProperty>
+	</resourceDescriptor>
+	<resourceDescriptor name="SugarCRMDataSourceJNDI" wsType="jndi" uriString="/analysis/datasources/SugarCRMDataSourceJNDI" isNew="false">
+		<label><![CDATA[SugarCRM Data Source JNDI]]></label>
+		<description><![CDATA[SugarCRM Data Source JNDI]]></description>
+		<creationDate>1316549654671</creationDate>
+		<resourceProperty name="PROP_RESOURCE_TYPE">
+			<value><![CDATA[com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JndiJdbcReportDataSource]]></value>
+		</resourceProperty>
+		<resourceProperty name="PROP_PARENT_FOLDER">
+			<value><![CDATA[/analysis/datasources]]></value>
+		</resourceProperty>
+		<resourceProperty name="PROP_VERSION">
+			<value><![CDATA[0]]></value>
+		</resourceProperty>
+		<resourceProperty name="PROP_DATASOURCE_JNDI_NAME">
+			<value><![CDATA[jdbc/sugarcrm]]></value>
+		</resourceProperty>
+	</resourceDescriptor>
+</resourceDescriptor>

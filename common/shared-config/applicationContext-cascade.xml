@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:util="http://www.springframework.org/schema/util"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+    <alias name="${bean.repositoryService}" alias="concreteRepository"/>
+    <alias name="${bean.controlLogicUriMapping}" alias="controlLogicUriMapping"/>
+    <alias name="${bean.controlLogicRegestry}" alias="controlLogicRegestry"/>
+    <alias name="${bean.controlLogicReportTypeMapping}" alias="controlLogicReportTypeMapping"/>
+    <alias name="${bean.filterResolver}" alias="filterResolver"/>
+    <alias name="${bean.auditContext}" alias="concreteAuditContext"/>
+
+    <alias name="${bean.securityContextProvider}" alias="concreteSecurityContextProvider"/>
+
+    <context:component-scan base-package="com.jaspersoft.jasperserver.war.cascade"/>
+
+    <bean id="controlLogicRegestryCe" class="java.util.HashMap">
+        <constructor-arg  index="0" type="java.util.Map">
+            <map>
+                <entry key="defaultInputControlLogic" value-ref="genericInputControlLogic"/>
+                <entry key="singleInputControlLogic" value-ref="singleInputControlLogic"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="defaultEvaluationEventsHandler" class="com.jaspersoft.jasperserver.war.cascade.EmptyEvaluationEventsHandlerImpl"/>
+
+
+    <bean id="controlLogicUriMappingCe" class="java.util.HashMap">
+        <constructor-arg  index="0" type="java.util.Map">
+            <map>
+                <!-- this map contain mapping from report URI to input control logic alias -->
+                <!-- key - regular expression -->
+                <!-- value - input control logic alias - -->
+
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="controlLogicReportTypeMappingCe" class="java.util.HashMap">
+        <constructor-arg  index="0" type="java.util.Map">
+            <map>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl" value="singleInputControlLogic"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+
+    <bean id="defaultControlLogicName" class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="defaultInputControlLogic"/>
+    </bean>
+
+    <bean id="applyRegexpToEmptyString" class="java.lang.Boolean">
+        <constructor-arg value="false"/>
+    </bean>
+
+    <util:map id="globalDefaultValues" value-type="java.lang.String" key-type="java.lang.Byte">
+        <!-- if DataType isn't defined-->
+        <entry key="-1" value="~NULL~"></entry>
+        <!--TYPE_TEXT = 1-->
+        <!--<entry key="1" value="Enter value"></entry>-->
+        <entry key="1" value="~NULL~"></entry>
+        <!--TYPE_NUMBER = 2-->
+        <!--<entry key="2" value="0"></entry>-->
+        <entry key="2" value="~NULL~"></entry>
+        <!--TYPE_DATE = 3-->
+        <!--<entry key="3" value="2020-03-12"></entry>-->
+        <entry key="3" value="~NULL~"></entry>
+        <!--TYPE_DATE_TIME = 4-->
+        <!--<entry key="4" value="2015-09-22T05:26:16"></entry>-->
+        <entry key="4" value="~NULL~"></entry>
+        <!--TYPE_TIME = 5-->
+        <!--<entry key="5" value="13:37:54"></entry>-->
+        <entry key="5" value="~NULL~"></entry>
+    </util:map>
+	
+	<!-- Cache Manager -->
+	<bean id="controlLogicCacheManager" class="com.jaspersoft.jasperserver.war.cascade.cache.ControlLogicCacheManagerImpl">
+	    <!-- seconds before a user cache is invalid -->
+		<property name="userCacheTimeout" value="600"/>
+		<!-- seconds between server cleanup process checks for invalid user sessions -->
+		<property name="cacheCleanTriggerTime" value="60"/>
+	</bean>
+
+    <bean id="inputControlsCachingEnabled" class="java.lang.Boolean">
+        <constructor-arg value="true"/>
+    </bean>
+
+    <bean id="coreFilterResolver" class="com.jaspersoft.jasperserver.war.cascade.token.FilterCore">
+        <property name="builtInParameterProviders" ref="builtInParameterProviders"/>
+    </bean>
+
+    <util:map id="multyDataTypeMapping">
+        <entry key="1" value="singleValueText"/>
+        <entry key="2" value="singleValueNumber"/>
+        <entry key="3" value="singleValueDate"/>
+        <entry key="4" value="singleValueDatetime"/>
+        <entry key="5" value="singleValueTime"/>
+    </util:map>
+
+	<!-- query manipulator -->
+	<bean id="CascadeQueryManipulator" class="com.jaspersoft.jasperserver.war.cascade.token.QueryFilter">
+		<property name="filterResolver">
+            <ref bean="${bean.filterResolver}"/>
+	    </property>
+    </bean>
+
+
+    <util:map id="inputControlTypeConfiguration">
+        <entry key="1">
+            <map>
+                <entry key="handler" value-ref="basicInputControlHandler"/>
+                <entry key="uiType" value="bool"/>
+                <entry key="name" value="input.control.type.boolean"/>
+            </map>
+        </entry>
+        <entry key="2">
+            <map>
+                <entry key="handler" value-ref="basicInputControlHandler"/>
+                <entry key="uiType" value="singleValue"/>
+                <entry key="name" value="input.control.type.single.value"/>
+                <entry key="usedFields" value="dataType"/>
+            </map>
+        </entry>
+        <entry key="3">
+            <map>
+                <entry key="handler">
+                    <bean parent="basicInputControlHandler" class="com.jaspersoft.jasperserver.war.cascade.handlers.SingleSelectListInputControlHandler">
+                        <property name="loader" ref="listOvValuesLoader"/>
+                    </bean>
+                </entry>
+                <entry key="uiType" value="singleSelect"/>
+                <entry key="name" value="input.control.type.single.select.lov"/>
+                <entry key="usedFields" value="listOfValues"/>
+            </map>
+        </entry>
+        <entry key="4">
+            <map>
+                <entry key="handler">
+                    <bean parent="basicInputControlHandler" class="com.jaspersoft.jasperserver.war.cascade.handlers.SingleSelectListInputControlHandler">
+                        <property name="loader" ref="queryValuesLoader"/>
+                    </bean>
+                </entry>
+                <entry key="uiType" value="singleSelect"/>
+                <entry key="name" value="input.control.type.single.select.query"/>
+                <entry key="usedFields" value="query;queryValueColumn"/>
+            </map>
+        </entry>
+        <entry key="6">
+            <map>
+                <entry key="handler">
+                    <bean parent="basicInputControlHandler" class="com.jaspersoft.jasperserver.war.cascade.handlers.MultiSelectListInputControlHandler">
+                        <property name="loader" ref="listOvValuesLoader"/>
+                    </bean>
+                </entry>
+                <entry key="uiType" value="multiSelect"/>
+                <entry key="name" value="input.control.type.multi.select.lov"/>
+                <entry key="usedFields" value="listOfValues"/>
+            </map>
+        </entry>
+        <entry key="7">
+            <map>
+                <entry key="handler">
+                    <bean parent="basicInputControlHandler" class="com.jaspersoft.jasperserver.war.cascade.handlers.MultiSelectListInputControlHandler">
+                        <property name="loader" ref="queryValuesLoader"/>
+                    </bean>
+                </entry>
+                <entry key="uiType" value="multiSelect"/>
+                <entry key="name" value="input.control.type.multi.select.query"/>
+                <entry key="usedFields" value="query;queryValueColumn"/>
+            </map>
+        </entry>
+        <entry key="8">
+            <map>
+                <entry key="handler">
+                    <bean parent="basicInputControlHandler" class="com.jaspersoft.jasperserver.war.cascade.handlers.SingleSelectListInputControlHandler">
+                        <property name="loader" ref="listOvValuesLoader"/>
+                    </bean>
+                </entry>
+                <entry key="uiType" value="singleSelectRadio"/>
+                <entry key="name" value="input.control.type.single.select.lov.radio"/>
+                <entry key="usedFields" value="listOfValues"/>
+            </map>
+        </entry>
+        <entry key="9">
+            <map>
+                <entry key="handler">
+                    <bean parent="basicInputControlHandler" class="com.jaspersoft.jasperserver.war.cascade.handlers.SingleSelectListInputControlHandler">
+                        <property name="loader" ref="queryValuesLoader"/>
+                    </bean>
+                </entry>
+                <entry key="uiType" value="singleSelectRadio"/>
+                <entry key="name" value="input.control.type.single.select.query.radio"/>
+                <entry key="usedFields" value="query;queryValueColumn"/>
+            </map>
+        </entry>
+        <entry key="10">
+            <map>
+                <entry key="handler">
+                    <bean parent="basicInputControlHandler" class="com.jaspersoft.jasperserver.war.cascade.handlers.MultiSelectListInputControlHandler">
+                        <property name="loader" ref="listOvValuesLoader"/>
+                    </bean>
+                </entry>
+                <entry key="uiType" value="multiSelectCheckbox"/>
+                <entry key="name" value="input.control.type.multi.select.lov.checkbox"/>
+                <entry key="usedFields" value="listOfValues"/>
+            </map>
+        </entry>
+        <entry key="11">
+            <map>
+                <entry key="handler">
+                    <bean parent="basicInputControlHandler" class="com.jaspersoft.jasperserver.war.cascade.handlers.MultiSelectListInputControlHandler">
+                        <property name="loader" ref="queryValuesLoader"/>
+                    </bean>
+                </entry>
+                <entry key="uiType" value="multiSelectCheckbox"/>
+                <entry key="name" value="input.control.type.multi.select.query.checkbox"/>
+                <entry key="usedFields" value="query;queryValueColumn"/>
+            </map>
+        </entry>
+    </util:map>
+	
+</beans>
+
+
+
+

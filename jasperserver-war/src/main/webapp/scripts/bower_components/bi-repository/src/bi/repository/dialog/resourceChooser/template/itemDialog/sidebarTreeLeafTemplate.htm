@@ -1,0 +1,8 @@
+<ul class="list collapsible" style="top: {{- top}}px; position: relative;">
+    {{ _.each(items, function(item){ }}
+    <li class="{{- item._node ? 'node folders closed' : 'leaf'}} {{- item.selected ? 'selected' : ''}} {{- item.cssClass }}" data-index="{{- item.index }}" tabindex="-1">
+        <p class="wrap button {{- item._node ? '' : 'draggable'}} " {{ if (item.value.description || item.value.uri) { }}data-tooltip='{{ if (item.value.description) { }}<p class="message label">Description: </p><p class="message">{{- item.value.description }}</p>{{ } }} {{ if (item.value.uri) { }} <p class="message label">Path: </p><p class="message">{{- item.value.uri }}</p> {{ } }}' {{ } }}><b class="icon"/> {{- item.value.label }} </p>
+        <div class="subcontainer" />
+    </li>
+    {{ }) }}
+</ul>

@@ -1,0 +1,17 @@
+<div class="section file-name">
+    {{ if (!isRepository) { }} <p class="title">{{- i18n["export.dialog.file.properties"] }}</p> {{ } }}
+    <div class="group">
+        <div class="control input" data-bind="validationErrorClass:fileName" data-model-attr="fileName">
+            <span class="wrap">{{- i18n["export.dialog.file.properties.data.file.name"]}}</span>
+            <input type="text" class="fileName"  data-bind="value:fileName, events:['keyup']"/>
+            <span class="message warning fileNameMessage" data-bind="validationErrorText:fileName" data-model-attr="fileName"></span>
+        </div>
+
+        {{ if (0) { }}
+        <div class="control checkBox encryptFileWrapper">
+            <label class="wrap" title="">{{- i18n["export.dialog.file.properties.encrypt.file"] }}</label>
+            <input class="encryptFile" name="encryptFile" type="checkbox" data-bind="checked:encryptFile">
+        </div>
+        {{ } }}
+    </div>
+</div>

@@ -1,0 +1,85 @@
+<input name="organization" class="" type="hidden" data-bind="value:organization"/>
+
+<fieldset class="group">
+    <legend class="">
+        <span>{{- i18n['import.file.name'] }}</span>
+    </legend>
+    <label for="uploadFile">
+        <input name="file" class="upload-file" id="uploadFile" type="file"/>
+    </label>
+</fieldset>
+<fieldset class="group">
+    <legend class="">
+        <span>{{- i18n['import.options'] }}</span>
+    </legend>
+    <ul class="list inputSet">
+        <li class="leaf">
+            <div class="control checkBox">
+                <label class="wrap" title="" for="update">{{- i18n['import.update'] }}</label>
+                <input id="update" class="" type="checkbox" value="" name="update" data-bind="checked:update"/>
+            </div>
+            <ul class="list inputSet">
+                <li class="leaf">
+                    <div class="control checkBox">
+                        <label class="wrap" title="">{{- i18n['import.skip.user.update']
+                            }}</label>
+                        <input id="skipUserUpdate" class="" type="checkbox" value="" name="skip-user-update"
+                               data-bind="checked:skipUserUpdate, enabled:update"/>
+                    </div>
+                </li>
+            </ul>
+        </li>
+
+        {{ if (model.includeAuditEvents) { }}
+        <li class="leaf">
+            <div class="control checkBox">
+                <label class="wrap" title="">{{- i18n['import.include.audit.events']}}</label>
+                <input id="includeAuditEvents" class="" type="checkbox" name="include-audit-events"
+                       data-bind="checked:includeAuditEvents"/>
+            </div>
+        </li>
+
+        {{ } if (model.includeAccessEvents) { }}
+        <li class="leaf">
+            <div class="control checkBox">
+                <label class="wrap" title="">{{- i18n['import.include.access.events']}}</label>
+                <input id="includeAccessEvents" class="" type="checkbox" value="" name="include-access-events"
+                       data-bind="checked:includeAccessEvents"/>
+            </div>
+        </li>
+
+        {{ } if (model.includeMonitoringEvents) { }}
+        <li class="leaf">
+            <div class="control checkBox">
+                <label class="wrap" title="">{{- i18n['import.include.monitoring.events'] }}</label>
+                <input id="includeMonitoringEvents" class="" type="checkbox" value="" name="include-monitoring-events"
+                       data-bind="checked:includeMonitoringEvents"/>
+            </div>
+        </li>
+
+        {{ } if (model.includeServerSettings) { }}
+        <li class="leaf">
+            <div class="control checkBox">
+                <label class="wrap">{{- i18n['import.include.configuration.settings']}}</label>
+                <input class="" type="checkbox" value="" name="include-server-settings"
+                       data-bind="checked:includeServerSettings"/>
+            </div>
+        </li>
+        {{ } if (typeof model.skipThemes !== "undefined") { }}
+
+        <li class="leaf">
+            <div class="control checkBox">
+                <label class="wrap" title="">{{- i18n['import.include.themes']}}</label>
+                <input type="checkbox" value=""
+                       data-bind="checked:not(skipThemes)"/>
+                <input class="hidden" id="skip-themes" type="checkbox"  value="" name="skip-themes"
+                       data-bind="checked:skipThemes"/>
+            </div>
+        </li>
+        {{ } }}
+    </ul>
+</fieldset>
+
+<!-- Hack for correct sending of multipart/form-data in IE. -->
+<!-- Here is the fix https://blog.yorkxin.org/posts/2014/02/06/ajax-with-formdata-is-broken-on-ie10-ie11/ -->
+<input type="hidden" name="_dontcare">

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+  <!-- Backing action for edit query flow -->
+  
+  <!-- README README README -->
+  <!-- This file is overwritten by the pro version -->
+  <!-- README README README -->
+
+  <bean id="editQueryAction" class="com.jaspersoft.jasperserver.war.action.EditQueryAction">
+    <property name="repository">
+      <ref bean="${bean.repositoryService}"/>
+    </property>
+    <property name="queryLanguages" ref="queryLanguages"/>
+    <property name="queryLanguagesRequestAttrName" value="queryLanguages"/>
+    <property name="validator" ref="queryValidator"/>
+    <property name="dataSourceTreeDataProvider" ref="dsTreeDataProvider" />
+    <property name="messages" ref="messageSource"/>
+    <property name="configuration" ref="configurationBean"/>
+    <property name="customDataSourceFactory" ref="customDataSourceServiceFactory"/>
+  </bean>
+  <bean id="queryValidator" class="com.jaspersoft.jasperserver.war.validation.QueryValidator">
+    <property name="repository">
+       <ref bean="${bean.repositoryService}"/>
+    </property>
+  </bean>
+
+    <import resource="repositoryExplorerBean.xml"/>
+
+</beans>

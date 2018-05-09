@@ -1,0 +1,5 @@
+account_type,annual_cost,symbol
+Consulting,100000,CON
+Distribution,320000,DIST
+Manufacturing,150000,MAN
+Supply,120000,SUP

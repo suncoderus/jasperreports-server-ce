@@ -1,0 +1,42 @@
+<label title="{{- i18n['resource.datasource.saveDomainDialog.domainNameTitle']}}" class="control input text ">
+	<span class="wrap">{{- i18n['resource.datasource.saveDomainDialog.domainName']}} ({{- i18n['required.field']}}):</span>
+	<input type="text" value="{{- model.label }}" name="label">
+	<span class="message warning"></span>
+</label>
+
+
+<label title="{{- i18n['resource.datasource.saveDomainDialog.resourceIDTitle']}}" class="control input text ">
+	<span class="wrap">{{- i18n['resource.datasource.saveDomainDialog.resourceID']}} ({{- i18n['required.field']}}):</span>
+	<input type="text" {{ if (model.isEditMode) { }}readonly="readonly"{{ } }} value="{{- model.name }}" name="name">
+	<span class="message warning"></span>
+</label>
+
+
+<label title="{{- i18n['resource.datasource.saveDomainDialog.descriptionTitle']}}" class="control textArea">
+	<span class="wrap">{{- i18n['resource.datasource.saveDomainDialog.description']}}</span>
+	<textarea type="text" name="description">{{- model.description }}</textarea>
+	<span class="message warning"></span>
+</label>
+
+{{ if (skipLocation === false) { }}
+<div class="control groupBox treeBox">
+	<div class="content">
+		<div class="header ">
+			<div class="title"></div>
+		</div>
+        <ul class="list collapsible folders"></ul>
+	</div>
+</div>
+
+<label class="control textArea">
+	<textarea type="text" class="hidden" name="parentFolderUri"></textarea>
+	<span class="message warning"></span>
+</label>
+{{ } }}
+
+<!--
+<div class="control checkBox toggle">
+    <label for="__jrs_openInAdHocDesigner" class="wrap">{{- i18n['resource.datasource.saveDomainDialog.openInAdhoc']}}</label>
+    <input type="checkbox" name="openInAdHocDesigner" id="__jrs_openInAdHocDesigner" {{ if (model.openInAdHocDesigner) { }}checked="checked"{{ } }} />
+</div>
+-->

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <alias name="${bean.loggingContextProvider}" alias="concreteLoggingContextProvider"/>
+
+    <bean id="accessEventPurgerJob" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.JSMethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="accessService"/>
+        <property name="targetMethod" value="purgeAccessEvents"/>
+        <property name="scheduler" ref="quartzScheduler"/>
+    </bean>
+
+    <!--
+    <bean id="accessEventPurgerJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="accessService"/>
+        <property name="targetMethod" value="purgeAccessEvents"/>
+    </bean>
+    -->
+
+    <bean id="accessEventPurgerTrigger" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.JSCronTriggerBean">
+        <property name="jobDetail" ref="accessEventPurgerJob"/>
+        <property name="cronExpression" value="0 0 1 * * ?"/>
+        <!-- no longer in Quartz
+        <property name="volatility" value="true"/>
+        -->
+    </bean>
+    <!--
+    <bean id="accessEventPurgerTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail" ref="accessEventPurgerJob"/>
+        <property name="cronExpression" value="0 0 1 * * ?"/>
+        <property name="volatility" value="true"/>
+    </bean>
+    -->
+
+    <bean id="accessService"
+        class="com.jaspersoft.jasperserver.api.logging.access.service.impl.AccessServiceImpl">
+        <property name="sessionFactory" ref="sessionFactory"/>
+        <property name="hibernateRepositoryService" ref="unsecureRepositoryService"/>
+        <property name="persistentUserResolver" ref="${bean.internalUserAuthorityService}"/>
+        <property name="persistentClassFactory" ref="persistentMappings"/>
+        <property name="clientClassFactory" ref="mappingResourceFactory"/>
+        <property name="maxAccessEventAge" value="60"/>
+    </bean>
+
+    <bean id="hibernateAccessEventDeleteListener"
+          class="com.jaspersoft.jasperserver.api.logging.access.service.impl.HibernateAccessEventDeleteListener"/>
+
+    <bean id="loggingFilter" class="com.jaspersoft.jasperserver.api.logging.filter.StandardLoggingFilter">
+        <property name="loggingContextProvider" ref="concreteLoggingContextProvider"/>
+    </bean>
+
+    <bean id="loggingContextProvider"
+          class="com.jaspersoft.jasperserver.api.logging.context.impl.LoggingContextProviderImpl">
+        <property name="enabledLoggingTypesMap">
+            <map>
+                <entry key="com.jaspersoft.jasperserver.api.logging.monitor.domain.MonitorEvent" value="false"/>
+                <entry key="com.jaspersoft.jasperserver.api.logging.access.domain.AccessEvent" value="true"/>
+            </map>
+        </property>
+        <property name="loggingService" ref="loggingEventsService"/>
+    </bean>
+    <bean id="routingMapCe" class="java.util.HashMap">
+        <constructor-arg index="0" type="java.util.Map">
+            <map key-type="java.lang.Class">
+                <!--<entry key="com.jaspersoft.jasperserver.api.logging.monitor.domain.MonitorEvent"
+               value-ref="ref to logging service">-->
+                <entry key="com.jaspersoft.jasperserver.api.logging.access.domain.AccessEvent"
+                       value-ref="accessService"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="loggingEventsService"
+          class="com.jaspersoft.jasperserver.api.logging.service.impl.LoggingFacade">
+    </bean>
+
+    <bean id="accessContext"
+          class="com.jaspersoft.jasperserver.api.logging.access.context.impl.AccessContextImpl">
+        <property name="clientClassFactory" ref="mappingResourceFactory"/>
+        <property name="loggingContextProvider" ref="${bean.loggingContextProvider}"/>
+    </bean>
+
+    <bean id="dummyAuditContext"
+          class="com.jaspersoft.jasperserver.api.logging.audit.context.impl.DummyAuditContext"/>
+
+    <bean id="dummyRequestTypeListener"
+          class="com.jaspersoft.jasperserver.api.logging.audit.context.impl.DummyRequestTypeListener"/>
+
+    <bean name="loggableExecutorService" class="com.jaspersoft.jasperserver.api.logging.util.LoggableExecutorService">
+        <property name="loggingContextProvider" ref="${bean.loggingContextProvider}"/>
+        <property name="requestTypeListener" ref="${bean.requestTypeListener}"/>
+    </bean>
+
+    <bean class="com.jaspersoft.jasperserver.api.logging.context.LoggingContextProviderStaticInjector">
+        <property name="loggingContextProvider" ref="${bean.loggingContextProvider}"/>
+        <property name="loggingContextProviderAwareClasses">
+            <list>
+                <value>com.jaspersoft.jasperserver.api.engine.scheduling.quartz.ReportExecutionJob</value>
+            </list>
+        </property>
+    </bean>
+</beans>

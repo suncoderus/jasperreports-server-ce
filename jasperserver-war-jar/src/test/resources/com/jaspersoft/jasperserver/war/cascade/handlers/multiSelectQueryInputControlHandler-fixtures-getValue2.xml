@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:util="http://www.springframework.org/schema/util"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+    <import resource="multiSelectQueryInputControlHandler-fixtures-getValue1.xml"/>
+
+    <!-- sampleTestCase -->
+
+    <bean id="getValue2" parent="getValue1">
+        <constructor-arg index="0">
+            <map merge="true">
+                <entry key-ref="CONTROLS">
+                    <bean parent="allControlsDefinition">
+                        <constructor-arg index="0">
+                            <map merge="true">
+                                <entry key="country"> <!-- Control name -->
+                                    <bean parent="countryControlDefinition">
+                                        <constructor-arg index="0">
+                                            <map merge="true">
+                                                <entry key-ref="INPUT_CONTROL">
+                                                    <bean parent="country_inputControl">
+                                                        <property name="mandatory" value="false"/>
+                                                    </bean>
+                                                </entry>
+                                            </map>
+                                        </constructor-arg>
+                                    </bean>
+                                </entry>
+                            </map>
+                        </constructor-arg>
+                    </bean>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+</beans>
+
+
+
+

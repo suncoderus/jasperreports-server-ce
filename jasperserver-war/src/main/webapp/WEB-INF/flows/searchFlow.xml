@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<flow xmlns="http://www.springframework.org/schema/webflow" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+      ns0:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd"
+      start-state="startSearch">
+
+    <input name="searchValue"/>
+
+    <decision-state id="startSearch">
+        <if test="requestParameters.method != null" then="${requestParameters.method}" else="init"/>
+    </decision-state>
+
+    <action-state id="init">
+        <evaluate expression="repositorySearchAction"/>
+        <transition on="success" to="searchResults"/>
+    </action-state>
+
+    <!-- Transitions whose 'on' attributes check for externalContext.nativeRequest.method == 'POST' will happen
+    only if the reqest's http method is POST.  This was done to protect sensitive areas against CSRF attacks.
+    Currently, CSRFGuard only protects POST, PUT, DELETE; we want to avoid all server state changing requests via GET, etc.. -->
+    <view-state id="searchResults" view="modules/search/results">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'searchResults'"/>
+            <set name="requestScope.errorPopupMessage" value="requestParameters.errorPopupMessage"/>
+        </on-entry>
+        
+        <!-- Search transitions. -->
+        <transition on="search" to="search"/>
+        <transition on="sort" to="sort"/>
+        <transition on="filter" to="filter"/>
+        <transition on="browse" to="browse"/>
+        <transition on="rollback" to="rollback"/>
+        <transition on="next" to="next"/>
+        <transition on="getResourceChildren" to="getResourceChildren"/>
+        <transition on="isServerAvailable" to="isServerAvailable"/>
+        <transition on="getDisplayPath" to="getDisplayPath"/>
+
+        <!-- Redirect transitions. -->
+        <transition on="redirect" to="redirect"/>
+
+        <!-- Resource transitions. -->
+        <transition on="${currentEvent.id == 'copyResources' and externalContext.nativeRequest.method == 'POST'}" to="copyResources"/>
+        <transition on="${currentEvent.id == 'moveResources' and externalContext.nativeRequest.method == 'POST'}" to="moveResources"/>
+        <transition on="${currentEvent.id == 'deleteResources' and externalContext.nativeRequest.method == 'POST'}" to="deleteResources"/>
+        <transition on="${currentEvent.id == 'updateResource' and externalContext.nativeRequest.method == 'POST'}" to="updateResource"/>
+
+        <!-- Folder transitions. -->
+        <transition on="${currentEvent.id == 'createFolder' and externalContext.nativeRequest.method == 'POST'}" to="createFolder"/>
+        <transition on="${currentEvent.id == 'updateFolder' and externalContext.nativeRequest.method == 'POST'}" to="updateFolder"/>
+        <transition on="${currentEvent.id == 'deleteFolder' and externalContext.nativeRequest.method == 'POST'}" to="deleteFolder"/>
+        <transition on="${currentEvent.id == 'copyFolder' and externalContext.nativeRequest.method == 'POST'}" to="copyFolder"/>
+        <transition on="${currentEvent.id == 'moveFolder' and externalContext.nativeRequest.method == 'POST'}" to="moveFolder"/>
+
+        <!-- Theme transitions. -->
+        <transition on="setActiveTheme" to="setActiveTheme"/>
+        <transition on="downloadTheme" to="downloadTheme"/>
+        <transition on="uploadTheme" to="uploadTheme">
+            <evaluate expression="themeAction.getFileContent(flowRequestContext)" result="flowScope.fileContent"/>
+        </transition>
+        <transition on="reuploadTheme" to="reuploadTheme"/>
+
+        <!-- Tree transitions. -->
+        <transition on="getNode" to="getNode"/>
+        <transition on="getChildren" to="getChildren"/>
+        <transition on="error" to="errorPage"/>
+
+        <!-- Permission transitions. -->
+        <transition on="permissionBrowse" to="permissionBrowse"/>
+        <transition on="permissionSearch" to="permissionSearch"/>
+        <transition on="permissionNext" to="permissionNext"/>
+        <transition on="${currentEvent.id == 'permissionsUpdate' and externalContext.nativeRequest.method == 'POST'}" to="permissionsUpdate"/>
+    </view-state>
+
+    <!-- Search actions. -->
+    <action-state id="search">
+        <evaluate expression="repositorySearchAction"/>
+        <transition on="success" to="next"/>
+    </action-state>
+
+    <action-state id="sort">
+        <evaluate expression="repositorySearchAction"/>
+        <transition on="success" to="next"/>
+    </action-state>
+
+    <action-state id="filter">
+        <evaluate expression="repositorySearchAction"/>
+        <transition on="success" to="next"/>
+    </action-state>
+
+    <action-state id="browse">
+        <evaluate expression="repositorySearchAction"/>
+        <transition on="success" to="next"/>
+    </action-state>
+
+    <action-state id="rollback">
+        <evaluate expression="repositorySearchAction"/>
+        <transition on="success" to="next"/>
+    </action-state>
+
+    <action-state id="next">
+        <evaluate expression="repositorySearchAction"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="getResourceChildren">
+        <evaluate expression="repositorySearchAction.getChildren"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="isServerAvailable">
+        <evaluate expression="repositorySearchAction"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="getDisplayPath">
+        <evaluate expression="repositorySearchAction"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <!-- Resources actions. -->
+    <action-state id="copyResources">
+        <evaluate expression="resourceAction.copy"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="moveResources">
+        <evaluate expression="resourceAction.move"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="deleteResources">
+        <evaluate expression="resourceAction.delete"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="updateResource">
+        <evaluate expression="resourceAction.update"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <!-- Tree actions. -->
+    <action-state id="getNode">
+        <evaluate expression="RepositoryTreeAction"/>
+        <transition on="success" to="treeView"/>
+    </action-state>
+
+    <action-state id="getChildren">
+        <evaluate expression="RepositoryTreeAction"/>
+        <transition on="success" to="treeView"/>
+    </action-state>
+
+    <!-- Folder actions. -->
+    <action-state id="createFolder">
+        <evaluate expression="folderAction.create"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="updateFolder">
+        <evaluate expression="folderAction.update"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="deleteFolder">
+        <evaluate expression="folderAction.delete"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="copyFolder">
+        <evaluate expression="folderAction.copy"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="moveFolder">
+        <evaluate expression="folderAction.move"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <!-- Theme actions. -->
+    <action-state id="setActiveTheme">
+        <evaluate expression="themeAction.setActiveTheme"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="downloadTheme">
+        <evaluate expression="themeAction.downloadTheme"/>
+        <transition on="success" to="downloadView"/>
+        <transition on="error" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="uploadTheme">
+        <evaluate expression="themeAction.uploadTheme"/>
+        <transition on="success" to="ajaxView"/>
+        <transition on="error" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="reuploadTheme">
+        <evaluate expression="themeAction.reuploadTheme"/>
+        <transition on="success" to="ajaxView"/>
+        <transition on="error" to="ajaxView"/>
+    </action-state>
+
+    <!-- Permissions actions. -->
+    <action-state id="permissionBrowse">
+        <evaluate expression="ResourcePermissionsAction.browse"/>
+        <transition on="success" to="permissionNext"/>
+    </action-state>
+
+    <action-state id="permissionSearch">
+        <evaluate expression="ResourcePermissionsAction.search"/>
+        <transition on="success" to="permissionNext"/>
+    </action-state>
+
+    <action-state id="permissionNext">
+        <evaluate expression="ResourcePermissionsAction.next"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <action-state id="permissionsUpdate">
+        <evaluate expression="ResourcePermissionsAction.updatePermissions"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <!-- redirect to another flow, e.g. run report, edit resource, etc. -->
+    <end-state id="redirect" view="flowRedirect:${requestParameters.flowParams}"/>
+    <end-state id="cancel"/>
+
+    <!-- ajax views -->
+    <view-state id="ajaxView" view="ajax/ajaxresponse"/>
+    <view-state id="treeView" view="ajax/ajaxresponse"/>
+    <view-state id="downloadView" view="modules/common/download"/>
+
+    <view-state id="ajaxError" view="ajax/ajaxerror"/>
+
+    <!-- exceptions handling -->
+    <decision-state id="backFromError">
+        <if test="not (flowScope.prevForm == null or flowScope.prevForm == '')" then="${flowScope.prevForm}"
+            else="cancel"/>
+    </decision-state>
+
+    <view-state id="errorPage" view="modules/system/errorPage">
+        <on-entry>
+            <evaluate expression="errorPageHandlerAction"/>
+        </on-entry>
+    </view-state>
+
+    <global-transitions>
+        <transition on="backFromErrorPage" to="backFromError"/>
+        <transition on-exception="java.lang.Throwable" to="errorPage"/>
+    </global-transitions>
+    <!-- end exceptions handling -->
+
+    <bean-import resource="spring-config.xml"/>
+
+    <!-- search action beans -->
+    <bean-import resource="searchBeans.xml"/>
+    <bean-import resource="repositoryExplorerBean.xml"/>
+
+</flow>

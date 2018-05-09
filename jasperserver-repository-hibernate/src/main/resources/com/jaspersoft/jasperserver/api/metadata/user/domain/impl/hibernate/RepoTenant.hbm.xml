@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+  <class table="JITenant" name="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoTenant" batch-size="1000">
+    <id type="long" column="id" name="id">
+      <generator class="native"/>
+    </id>
+    <natural-id>
+    	<property name="tenantId" type="string" length="100"/>
+    </natural-id>
+    <property name="tenantAlias" not-null="true" length="100" type="string" column="tenantAlias"/>
+    <many-to-one name="parent" column="parentId" not-null="false"
+      class="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoTenant" outer-join="auto"/>
+    <property name="tenantName" not-null="true" length="100" type="string" column="tenantName"/>
+    <property name="tenantDesc" not-null="false" length="250" type="string" column="tenantDesc"/>
+    <property name="tenantNote" not-null="false" length="250" type="string" column="tenantNote"/>
+    <property name="tenantUri" not-null="true" length="250" type="string" column="tenantUri"/>
+    <property name="tenantFolderUri" not-null="true" length="250" type="string" column="tenantFolderUri"/>
+    <property name="theme" not-null="false" length="250" type="string" column="theme"/>
+    <set name="subTenants" inverse="true" batch-size="1000"  lazy="true" outer-join="auto"> 
+      <key column="parentId"/>
+      <one-to-many
+        class="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoTenant"/>
+    </set>
+    <set name="users" inverse="true" cascade="delete,delete-orphan" batch-size="1000" lazy="true" outer-join="auto"> 
+      <key column="tenantId"/>
+      <one-to-many
+        class="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoUser"/>
+    </set>
+    <set name="roles" inverse="true" batch-size="1000" outer-join="auto">
+      <key column="tenantId"/> 
+      <one-to-many
+        class="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoRole"/>
+    </set>
+  </class>
+
+<!-- create index JITenant_parentId_index on JITenant (parentId); -->
+<database-object>
+	<create>create index JITenant_parentId_index on JITenant (parentId)</create>
+	<drop>DROP INDEX JITenant_parentId_index ON JITenant</drop>
+</database-object>
+
+</hibernate-mapping>

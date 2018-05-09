@@ -1,0 +1,87 @@
+{"query": {
+    "type": "Multidimensional",
+    "select": {
+        "rows": [
+            {
+                "id": "sales_fact_ALL.sales__store.sales__store__store_type",
+                "expanded": true
+            },
+            {
+                "id": "sales_fact_ALL.sales__store.sales__store__region.sales__store__region__sales_country",
+                "expanded": true
+            }
+        ],
+        "columns": [
+            {
+                "id": "Measures",
+                "expanded": false,
+                "measures": [
+                    {
+                        "id": "sales_fact_ALL.sales_fact_ALL__store_sales_2013"
+                    },
+                    {
+                        "id": "sales_fact_ALL.sales_fact_ALL__store_cost_2013"
+                    },
+                    {
+                        "id": "field_2"
+                    }
+                ]
+            }
+        ]
+    },
+    "from": "/uri",
+    "where": {
+        "fields": [
+            {
+                "id": "filter_1",
+                "fieldId": "sales_fact_ALL.sales_fact_ALL__store_sales_2013",
+                "complexExpressionId": "A",
+                "operatorName": "greater",
+                "optionsCount": 0,
+                "value": "19"
+            },
+            {
+                "id": "filter_2",
+                "fieldId": "sales_fact_ALL.sales__product.sales__product__low_fat",
+                "complexExpressionId": "B",
+                "operatorName": "in",
+                "optionsCount": 2,
+                "options": [
+                    {
+                        "value": "true"
+                    }
+                ]
+            },
+            {
+                "id": "filter_3",
+                "fieldName": "sales_fact_ALL.sales__product.sales__product__recyclable_package",
+                "complexExpressionId": "C",
+                "operatorName": "in",
+                "optionsCount": 2,
+                "options": [
+                    {
+                        "value": "false"
+                    }
+                ]
+            },
+            {
+                "id": "filter_4",
+                "fieldId": "sales_fact_ALL.sales__product.sales__product__product_name",
+                "complexExpressionId": "D",
+                "operatorName": "isAnyValue",
+                "optionsCount": 0
+            }
+        ],
+        "complexExpression": "A and D and (B or C)"
+    },
+    "order": [
+        {
+            "id": "sales_fact_ALL.sales__store.sales__store__store_type",
+            "asc": true
+        }
+    ],
+    "toggleNodes": ["ab/bc", ""],
+    "limit": 30,
+    "offset": 30
+}
+}

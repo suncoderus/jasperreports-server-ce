@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<joined-subclass 
+			name="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.impl.datasource.RepoVirtualDataSource"
+			extends="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoResource"
+			table="JIVirtualDatasource">
+		<key column="id"/>
+        <map name="dataSourceUriMap" table="JIVirtualDataSourceUriMap" fetch="subselect">
+            <key column="virtualDS_id"/>
+            <map-key column="data_source_name" type="string" length="200"/>
+            <many-to-many column="resource_id" class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoResource"/>
+        </map>
+		<property name="timezone" length="100" type="string" column="timezone"/>
+	</joined-subclass>
+
+<!-- create index JIVirtualDataSourceUriMap_resource_id_index on JIVirtualDataSourceUriMap (resource_id); -->
+<!-- replacing JIVirtualDataSourceUriMap_resource_id_index with idx36_resource_id_idx -->
+<database-object>
+	<create>create index idx36_resource_id_idx on JIVirtualDataSourceUriMap (resource_id)</create>
+	<drop>DROP INDEX idx36_resource_id_idx ON JIVirtualDataSourceUriMap</drop>
+</database-object>
+
+</hibernate-mapping>

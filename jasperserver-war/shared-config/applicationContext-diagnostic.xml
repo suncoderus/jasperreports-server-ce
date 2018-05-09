@@ -1,0 +1,515 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd"
+       default-lazy-init="true">
+
+    <bean id="diagnosticUsersCe" class="com.jaspersoft.jasperserver.api.logging.diagnostic.jmx.DiagnosticDynamicMBean">
+        <property name="diagnosticServices">
+            <set>
+                <ref bean="sessionRegistryWrapper"/>
+                <ref bean="userAuthorityService"/>
+            </set>
+        </property>
+        <property name="excludedDiagnosticAttributes">
+            <set>
+                <!--
+                <value>LoggedInUsersCount</value>
+                <value>LoggedInUsersList</value>
+                <value>TotalUsersCount</value>
+                <value>TotalEnabledUsersCount</value>
+                <value>TotalRolesCount</value>
+                -->
+            </set>
+        </property>
+    </bean>
+
+    <bean id="diagnosticReportsCe" class=" com.jaspersoft.jasperserver.api.logging.diagnostic.jmx.DiagnosticDynamicMBean">
+        <property name="diagnosticServices">
+            <set>
+                <ref bean="engineService"/>
+            </set>
+        </property>
+        <property name="excludedDiagnosticAttributes">
+            <set>
+                <!--
+                <value>RunningReportsCount</value>
+                <value>RunningAsyncReportsCuml</value>
+                <value>RunningAsyncReportsPoolSize</value>
+                <value>RunningAsyncReportsActiveTaskCount</value>
+                <value>RunningSyncReportsCuml</value>
+                <value>RunningReportsList</value>
+                <value>RunningReportsErrorsCuml</value>
+                <value>RunningReportsCountCuml</value>
+                -->
+            </set>
+        </property>
+    </bean>
+
+    <bean id="diagnosticSchedulerCe" class=" com.jaspersoft.jasperserver.api.logging.diagnostic.jmx.DiagnosticDynamicMBean">
+        <property name="diagnosticServices">
+            <set>
+                <ref bean="reportScheduler"/>
+            </set>
+        </property>
+        <property name="excludedDiagnosticAttributes">
+            <set>
+                <!--
+                <value>ScheduledJobsCount</value>
+                <value>RunningJobsCount</value>
+                <value>RunningJobsList</value>
+                -->
+            </set>
+        </property>
+    </bean>
+
+    <bean id="diagnosticSettingsCe" class="com.jaspersoft.jasperserver.api.logging.diagnostic.jmx.DiagnosticDynamicMBean">
+        <property name="diagnosticServices">
+            <set>
+                <ref bean="olapSettingDiagnosticService"/>
+                <ref bean="logSettingsDiagnosticService"/>
+                <ref bean="awsProperties"/>
+            </set>
+        </property>
+        <property name="excludedDiagnosticAttributes">
+            <set>
+                <!--
+                <value>LogSettings</value>
+                -->
+            </set>
+        </property>
+    </bean>
+
+    <bean id="diagnosticRepositoryCe" class="com.jaspersoft.jasperserver.api.logging.diagnostic.jmx.DiagnosticDynamicMBean">
+        <property name="diagnosticServices">
+            <set>
+                <ref bean="${bean.repositorySearchService}"/>
+            </set>
+        </property>
+        <property name="excludedDiagnosticAttributes">
+            <set>
+                <!--
+                <value>TotalReportsCount</value>
+                <value>TotalFoldersCount</value>
+                <value>TotalReportOutputsCount</value>
+                <value>TotalOlapViewsCount</value>
+                <value>TotalDataSourcesCount</value>
+                -->
+            </set>
+        </property>
+    </bean>
+
+    <bean id="diagnosticJSAboutCe" class="com.jaspersoft.jasperserver.api.logging.diagnostic.jmx.DiagnosticDynamicMBean">
+        <property name="diagnosticServices">
+            <set>
+                <ref bean="${bean.serverInfoService}"/>
+            </set>
+        </property>
+        <property name="excludedDiagnosticAttributes">
+            <set>
+                <!--
+                <value>Version</value>
+                <value>Edition</value>
+                -->
+            </set>
+        </property>
+    </bean>
+
+    <bean id="diagnosticHibernateCe" class="com.jaspersoft.jasperserver.api.logging.diagnostic.jmx.DiagnosticDynamicMBean">
+        <property name="diagnosticServices">
+            <set>
+                <ref bean="hibernateDiagnosticService"/>
+            </set>
+        </property>
+        <property name="excludedDiagnosticAttributes">
+            <set>
+                <!--
+                <value>StartTime</value>
+                <value>StatisticsEnabled</value>
+                <value>EntityDeleteCount</value>
+                <value>EntityInsertCount</value>
+                <value>EntityLoadCount</value>
+                <value>EntityFetchCount</value>
+                <value>EntityUpdateCount</value>
+                <value>QueryExecutionCount</value>
+                <value>QueryCacheHitCount</value>
+                <value>QueryExecutionMaxTime</value>
+                <value>QueryCacheMissCount</value>
+                <value>QueryCachePutCount</value>
+                <value>FlushCount</value>
+                <value>ConnectCount</value>
+                <value>SecondLevelCacheHitCount</value>
+                <value>SecondLevelCacheMissCount</value>
+                <value>SecondLevelCachePutCount</value>
+                <value>SessionCloseCount</value>
+                <value>SessionOpenCount</value>
+                <value>CollectionLoadCount</value>
+                <value>CollectionFetchCount</value>
+                <value>CollectionUpdateCount</value>
+                <value>CollectionRemoveCount</value>
+                <value>CollectionRecreateCount</value>
+                <value>CollectionRoleNames</value>
+                <value>EntityNames</value>
+                <value>Queries</value>
+                <value>SecondLevelCacheRegionNames</value>
+                <value>SuccessfulTransactionCount</value>
+                <value>TransactionCount</value>
+                <value>CloseStatementCount</value>
+                <value>PrepareStatementCount</value>
+                <value>OptimisticFailureCount</value>
+                <value>QueryExecutionMaxTimeQueryString</value>
+                -->
+            </set>
+        </property>
+    </bean>
+
+    <bean id="diagnosticEhCacheCe" class="com.jaspersoft.jasperserver.api.logging.diagnostic.jmx.DiagnosticDynamicMBean">
+        <property name="diagnosticServices">
+            <set>
+                <ref bean="EhCacheDiagnostic_aclCache"/>
+            </set>
+        </property>
+        <property name="excludedDiagnosticAttributes">
+            <set>
+                <!--
+                <value>CacheHitPercentage</value>
+                <value>CacheHits</value>
+                <value>CacheMissPercentage</value>
+                <value>CacheMisses</value>
+                <value>DiskStoreObjectCount</value>
+                <value>OnDiskHitPercentage</value>
+                <value>OnDiskHits</value>
+                <value>OnDiskMisses</value>
+                <value>MemoryStoreObjectCount</value>
+                <value>InMemoryHits</value>
+                <value>InMemoryHitPercentage</value>
+                <value>InMemoryMisses</value>
+                <value>OffHeapStoreObjectCount</value>
+                <value>OffHeapHits</value>
+                <value>OffHeapHitPercentage</value>
+                <value>OffHeapMisses</value>
+                <value>ObjectCount</value>
+                <value>WriteMaxQueueSize</value>
+                <value>WriteQueueLength</value>
+                <value>StatisticsAccuracy</value>
+                <value>StatisticsAccuracyDescription</value>
+                <value>Conf.Statistics</value>
+                <value>Conf.DiskExpiryThreadIntervalSeconds</value>
+                <value>DiskPersistent</value>
+                <value>Conf.DiskSpoolBufferSizeMB</value>
+                <value>Eternal</value>
+                <value>Conf.LoggingEnabled</value>
+                <value>Conf.MaxBytesLocalDisk</value>
+                <value>Conf.MaxBytesLocalHeap</value>
+                <value>Conf.MaxBytesLocalOffHeap</value>
+                <value>Conf.MaxElementsOnDisk</value>
+                <value>Conf.MaxElementsInMemory</value>
+                <value>Conf.MaxEntriesLocalDisk</value>
+                <value>Conf.MaxEntriesLocalHeap</value>
+                <value>Conf.MemoryStoreEvictionPolicy</value>
+                <value>OverflowToDisk</value>
+                <value>OverflowToOffHeap</value>
+                <value>Conf.TimeToIdleSeconds</value>
+                <value>Conf.TimeToLiveSeconds</value>
+                -->
+            </set>
+        </property>
+    </bean>
+
+    <bean id="diagnosticExternalInfoCe" class="com.jaspersoft.jasperserver.api.logging.diagnostic.jmx.DiagnosticDynamicMBean">
+        <property name="diagnosticServices">
+            <set>
+                <ref bean="externalInfo"/>
+            </set>
+        </property>
+        <property name="excludedDiagnosticAttributes">
+            <set>
+                <!--
+                <value>AvailableLogicalProcessors</value>
+                <value>FreeMemory</value>
+                <value>MaxMemory</value>
+                <value>TotalMemory</value>
+                <value>Environment</value>
+                <value>Properties</value>
+                <value>JvmHeapMemory</value>
+                <value>JvmNonHeapMemory</value>
+                <value>OsName</value>
+                <value>OsArchitecture</value>
+                <value>OsVersion</value>
+                <value>OsSystemLoadAverage</value>
+                <value>OsTotalPhysicalMemorySize</value>
+                <value>OsTotalSwapSpaceSize</value>
+                <value>OsFreeSwapSpaceSize</value>
+                <value>OsFreePhysicalMemorySize</value>
+                <value>OsProcessCpuTime</value>
+                <value>OsCommittedVirtualMemorySize</value>
+                <value>ClTotalLoadedClassCount</value>
+                <value>ClUnloadedClassCount</value>
+                <value>ClLoadedClassCount</value>
+                <value>RtBootClassPath</value>
+                <value>RtClassPath</value>
+                <value>RtLibraryPath</value>
+                <value>RtUpTime</value>
+                <value>RtVmName</value>
+                <value>RtVmVendor</value>
+                <value>RtVmVersion</value>
+                <value>RtInputArguments</value>
+                <value>DisksFreeSpace</value>
+                -->
+            </set>
+        </property>
+    </bean>
+
+    <bean id="diagnosticRepositoryDatabaseInfoCe" class="com.jaspersoft.jasperserver.api.logging.diagnostic.jmx.DiagnosticDynamicMBean">
+    <property name="diagnosticServices">
+        <set>
+            <ref bean="repositoryDatabaseInfo"/>
+        </set>
+    </property>
+    <property name="excludedDiagnosticAttributes">
+        <set>
+            <!--
+            <value>DatabaseProductName</value>
+            <value>DatabaseProductVersion</value>
+            <value>DriverName</value>
+            <value>SQLKeywords</value>
+            <value>URL</value>
+            <value>UserName</value>
+            <value>JDBCMajorVersion</value>
+            <value>JDBCMinorVersion</value>
+            <value>MaxRowSize</value>
+            <value>MaxStatementLength</value>
+            <value>MaxConnections</value>
+            <value>MaxCharLiteralLength</value>
+            <value>MaxColumnsInTable</value>
+            <value>MaxColumnsInSelect</value>
+            <value>MaxColumnsInGroupBy</value>
+            <value>MaxColumnNameLength</value>
+            -->
+        </set>
+    </property>
+    </bean>
+
+    <util:map id="diagnosticExportingMBeansMap" >
+        <entry key="jasperserver:name=Users" value-ref="${bean.diagnosticUsers}"/>
+        <entry key="jasperserver:name=Reports" value-ref="${bean.diagnosticReports}"/>
+        <entry key="jasperserver:name=Scheduler" value-ref="${bean.diagnosticScheduler}"/>
+        <entry key="jasperserver:name=Settings" value-ref="${bean.diagnosticSettings}"/>
+        <entry key="jasperserver:name=Repository" value-ref="${bean.diagnosticRepository}"/>
+        <entry key="jasperserver:name=About" value-ref="${bean.diagnosticJSAbout}"/>
+        <entry key="jasperserver:name=HibernateStatics" value-ref="${bean.diagnosticHibernate}"/>
+        <entry key="jasperserver:name=EhCache" value-ref="${bean.diagnosticEhCache}"/>
+        <entry key="jasperserver:name=ExternalInfo" value-ref="${bean.diagnosticExternalInfo}"/>
+        <entry key="jasperserver:name=RepositoryDatabase" value-ref="${bean.diagnosticRepositoryDatabaseInfo}"/>
+    </util:map>
+
+    <!--MBeanExporter -->
+    <bean id="diagnosticExporter" class="org.springframework.jmx.export.MBeanExporter" lazy-init="false">
+        <property name="exposeManagedResourceClassLoader" value="true"/>
+        <property name="server" ref="jasperJMXServer"/>
+        <property name="beans" ref="diagnosticExportingMBeansMap"/>
+    </bean>
+
+    <bean id="diagnosticDataProvider" class="com.jaspersoft.jasperserver.api.logging.diagnostic.service.impl.DiagnosticDataProvider" lazy-init="false">
+        <property name="diagnosticDataMap" ref="diagnosticExportingMBeansMap"/>
+        <property name="messageSource" ref="messageSource"/>
+    </bean>
+
+    <!--JMX can use JasperServer JMX Server on which provide Jasper Server Authorization and
+        remote connections on 10990 port
+        or can use available JMX Server (from Application server) but then it`s rely on AppServer JMX configuration
+        To use AppServer JMX Server instance then comment out these beans:
+        JMXauthenticator, JMXregistry, JasperJMXServerConnector,
+        and change property in JasperJMXServer:
+            locateExistingServerIfPossible to true
+            comment out: depends-on="JMXregistry"
+
+
+        P.S. to use JConsole with JasperServer JMX Server from same host where JasperServer instance running use this settings:
+           Remote process: service:jmx:rmi://localhost/jndi/rmi://localhost:10990/(context path)
+           Username: admin
+           password: .....
+
+        Beware if you running multiple instances of AppServers with deployed JasperServer on same host
+        you must ensure that they use separate JMX port for every AppServer instance
+    -->
+
+
+        <!--Bean provide Authentication to JMX Server connection, can be disabled if not Using separate JMX Server
+            Property allowedRole is used for describing role in which user should be to Authorize default is ROLE_ADMINISTRATOR
+        -->
+        <bean id="jMXAuthenticator" class="com.jaspersoft.jasperserver.api.logging.diagnostic.jmx.JmxSecurityAuthenticator">
+            <property name="authenticationManager" ref="authenticationManager"/>
+            <property name="allowedRoles" ref="${bean.diagnosticAllowedRoles}"/>
+        </bean>
+
+        <util:list id="diagnosticAllowedRolesCe" value-type="java.lang.String">
+            <value>ROLE_ADMINISTRATOR</value>
+        </util:list>
+
+        <!--Bean provide info about what port RMI should listen, can be disabled if not Using separate JMX Server-->
+        <bean id="jMXregistry" class="org.springframework.remoting.rmi.RmiRegistryFactoryBean">
+            <property name="port" value="${diagnostic.port}"/>
+        </bean>
+
+        <!--Bean which create Connector to JMS Servercan be disabled if not Using separate JMX Server-->
+        <bean id="jasperJMXServerConnector" class="org.springframework.jmx.support.ConnectorServerFactoryBean" lazy-init="false">
+            <property name="server" ref="jasperJMXServer"/>
+            <property name="objectName" value="connector:name=rmi"/>
+            <property name="serviceUrl" value="service:jmx:rmi:///jndi/rmi://${diagnostic.rmiHost}:${diagnostic.port}/${diagnostic.name}"/>
+            <property name="environmentMap">
+                <map>
+                    <entry key="jmx.remote.authenticator" value-ref="jMXAuthenticator"/>
+                </map>
+            </property>
+        </bean>
+
+
+    <!--JMX Server Bean, can automaticaly find already available JMX Server one and use it if property locateExistingServerIfPossible = "true"-->
+    <bean id="jasperJMXServer" class="org.springframework.jmx.support.MBeanServerFactoryBean" depends-on="jMXregistry">
+        <property name="locateExistingServerIfPossible" value="${diagnostic.usePlatformJMXServer}"/>
+    </bean>
+
+    <!--Additional Diagnostic service-wrappers)-->
+    <bean id="olapSettingDiagnosticService" class="com.jaspersoft.jasperserver.api.logging.diagnostic.service.impl.OlapSettingDiagnosticService">
+        <property name="messageSource" ref="messageSource"/>
+    </bean>
+
+    <bean id="logSettingsDiagnosticService" class="com.jaspersoft.jasperserver.api.logging.diagnostic.service.impl.LogSettingsDiagnosticService">
+        <property name="propertiesManagementService" ref="propertiesManagementService"/>
+        <property name="messageSource" ref="messageSource"/>
+        <property name="log4jSettingsService" ref="log4jSettingsService"/>
+    </bean>
+
+    <bean id="sessionRegistryWrapper" class="com.jaspersoft.jasperserver.api.logging.diagnostic.service.impl.SessionRegistryDiagnosticService">
+        <property name="sessionRegistry" ref="sessionRegistry"/>
+    </bean>
+    <bean id="externalInfo" class="com.jaspersoft.jasperserver.api.logging.diagnostic.service.impl.ExternalInfoCollectorService"/>
+    <bean id="repositoryDatabaseInfo" class="com.jaspersoft.jasperserver.api.logging.diagnostic.service.impl.RepositoryDiagnosticService">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <bean id="hibernateStatistics" class="org.hibernate.jmx.StatisticsService">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="hibernateDiagnosticService" class="com.jaspersoft.jasperserver.api.logging.diagnostic.service.impl.HibernateDiagnosticService">
+        <property name="hibernateStatistics" ref="hibernateStatistics"/>
+    </bean>
+
+    <!-- Can expose one EhCache using EhCache Diagnostic wrapper-->
+    <bean id="EhCacheDiagnostic_aclCache" class="com.jaspersoft.jasperserver.api.logging.diagnostic.service.impl.EhCacheDiagnosticService" lazy-init="false">
+        <property name="cache">
+            <bean class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+                <property name="cacheManager" ref="cacheManager"/>
+                <property name="cacheName" value="aclCache" />
+                <property name="StatisticsEnabled" value="true"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="ehCacheMBeanRegistration2" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean" lazy-init="false">
+        <property name="staticMethod" value="net.sf.ehcache.management.ManagementService.registerMBeans"/>
+        <property name="arguments">
+            <list>
+                <ref bean="dataSnapshotEhCacheManager"/>
+                <ref bean="jasperJMXServer"/>
+                <value>false</value>
+                <value>false</value>
+                <value>true</value>
+                <value>true</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="ehCacheMBeanRegistration" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean" lazy-init="false">
+        <property name="staticMethod" value="net.sf.ehcache.management.ManagementService.registerMBeans"/>
+        <property name="arguments">
+            <list>
+                <ref bean="cacheManager"/>
+                <ref bean="jasperJMXServer"/>
+                <value>false</value>
+                <value>false</value>
+                <value>true</value>
+                <value>true</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- disabled because by  ndefault olapacheManager is disabled
+    <bean id="ehCacheMBeanRegistration3" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+            <property name="staticMethod" value="net.sf.ehcache.management.ManagementService.registerMBeans"/>
+            <property name="arguments">
+                <list>
+                    <ref bean="olapCacheManager"/>
+                    <ref bean="JasperJMXServer"/>
+                    <value>false</value>
+                    <value>false</value>
+                    <value>true</value>
+                    <value>true</value>
+                </list>
+            </property>
+        </bean>
+    -->
+
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean" depends-on="jasperJMXServer" lazy-init="false">
+        <property name="targetObject">
+            <bean factory-method="getRootLogger" class="org.apache.log4j.Logger" />
+        </property>
+        <property name="targetMethod">
+            <value>addAppender</value>
+        </property>
+        <property name="arguments">
+            <list>
+                <bean init-method="activateOptions"
+                      class="jmxlogger.integration.log4j.JmxLogAppender">
+                    <!--<property name="ObjectName" value="jasperserver:name=Logger" />-->
+                    <property name="MBeanServerValue" ref="jasperJMXServer" />
+                    <property name="Layout">
+                        <bean class="org.apache.log4j.PatternLayout">
+                            <constructor-arg>
+                                <value>%-5p %c[1] - %m%n</value>
+                            </constructor-arg>
+                        </bean>
+                    </property>
+                    <property name="threshold">
+                        <bean class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean"
+                              id="org.apache.log4j.Priority.DEBUG" />
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.jmx.export.MBeanExporter" lazy-init="false">
+        <property name="server" ref="jasperJMXServer"/>
+        <property name="beans">
+            <util:map>
+                <entry key="jasperserver:name=JavascriptOptimizationSettings" value-ref="javascriptOptimizationSettings"/>
+            </util:map>
+        </property>
+    </bean>
+
+</beans>

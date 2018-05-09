@@ -1,0 +1,266 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<schema xmlns="http://www.jaspersoft.com/2007/SL/XMLSchema" version="1.0">
+  <itemGroups>
+    <itemGroup description="Accounts with Opportunities" descriptionId="" id="newSet1" label="Accounts" labelId="" resourceId="JoinTree_1">
+      <items>
+        <item description="Name of the account" descriptionId="" id="name" label="Account Name" labelId="" resourceId="JoinTree_1.accounts.name" />
+        <item description="City of account, based on billing address" descriptionId="" id="billing_address_city" label="Account City" labelId="" resourceId="JoinTree_1.accounts.billing_address_city" />
+        <item description="State of account, based on billing address" descriptionId="" id="billing_address_state" label="Account State" labelId="" resourceId="JoinTree_1.accounts.billing_address_state" />
+        <item description="Postal code of account, based on billing address" descriptionId="" id="billing_address_postalcode" label="Account ZIP" labelId="" resourceId="JoinTree_1.accounts.billing_address_postalcode" />
+        <item description="Industry of account" descriptionId="" id="industry" label="Account Industry" labelId="" resourceId="JoinTree_1.accounts.industry" />
+      </items>
+    </itemGroup>
+    <itemGroup description="Opportunities Associated with Accounts" descriptionId="" id="newSet2" label="Opportunities" labelId="" resourceId="JoinTree_1">
+      <items>
+        <item description="Name of opportunity" descriptionId="" id="name1" label="Opportunity" labelId="" resourceId="JoinTree_1.opportunities.name" />
+        <item description="Anticipated amount of opportunity" descriptionId="" id="amount" label="Amount" labelId="" resourceId="JoinTree_1.opportunities.amount" />
+        <item description="Estimated probability of winning the contract" descriptionId="" id="probability" label="Probability" labelId="" resourceId="JoinTree_1.opportunities.probability" />
+        <item description="Location of opportunity in sales decision tree" descriptionId="" id="sales_stage" label="Sales Stage" labelId="" resourceId="JoinTree_1.opportunities.sales_stage" />
+      </items>
+    </itemGroup>
+    <itemGroup description="Users Associated with Opportunities" descriptionId="" id="newSet3" label="Users" labelId="" resourceId="JoinTree_1">
+      <items>
+        <item description="User first name" descriptionId="" id="first_name" label="First Name" labelId="" resourceId="JoinTree_1.users.first_name" />
+        <item description="User last name" descriptionId="" id="last_name" label="Last Name" labelId="" resourceId="JoinTree_1.users.last_name" />
+        <item description="User title for correspondence, etc." descriptionId="" id="title" label="Title" labelId="" resourceId="JoinTree_1.users.title" />
+      </items>
+    </itemGroup>
+  </itemGroups>
+  <resources>
+    <jdbcTable datasourceId="dsSugarCRM" id="accounts" tableName="public.accounts">
+      <fieldList>
+        <field id="account_type" type="java.lang.String" />
+        <field id="annual_revenue" type="java.lang.String" />
+        <field id="assigned_user_id" type="java.lang.String" />
+        <field id="billing_address_city" type="java.lang.String" />
+        <field id="billing_address_country" type="java.lang.String" />
+        <field id="billing_address_postalcode" type="java.lang.String" />
+        <field id="billing_address_state" type="java.lang.String" />
+        <field id="billing_address_street" type="java.lang.String" />
+        <field id="created_by" type="java.lang.String" />
+        <field id="date_entered" type="java.sql.Timestamp" />
+        <field id="date_modified" type="java.sql.Timestamp" />
+        <field id="deleted" type="java.lang.Boolean" />
+        <field id="description" type="java.lang.String" />
+        <field id="email1" type="java.lang.String" />
+        <field id="email2" type="java.lang.String" />
+        <field id="employees" type="java.lang.String" />
+        <field id="id" type="java.lang.String" />
+        <field id="industry" type="java.lang.String" />
+        <field id="modified_user_id" type="java.lang.String" />
+        <field id="name" type="java.lang.String" />
+        <field id="ownership" type="java.lang.String" />
+        <field id="parent_id" type="java.lang.String" />
+        <field id="phone_alternate" type="java.lang.String" />
+        <field id="phone_fax" type="java.lang.String" />
+        <field id="phone_office" type="java.lang.String" />
+        <field id="rating" type="java.lang.String" />
+        <field id="shipping_address_city" type="java.lang.String" />
+        <field id="shipping_address_country" type="java.lang.String" />
+        <field id="shipping_address_postalcode" type="java.lang.String" />
+        <field id="shipping_address_state" type="java.lang.String" />
+        <field id="shipping_address_street" type="java.lang.String" />
+        <field id="sic_code" type="java.lang.String" />
+        <field id="ticker_symbol" type="java.lang.String" />
+        <field id="website" type="java.lang.String" />
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable datasourceId="dsSugarCRM" id="accounts_opportunities" tableName="public.accounts_opportunities">
+      <fieldList>
+        <field id="account_id" type="java.lang.String" />
+        <field id="date_modified" type="java.sql.Timestamp" />
+        <field id="deleted" type="java.lang.Boolean" />
+        <field id="id" type="java.lang.String" />
+        <field id="opportunity_id" type="java.lang.String" />
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable datasourceId="dsSugarCRM" id="opportunities" tableName="public.opportunities">
+      <fieldList>
+        <field id="amount" type="java.lang.Double" />
+        <field id="amount_backup" type="java.lang.String" />
+        <field id="amount_usdollar" type="java.lang.Double" />
+        <field id="assigned_user_id" type="java.lang.String" />
+        <field id="created_by" type="java.lang.String" />
+        <field id="currency_id" type="java.lang.String" />
+        <field id="date_closed" type="java.util.Date" />
+        <field id="date_entered" type="java.sql.Timestamp" />
+        <field id="date_modified" type="java.sql.Timestamp" />
+        <field id="deleted" type="java.lang.Boolean" />
+        <field id="description" type="java.lang.String" />
+        <field id="id" type="java.lang.String" />
+        <field id="lead_source" type="java.lang.String" />
+        <field id="modified_user_id" type="java.lang.String" />
+        <field id="name" type="java.lang.String" />
+        <field id="next_step" type="java.lang.String" />
+        <field id="opportunity_type" type="java.lang.String" />
+        <field id="probability" type="java.lang.Double" />
+        <field id="sales_stage" type="java.lang.String" />
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable datasourceId="dsSugarCRM" id="users" tableName="public.users">
+      <fieldList>
+        <field id="address_city" type="java.lang.String" />
+        <field id="address_country" type="java.lang.String" />
+        <field id="address_postalcode" type="java.lang.String" />
+        <field id="address_state" type="java.lang.String" />
+        <field id="address_street" type="java.lang.String" />
+        <field id="created_by" type="java.lang.String" />
+        <field id="date_entered" type="java.sql.Timestamp" />
+        <field id="date_modified" type="java.sql.Timestamp" />
+        <field id="deleted" type="java.lang.Boolean" />
+        <field id="department" type="java.lang.String" />
+        <field id="description" type="java.lang.String" />
+        <field id="email1" type="java.lang.String" />
+        <field id="email2" type="java.lang.String" />
+        <field id="employee_status" type="java.lang.String" />
+        <field id="first_name" type="java.lang.String" />
+        <field id="id" type="java.lang.String" />
+        <field id="is_admin" type="java.lang.String" />
+        <field id="last_name" type="java.lang.String" />
+        <field id="messenger_id" type="java.lang.String" />
+        <field id="messenger_type" type="java.lang.String" />
+        <field id="modified_user_id" type="java.lang.String" />
+        <field id="phone_fax" type="java.lang.String" />
+        <field id="phone_home" type="java.lang.String" />
+        <field id="phone_mobile" type="java.lang.String" />
+        <field id="phone_other" type="java.lang.String" />
+        <field id="phone_work" type="java.lang.String" />
+        <field id="portal_only" type="java.lang.Boolean" />
+        <field id="receive_notifications" type="java.lang.String" />
+        <field id="reports_to_id" type="java.lang.String" />
+        <field id="status" type="java.lang.String" />
+        <field id="title" type="java.lang.String" />
+        <field id="user_hash" type="java.lang.String" />
+        <field id="user_name" type="java.lang.String" />
+        <field id="user_password" type="java.lang.String" />
+        <field id="user_preferences" type="java.lang.String" />
+      </fieldList>
+    </jdbcTable>
+    <jdbcTable datasourceId="dsSugarCRM" id="JoinTree_1" tableName="public.accounts">
+      <fieldList>
+        <field id="accounts_opportunities.account_id" type="java.lang.String" />
+        <field id="accounts_opportunities.date_modified" type="java.sql.Timestamp" />
+        <field id="accounts_opportunities.deleted" type="java.lang.Boolean" />
+        <field id="accounts_opportunities.id" type="java.lang.String" />
+        <field id="accounts_opportunities.opportunity_id" type="java.lang.String" />
+        <field id="opportunities.amount" type="java.lang.Double" />
+        <field id="opportunities.amount_backup" type="java.lang.String" />
+        <field id="opportunities.amount_usdollar" type="java.lang.Double" />
+        <field id="opportunities.assigned_user_id" type="java.lang.String" />
+        <field id="opportunities.created_by" type="java.lang.String" />
+        <field id="opportunities.currency_id" type="java.lang.String" />
+        <field id="opportunities.date_closed" type="java.util.Date" />
+        <field id="opportunities.date_entered" type="java.sql.Timestamp" />
+        <field id="opportunities.date_modified" type="java.sql.Timestamp" />
+        <field id="opportunities.deleted" type="java.lang.Boolean" />
+        <field id="opportunities.description" type="java.lang.String" />
+        <field id="opportunities.id" type="java.lang.String" />
+        <field id="opportunities.lead_source" type="java.lang.String" />
+        <field id="opportunities.modified_user_id" type="java.lang.String" />
+        <field id="opportunities.name" type="java.lang.String" />
+        <field id="opportunities.next_step" type="java.lang.String" />
+        <field id="opportunities.opportunity_type" type="java.lang.String" />
+        <field id="opportunities.probability" type="java.lang.Double" />
+        <field id="opportunities.sales_stage" type="java.lang.String" />
+        <field id="accounts.account_type" type="java.lang.String" />
+        <field id="accounts.annual_revenue" type="java.lang.String" />
+        <field id="accounts.assigned_user_id" type="java.lang.String" />
+        <field id="accounts.billing_address_city" type="java.lang.String" />
+        <field id="accounts.billing_address_country" type="java.lang.String" />
+        <field id="accounts.billing_address_postalcode" type="java.lang.String" />
+        <field id="accounts.billing_address_state" type="java.lang.String" />
+        <field id="accounts.billing_address_street" type="java.lang.String" />
+        <field id="accounts.created_by" type="java.lang.String" />
+        <field id="accounts.date_entered" type="java.sql.Timestamp" />
+        <field id="accounts.date_modified" type="java.sql.Timestamp" />
+        <field id="accounts.deleted" type="java.lang.Boolean" />
+        <field id="accounts.description" type="java.lang.String" />
+        <field id="accounts.email1" type="java.lang.String" />
+        <field id="accounts.email2" type="java.lang.String" />
+        <field id="accounts.employees" type="java.lang.String" />
+        <field id="accounts.id" type="java.lang.String" />
+        <field id="accounts.industry" type="java.lang.String" />
+        <field id="accounts.modified_user_id" type="java.lang.String" />
+        <field id="accounts.name" type="java.lang.String" />
+        <field id="accounts.ownership" type="java.lang.String" />
+        <field id="accounts.parent_id" type="java.lang.String" />
+        <field id="accounts.phone_alternate" type="java.lang.String" />
+        <field id="accounts.phone_fax" type="java.lang.String" />
+        <field id="accounts.phone_office" type="java.lang.String" />
+        <field id="accounts.rating" type="java.lang.String" />
+        <field id="accounts.shipping_address_city" type="java.lang.String" />
+        <field id="accounts.shipping_address_country" type="java.lang.String" />
+        <field id="accounts.shipping_address_postalcode" type="java.lang.String" />
+        <field id="accounts.shipping_address_state" type="java.lang.String" />
+        <field id="accounts.shipping_address_street" type="java.lang.String" />
+        <field id="accounts.sic_code" type="java.lang.String" />
+        <field id="accounts.ticker_symbol" type="java.lang.String" />
+        <field id="accounts.website" type="java.lang.String" />
+        <field id="users.address_city" type="java.lang.String" />
+        <field id="users.address_country" type="java.lang.String" />
+        <field id="users.address_postalcode" type="java.lang.String" />
+        <field id="users.address_state" type="java.lang.String" />
+        <field id="users.address_street" type="java.lang.String" />
+        <field id="users.created_by" type="java.lang.String" />
+        <field id="users.date_entered" type="java.sql.Timestamp" />
+        <field id="users.date_modified" type="java.sql.Timestamp" />
+        <field id="users.deleted" type="java.lang.Boolean" />
+        <field id="users.department" type="java.lang.String" />
+        <field id="users.description" type="java.lang.String" />
+        <field id="users.email1" type="java.lang.String" />
+        <field id="users.email2" type="java.lang.String" />
+        <field id="users.employee_status" type="java.lang.String" />
+        <field id="users.first_name" type="java.lang.String" />
+        <field id="users.id" type="java.lang.String" />
+        <field id="users.is_admin" type="java.lang.String" />
+        <field id="users.last_name" type="java.lang.String" />
+        <field id="users.messenger_id" type="java.lang.String" />
+        <field id="users.messenger_type" type="java.lang.String" />
+        <field id="users.modified_user_id" type="java.lang.String" />
+        <field id="users.phone_fax" type="java.lang.String" />
+        <field id="users.phone_home" type="java.lang.String" />
+        <field id="users.phone_mobile" type="java.lang.String" />
+        <field id="users.phone_other" type="java.lang.String" />
+        <field id="users.phone_work" type="java.lang.String" />
+        <field id="users.portal_only" type="java.lang.Boolean" />
+        <field id="users.receive_notifications" type="java.lang.String" />
+        <field id="users.reports_to_id" type="java.lang.String" />
+        <field id="users.status" type="java.lang.String" />
+        <field id="users.title" type="java.lang.String" />
+        <field id="users.user_hash" type="java.lang.String" />
+        <field id="users.user_name" type="java.lang.String" />
+        <field id="users.user_password" type="java.lang.String" />
+        <field id="users.user_preferences" type="java.lang.String" />
+      </fieldList>
+      <joinInfo alias="accounts" referenceId="accounts" />
+      <joinedDataSetList>
+        <joinedDataSetRef>
+          <joinString>join accounts_opportunities accounts_opportunities on (accounts.id == accounts_opportunities.account_id)</joinString>
+        </joinedDataSetRef>
+        <joinedDataSetRef>
+          <joinString>join opportunities opportunities on (opportunities.id == accounts_opportunities.opportunity_id)</joinString>
+        </joinedDataSetRef>
+        <joinedDataSetRef>
+          <joinString>join users users on (users.id == opportunities.assigned_user_id)</joinString>
+        </joinedDataSetRef>
+      </joinedDataSetList>
+    </jdbcTable>
+  </resources>
+</schema>

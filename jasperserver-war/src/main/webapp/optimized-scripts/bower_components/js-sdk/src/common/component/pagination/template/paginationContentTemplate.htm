@@ -1,0 +1,11 @@
+<table class="paginationControl">
+    <tbody>
+        <tr>
+            <td class="firstPageCell"><button title="{{- i18n['pagination.first'] }}"  class="toLeft first" {{ if (current === 1) { }}disabled="disabled"{{ } }}><span class="wrap"><span class="icon"></span></span></button></td>
+            <td class="previousPageCell"><button title="{{- i18n['pagination.previous'] }}" class="left prev" {{ if (current === 1) { }}disabled="disabled"{{ } }}><span class="wrap"><span class="icon"></span></span></button></td>
+            <td class="currentPageCell"><span class="wrap">{{- i18n['pagination.page'] }}</span><input class="current" type="text" value="{{- current}}" />{{ if (total !== 1) { }}<span class="wrap" class="page_total">{{- i18n['pagination.of'] }}&nbsp;&nbsp;<span class="total_pages">{{- total}}</span></span>{{ } }}</td>
+            <td class="nextPageCell"><button title="{{- i18n['pagination.next'] }}" class="right next" {{ if (current === total) { }}disabled="disabled"{{ } }}><span class="wrap"><span class="icon" ></span></span></button></td>
+            <td class="lastPageCell"><button title="{{- i18n['pagination.last'] }}" class="toRight last" {{ if (current === total) { }}disabled="disabled"{{ } }}><span class="wrap"><span class="icon" ></span></span></button></td>
+        </tr>
+    </tbody>
+</table>

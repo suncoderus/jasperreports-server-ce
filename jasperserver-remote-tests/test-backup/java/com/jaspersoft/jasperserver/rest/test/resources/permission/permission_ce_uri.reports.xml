@@ -1,0 +1,96 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<entityResource>
+	<Item xsi:type="objectPermissionImpl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+		<permissionMask>30</permissionMask>
+		<permissionRecipient xsi:type="userImpl">
+			<externallyDefined>false</externallyDefined>
+			<fullName>etladmin</fullName>
+			<username>etladmin</username>
+		</permissionRecipient>
+		<URI>repo:/JUNIT_NEW_FOLDER</URI>
+	</Item>
+	<Item xsi:type="objectPermissionImpl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+		<permissionMask>30</permissionMask>
+		<permissionRecipient xsi:type="userImpl">
+			<externallyDefined>false</externallyDefined>
+			<fullName>admin</fullName>
+			<username>admin</username>
+		</permissionRecipient>
+		<URI>repo:/JUNIT_NEW_FOLDER</URI>
+	</Item>
+	<Item xsi:type="objectPermissionImpl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+		<permissionMask>30</permissionMask>
+		<permissionRecipient xsi:type="userImpl">
+			<externallyDefined>false</externallyDefined>
+			<fullName>anonymousUser</fullName>
+			<username>anonymousUser</username>
+		</permissionRecipient>
+		<URI>repo:/JUNIT_NEW_FOLDER</URI>
+	</Item>
+	<Item xsi:type="objectPermissionImpl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+		<permissionMask>30</permissionMask>
+		<permissionRecipient xsi:type="userImpl">
+			<externallyDefined>false</externallyDefined>
+			<fullName>Joe User</fullName>
+			<username>joeuser</username>
+		</permissionRecipient>
+		<URI>repo:/JUNIT_NEW_FOLDER</URI>
+	</Item>
+	<Item xsi:type="objectPermissionImpl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+		<permissionMask>30</permissionMask>
+		<permissionRecipient xsi:type="roleImpl">
+			<externallyDefined>false</externallyDefined>
+			<roleName>ROLE_USER</roleName>
+		</permissionRecipient>
+		<URI>repo:/JUNIT_NEW_FOLDER</URI>
+	</Item>
+	<Item xsi:type="objectPermissionImpl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+		<permissionMask>30</permissionMask>
+		<permissionRecipient xsi:type="roleImpl">
+			<externallyDefined>false</externallyDefined>
+			<roleName>ROLE_PORTLET</roleName>
+		</permissionRecipient>
+		<URI>repo:/JUNIT_NEW_FOLDER</URI>
+	</Item>
+	<Item xsi:type="objectPermissionImpl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+		<permissionMask>30</permissionMask>
+		<permissionRecipient xsi:type="roleImpl">
+			<externallyDefined>false</externallyDefined>
+			<roleName>ROLE_USER</roleName>
+		</permissionRecipient>
+		<URI>repo:/JUNIT_NEW_FOLDER</URI>
+	</Item>
+	<Item xsi:type="objectPermissionImpl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+		<permissionMask>30</permissionMask>
+		<permissionRecipient xsi:type="roleImpl">
+			<externallyDefined>false</externallyDefined>
+			<roleName>ROLE_ANONYMOUS</roleName>
+		</permissionRecipient>
+		<URI>repo:/JUNIT_NEW_FOLDER</URI>
+	</Item>
+	<Item xsi:type="objectPermissionImpl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+		<permissionMask>30</permissionMask>
+		<permissionRecipient xsi:type="roleImpl">
+			<externallyDefined>false</externallyDefined>
+			<roleName>ROLE_ETL_ADMIN</roleName>
+		</permissionRecipient>
+		<URI>repo:/JUNIT_NEW_FOLDER</URI>
+	</Item>
+</entityResource>

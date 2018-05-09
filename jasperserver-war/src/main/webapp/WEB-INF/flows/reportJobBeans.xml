@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+    <!-- Backing action for report scheduling flow -->
+    <bean id="reportJobEditAction" class="com.jaspersoft.jasperserver.war.action.ReportJobEditAction">
+        <property name="formObjectClass" value="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJob"/>
+		<property name="formObjectName" value="job"/>
+		<property name="formObjectScope" value="FLOW"/>
+		<property name="validator" ref="reportJobValidator"/>
+		<property name="messageSource" ref="messageSource"/>
+        <property name="schedulingService" ref="reportSchedulingService"/>
+        <property name="securityContextProvider" ref="${bean.securityContextProvider}"/>
+        <property name="isNewModeAttrName" value="isNewMode"/>
+		<property name="reportUnitURIAttrName" value="reportUnitURI"/>
+		<property name="editJobIdParamName" value="editJobId"/>
+		<property name="outputFormatsAttrName" value="allOutputFormats"/>
+		<property name="intervalUnitsAttrName" value="intervalUnits"/>
+		<property name="localesList" ref="userLocalesList"/>
+		<property name="localesAttrName" value="outputLocales"/>
+		<property name="timeZonesList" ref="userTimeZonesList"/>
+		<property name="timeZonesAttrName" value="timeZones"/>
+		<!-- property name="exportParametersMap" ref="jobExportParametersMap"/-->
+		<property name="recurrenceIntervalUnits" ref="recurrenceIntervalUnits"/>
+		<property name="configuration" ref="configurationBean"/>
+		<property name="allOutputFormats" ref="allOutputFormats"/>
+        <property name="auditContext" ref="${bean.auditContext}"/>
+    </bean>
+
+	<bean id="scheduleReportParametersAction" class="com.jaspersoft.jasperserver.war.action.ScheduleReportParametersAction">
+		<property name="repository" ref="${bean.repositoryService}"/>
+		<property name="engine" ref="engineService"/>
+		<property name="messages" ref="messageSource"/>
+		<property name="reportUnitAttrName" value="reportUnitURI"/>
+		<property name="hasInputControlsAttrName" value="hasReportParameters"/>
+        <property name="reportReadOnlyAttrName" value="isReportReadOnly"/>
+        <property name="reportFolderReadOnlyAttrName" value="isReportFolderReadOnly"/>
+        <property name="jobFormObjectClass" value="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJob"/>
+		<property name="jobFormObjectName" value="job"/>
+		<property name="jobFormObjectScope" value="FLOW"/>
+		<property name="controlsDisplayFormAttrName" value="controlsDisplayForm"/>
+		<property name="controlsDisplayViewAttrName" value="controlsDisplayView"/>
+		<property name="reportDisplayFormAttrName" value="reportDisplayForm"/>
+		<property name="reportUnitObjectAttrName" value="reportUnitObject"/>
+		<property name="calendarDatePatternAttrName" value="calendarDatePattern"/>
+		<property name="calendarDatetimePatternAttrName" value="calendarDatetimePattern"/>
+		<property name="calendarFormatProvider" ref="messagesCalendarFormatProvider"/>
+		<property name="attributeInputControlsInformation" value="inputControlsInformation"/>
+		<property name="inputControlsAttrName" value="inputControls"/>
+        <property name="messageSourceObjectAttrName" value="messageSource"/>
+        <property name="reportLoadingService" ref="${bean.reportLoadingService}"/>
+        <property name="objectPermissionService" ref="objectPermissionService"/>
+    </bean>
+
+	<bean id="reportJobValidator" class="com.jaspersoft.jasperserver.war.validation.ReportJobValidator">
+		<property name="schedulingService" ref="reportSchedulingService"/>
+	</bean>
+
+	<util:list id="recurrenceIntervalUnits">
+		<bean class="com.jaspersoft.jasperserver.war.dto.ByteEnum">
+			<property name="code">
+				<util:constant static-field="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJobSimpleTrigger.INTERVAL_MINUTE"/>
+			</property>
+			<property name="labelMessage">
+				<value>job.interval.unit.minute.label</value>
+			</property>
+		</bean>
+		<bean class="com.jaspersoft.jasperserver.war.dto.ByteEnum">
+			<property name="code">
+				<util:constant static-field="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJobSimpleTrigger.INTERVAL_HOUR"/>
+			</property>
+			<property name="labelMessage">
+				<value>job.interval.unit.hour.label</value>
+			</property>
+		</bean>
+		<bean class="com.jaspersoft.jasperserver.war.dto.ByteEnum">
+			<property name="code">
+				<util:constant static-field="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJobSimpleTrigger.INTERVAL_DAY"/>
+			</property>
+			<property name="labelMessage">
+				<value>job.interval.unit.day.label</value>
+			</property>
+		</bean>
+		<bean class="com.jaspersoft.jasperserver.war.dto.ByteEnum">
+			<property name="code">
+				<util:constant static-field="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJobSimpleTrigger.INTERVAL_WEEK"/>
+			</property>
+			<property name="labelMessage">
+				<value>job.interval.unit.week.label</value>
+			</property>
+		</bean>
+	</util:list>
+
+	<bean id="allOutputFormats" class="org.springframework.beans.factory.config.ListFactoryBean">
+		<property name="sourceList"><list>
+        <!-- comment/uncomment any of the beans below if you want related exporters 
+        	 to be excluded/included in the scheduler's output formats list -->
+        	 		
+		<bean class="com.jaspersoft.jasperserver.war.dto.ByteEnum">
+			<property name="code">
+				<util:constant static-field="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJob.OUTPUT_FORMAT_PDF"/>
+			</property>
+			<property name="labelMessage">
+				<value>report.output.pdf.label</value>
+			</property>
+		</bean>
+		<bean class="com.jaspersoft.jasperserver.war.dto.ByteEnum">
+			<property name="code">
+				<util:constant static-field="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJob.OUTPUT_FORMAT_HTML"/>
+			</property>
+			<property name="labelMessage">
+				<value>report.output.html.label</value>
+			</property>
+		</bean>
+		<bean class="com.jaspersoft.jasperserver.war.dto.ByteEnum">
+			<property name="code">
+				<util:constant static-field="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJob.OUTPUT_FORMAT_XLS"/>
+			</property>
+			<property name="labelMessage">
+				<value>report.output.xls.label</value>
+			</property>
+		</bean>
+		<bean class="com.jaspersoft.jasperserver.war.dto.ByteEnum">
+			<property name="code">
+				<util:constant static-field="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJob.OUTPUT_FORMAT_CSV"/>
+			</property>
+			<property name="labelMessage">
+				<value>report.output.csv.label</value>
+			</property>
+		</bean>
+		<bean class="com.jaspersoft.jasperserver.war.dto.ByteEnum">
+			<property name="code">
+				<util:constant static-field="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJob.OUTPUT_FORMAT_DOCX"/>
+			</property>
+			<property name="labelMessage">
+				<value>report.output.docx.label</value>
+			</property>
+		</bean>
+		<bean class="com.jaspersoft.jasperserver.war.dto.ByteEnum">
+			<property name="code">
+				<util:constant static-field="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJob.OUTPUT_FORMAT_RTF"/>
+			</property>
+			<property name="labelMessage">
+				<value>report.output.rtf.label</value>
+			</property>
+		</bean>
+		<bean class="com.jaspersoft.jasperserver.war.dto.ByteEnum">
+			<property name="code">
+				<util:constant static-field="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJob.OUTPUT_FORMAT_ODT"/>
+			</property>
+			<property name="labelMessage">
+				<value>report.output.odt.label</value>
+			</property>
+		</bean>
+		<bean class="com.jaspersoft.jasperserver.war.dto.ByteEnum">
+			<property name="code">
+				<util:constant static-field="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJob.OUTPUT_FORMAT_ODS"/>
+			</property>
+			<property name="labelMessage">
+				<value>report.output.ods.label</value>
+			</property>
+		</bean>
+		<bean class="com.jaspersoft.jasperserver.war.dto.ByteEnum">
+			<property name="code">
+				<util:constant static-field="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJob.OUTPUT_FORMAT_XLSX"/>
+			</property>
+			<property name="labelMessage">
+				<value>report.output.xlsx.label</value>
+			</property>
+		</bean>
+		<bean class="com.jaspersoft.jasperserver.war.dto.ByteEnum">
+			<property name="code">
+				<util:constant static-field="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJob.OUTPUT_FORMAT_XLS_NOPAG"/>
+			</property>
+			<property name="labelMessage">
+				<value>report.output.xls.nopag.label</value>
+			</property>
+		</bean>
+		<bean class="com.jaspersoft.jasperserver.war.dto.ByteEnum">
+			<property name="code">
+				<util:constant static-field="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJob.OUTPUT_FORMAT_XLSX_NOPAG"/>
+			</property>
+			<property name="labelMessage">
+				<value>report.output.xlsx.nopag.label</value>
+			</property>
+		</bean>
+		<bean class="com.jaspersoft.jasperserver.war.dto.ByteEnum">
+			<property name="code">
+				<util:constant static-field="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJob.OUTPUT_FORMAT_PPTX"/>
+			</property>
+			<property name="labelMessage">
+				<value>report.output.pptx.label</value>
+			</property>
+		</bean>
+		<bean class="com.jaspersoft.jasperserver.war.dto.ByteEnum">
+			<property name="code">
+				<util:constant static-field="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJob.OUTPUT_FORMAT_JSON"/>
+			</property>
+			<property name="labelMessage">
+				<value>report.output.json.label</value>
+			</property>
+		</bean>
+		<!-- 
+		<bean class="com.jaspersoft.jasperserver.war.dto.ByteEnum">
+			<property name="code">
+				<util:constant static-field="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJob.OUTPUT_FORMAT_TXT"/>
+			</property>
+			<property name="labelMessage">
+				<value>report.output.txt.label</value>
+			</property>
+		</bean>
+		-->
+		<!-- data snapshot persistence is turned off by default -->
+		<!-- 
+		<bean class="com.jaspersoft.jasperserver.war.dto.ByteEnum">
+			<property name="code">
+				<util:constant static-field="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJob.OUTPUT_FORMAT_DATA_SNAPSHOT"/>
+			</property>
+			<property name="labelMessage">
+				<value>report.output.data.snapshot.label</value>
+			</property>
+		</bean>
+		-->
+		</list></property>
+	</bean>
+</beans>

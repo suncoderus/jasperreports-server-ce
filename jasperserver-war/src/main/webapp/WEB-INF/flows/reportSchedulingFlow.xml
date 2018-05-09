@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<flow xmlns="http://www.springframework.org/schema/webflow" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+      ns0:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd"
+      start-state="viewList">
+
+    <input name="reportUnitURI"/>
+
+    <view-state id="viewList" view="modules/reportScheduling/jobList">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'viewList'"/>
+        </on-entry>
+        <on-render>
+            <evaluate expression="reportSchedulingListAction.listJobs"/>
+        </on-render>
+        <transition on="back" to="done"/>
+        <transition on="delete" to="deleteJobs"/>
+        <transition on="edit" to="jobEdit"/>
+        <transition on="new" to="newJob"/>
+        <transition on="now" to="runNow"/>
+        <transition on="refresh" to="viewList"/>
+    </view-state>
+
+    <action-state id="deleteJobs">
+        <evaluate expression="reportSchedulingListAction"/>
+        <transition on="success" to="ajaxView"/>
+    </action-state>
+
+    <subflow-state id="newJob" subflow="reportJobFlow">
+        <input name="isNewMode" value="true"/>
+        <input name="isRunNowMode" value="false"/>
+        <input name="reportUnitURI" value="flowScope.reportUnitURI"/>
+        <transition on="cancel" to="viewList"/>
+        <transition on="saved" to="redirectAfterEdit"/>
+    </subflow-state>
+
+    <subflow-state id="runNow" subflow="reportJobFlow">
+        <input name="isNewMode" value="true"/>
+        <input name="isRunNowMode" value="true"/>
+        <input name="reportUnitURI" value="flowScope.reportUnitURI"/>
+        <transition on="cancel" to="viewList"/>
+        <transition on="saved" to="redirectAfterEdit"/>
+    </subflow-state>
+
+    <subflow-state id="jobEdit" subflow="reportJobFlow">
+        <input name="isNewMode" value="false"/>
+        <input name="isRunNowMode" value="false"/>
+        <input name="reportUnitURI" value="flowScope.reportUnitURI"/>
+        <output name="errorMessage"/>
+        <output name="errorArguments"/>
+        <transition on="cancel" to="viewList"/>
+        <transition on="saved" to="redirectAfterEdit"/>
+        <transition on="jobNotFound" to="viewList"/>
+    </subflow-state>
+
+    <action-state id="redirectAfterEdit">
+        <evaluate expression="reportSchedulingListAction"/>
+        <transition to="viewList"/>
+    </action-state>
+
+    <end-state id="done" view="flowRedirect:searchFlow?lastMode=true"/>
+
+    <view-state id="ajaxView" view="ajax/ajaxresponse"/>
+
+    <!-- exceptions handling -->
+    <decision-state id="backFromError">
+        <if test="not (flowScope.prevForm == null or flowScope.prevForm == '')" then="${flowScope.prevForm}"
+            else="done"/>
+    </decision-state>
+
+    <view-state id="errorPage" view="modules/system/errorPage">
+        <on-entry>
+            <evaluate expression="errorPageHandlerAction"/>
+        </on-entry>
+    </view-state>
+
+    <global-transitions>
+        <transition on="backFromErrorPage" to="backFromError"/>
+        <transition on-exception="com.jaspersoft.jasperserver.api.JSException" to="cancelWithError">
+            <evaluate expression="reportOptionsSchedulingListAction.formatException"/>
+        </transition>
+        <transition on-exception="java.lang.Throwable" to="errorPage"/>
+    </global-transitions>
+
+    <!-- end exceptions handling -->
+    <bean-import resource="reportSchedulingBeans.xml"/>
+
+</flow>

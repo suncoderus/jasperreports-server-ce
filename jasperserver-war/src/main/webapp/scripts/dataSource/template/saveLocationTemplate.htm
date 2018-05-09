@@ -1,0 +1,14 @@
+<fieldset class="group">
+
+    <label title="{{- i18n['dialog.datasource.destination']}}" class="control saveLocation browser">
+        <span class="wrap">{{- i18n['dialog.datasource.destination']}} ({{- i18n['required.field']}}):</span>
+        <input type="text" value="{{- modelAttributes.parentFolderUri }}" {{ if (isEditMode) { }}disabled="disabled"{{ } }} name="parentFolderUri" id="parentFolderUri">
+        <button class="button action" type="button" {{ if (isEditMode) { }}disabled="disabled"{{ } }} id="parentFolderUriBrowse">
+			<span class="wrap">{{- i18n['dialog.file.browse'] }}...
+				<span class="icon"></span>
+			</span>
+		</button>
+        <span class="message warning"></span>
+    </label>
+
+</fieldset>

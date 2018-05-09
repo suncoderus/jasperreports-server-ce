@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>DatePicker</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+    <link type="text/css" href="../../../../demos/css/jasper-ui-dev.css" rel="stylesheet">
+    <link type="text/css" href="../../../../themes/default/jquery-ui/jquery-ui.css" rel="stylesheet">
+
+    <script type="text/javascript" src="../../requireSnippetsConfig.js"></script>
+    <script type="text/javascript" src="../../../bower_components/requirejs/require.js"></script>
+    <script type="text/javascript" src="../../../../config.js"></script>
+
+</head>
+<body>
+
+<div>
+    <div id="inline-picker" class="jr" style="float: left;margin-right: 2em"></div>
+
+    <div style="float: left;">
+        <div class="jr-mInput jr-uWidth-300px jr">
+            <label class="jr-mInput-label jr">Date</label>
+            <input class="jr-mInput-date jr" type="text">
+            <button class="jr-mInput-datetrigger jr">
+                <span class="jr-mInput-datetrigger-icon jr-mIcon jr-calendar jr"></span>
+            </button>
+            <span class="jr-mInput-alert jr-isInvisible jr">warning</span>
+        </div>
+    </div>
+
+
+</div>
+
+<script type="text/javascript">
+
+   require(["components/dateAndTime/DateAndTimePicker"], function(DateAndTimePicker){
+
+       new DateAndTimePicker({
+           el: "#inline-picker",
+           dateFormat: "mm/dd/yy"
+       });
+
+       var inputDatePicker = new DateAndTimePicker({
+           el: ".jr-mInput-date",
+           dateFormat: "mm/dd/yy"
+       });
+
+       $(".jr-mInput-datetrigger").on("click", function(){
+           inputDatePicker.show();
+       });
+
+   });
+
+</script>
+
+</body>
+</html>

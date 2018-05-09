@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <bean id="loggingService" class="com.jaspersoft.jasperserver.api.engine.common.service.impl.HibernateLoggingService">
+        <property name="sessionFactory" ref="sessionFactory"/>
+        <property name="securityContextProvider" ref="${bean.securityContextProvider}"/>
+        <property name="maximumAge" value="60"/>
+        <property name="objectMappingFactory" ref="mappingResourceFactory"/>
+        <property name="userHandler" ref="${bean.standardUserPersistenceHandler}"/>
+    </bean>
+
+    <bean id="logPurgerJob" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.JSMethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="loggingService"/>
+        <property name="targetMethod" value="purge"/>
+        <property name="scheduler" ref="quartzScheduler"/>
+    </bean>
+
+    <!--
+    <bean id="logPurgerJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="loggingService"/>
+        <property name="targetMethod" value="purge"/>
+    </bean>
+    -->
+
+    <bean id="logPurgerTrigger" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.JSCronTriggerBean">
+        <property name="jobDetail" ref="logPurgerJob"/>
+        <property name="cronExpression" value="0 0 2 * * ?"/>
+        <!-- no longer in Quartz
+        <property name="volatility" value="true"/>
+        -->
+    </bean>
+
+    <!--
+    <bean id="logPurgerTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail" ref="logPurgerJob"/>
+        <property name="cronExpression" value="0 0 2 * * ?"/>
+        <property name="volatility" value="true"/>
+    </bean>
+     -->
+
+    <bean id="nullFactoryBean" class="com.jaspersoft.jasperserver.war.common.NullFactoryBean"/>
+
+    <!--<bean id="nullBean" factory-bean="nullFactoryBean"/>-->
+
+    <bean name="hibernateLoggingServiceUserDeleteListener"
+		class="com.jaspersoft.jasperserver.api.engine.common.service.impl.LoggingServiceUserDeleteListener"/>
+
+</beans>

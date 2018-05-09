@@ -1,0 +1,1 @@
+JRS.Export=function(){return{configs:{TIMEOUT:12e5,DELAY:3e3},i18n:{}}}();

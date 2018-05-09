@@ -1,0 +1,1 @@
+define(["require","backbone","underscore","jrs.configs"],function(e){"use strict";var n=e("backbone"),r=e("underscore"),t=e("jrs.configs");return n.Collection.extend({url:t.contextPath+"/rest_v2/customDataSources",parse:function(e){var n=[];return e.definition&&r.each(e.definition,function(e){n.push({id:e})}),n}})});

@@ -1,0 +1,448 @@
+
+
+{
+    "uuid": "bd718cea-52e9-4c24-8b11-434d4cfb4d1c",
+    "adHocViewUri": "/public/Samples/Ad_Hoc_Views/2_Sales_Mix_by_Demographic",
+    "view":
+    {
+        "title": null,
+        "type": "olap_ichart",
+        "isOLAP": true,
+        "measures":
+            [
+                {
+                    "id": "Store Sales",
+                    "label": "Store Sales",
+                    "isMeasure": true
+                }
+            ],
+        "columns":
+            [
+                {
+                    "id": "Measures",
+                    "label": "Measures",
+                    "isNumeric": false
+                },
+                {
+                    "id": "Gender",
+                    "label": "Gender",
+                    "isNumeric": false
+                },
+                {
+                    "id": "Education Level",
+                    "label": "Education Level",
+                    "isNumeric": false
+                }
+            ],
+        "rows":
+            [
+                {
+                    "id": "Marital Status",
+                    "label": "Marital Status"
+                }
+            ],
+        "chartType": "column",
+        "xAxisRotation": 0,
+        "YAxisRotation": 0,
+        "xAxisStep": 1,
+        "yAxisStep": 1,
+        "showMeasureOnValueAxis": false,
+        "showDataPoints": true
+    },
+    "query":
+    {
+        "measures":
+            [
+                {
+                    "id": "Store Sales"
+                }
+            ],
+        "axes":
+        {
+            "rows":
+                [
+                    {
+                        "id": "(All)[Marital Status]",
+                        "expanded": true
+                    },
+                    {
+                        "id": "Marital Status[Marital Status]",
+                        "expanded": true
+                    }
+                ],
+            "columns":
+                [
+                    {
+                        "id": "MeasuresLevel",
+                        "expanded": false
+                    },
+                    {
+                        "id": "(All)[Gender]",
+                        "expanded": true
+                    },
+                    {
+                        "id": "Gender[Gender]",
+                        "expanded": true
+                    },
+                    {
+                        "id": "(All)[Education Level]",
+                        "expanded": true
+                    },
+                    {
+                        "id": "Education Level[Education Level]",
+                        "expanded": true
+                    }
+                ]
+        },
+        "sortBy":
+            [
+            ],
+        "fields":
+            [
+                {
+                    "id": "filter_2",
+                    "fieldName": "[Marital Status].[Marital Status]",
+                    "operatorName": "in",
+                    "totalCount": 0,
+                    "options":
+                        [
+                        ]
+                }
+            ],
+        "complexExpression": null
+    },
+    "fields":
+        [
+            {
+                "id": "filter_2",
+                "fieldName": "[Marital Status].[Marital Status]",
+                "operatorName": "in",
+                "totalCount": 2,
+                "options":
+                    [
+                        {
+                            "value": "[Marital Status].[All Marital Status].[M]",
+                            "selected": false
+                        },
+                        {
+                            "value": "[Marital Status].[All Marital Status].[S]",
+                            "selected": false
+                        }
+                    ]
+            }
+        ],
+    "dataset":
+    {
+        "dataCount": 3,
+        "data":
+            [
+                [
+                    565238.13,
+                    145505.41,
+                    32896.19,
+                    166739.64,
+                    52359.19,
+                    167737.7,
+                    280226.21,
+                    72119.26,
+                    17641.64,
+                    81112.23,
+                    27175.97,
+                    82177.11,
+                    285011.92,
+                    73386.15,
+                    15254.55,
+                    85627.41,
+                    25183.22,
+                    85560.59
+                ],
+                [
+                    278989.06,
+                    72988.37,
+                    16433.41,
+                    81446.04,
+                    26596.19,
+                    81525.05,
+                    139195.8,
+                    37110.98,
+                    9428.66,
+                    37664.64,
+                    15201.16,
+                    39790.36,
+                    139793.26,
+                    35877.39,
+                    7004.75,
+                    43781.4,
+                    11395.03,
+                    41734.69
+                ],
+                [
+                    286249.07,
+                    72517.04,
+                    16462.78,
+                    85293.6,
+                    25763,
+                    86212.65,
+                    141030.41,
+                    35008.28,
+                    8212.98,
+                    43447.59,
+                    11974.81,
+                    42386.75,
+                    145218.66,
+                    37508.76,
+                    8249.8,
+                    41846.01,
+                    13788.19,
+                    43825.9
+                ]
+            ],
+        "treeNodes":
+            [
+                {
+                    "label": "All",
+                    "level": 0,
+                    "axisCoordinate": -1,
+                    "children":
+                        [
+                            {
+                                "label": "",
+                                "level": 1,
+                                "axisCoordinate": 0,
+                                "children":
+                                    [
+                                    ],
+                                "all": true
+                            },
+                            {
+                                "label": "M",
+                                "level": 1,
+                                "axisCoordinate": 1,
+                                "children":
+                                    [
+                                    ],
+                                "all": false
+                            },
+                            {
+                                "label": "S",
+                                "level": 1,
+                                "axisCoordinate": 2,
+                                "children":
+                                    [
+                                    ],
+                                "all": false
+                            }
+                        ],
+                    "all": true
+                },
+                {
+                    "label": "All",
+                    "level": 0,
+                    "axisCoordinate": -1,
+                    "children":
+                        [
+                            {
+                                "label": "Store Sales",
+                                "level": 1,
+                                "axisCoordinate": -1,
+                                "children":
+                                    [
+                                        {
+                                            "label": "",
+                                            "level": 2,
+                                            "axisCoordinate": -1,
+                                            "children":
+                                                [
+                                                    {
+                                                        "label": "",
+                                                        "level": 3,
+                                                        "axisCoordinate": 0,
+                                                        "children":
+                                                            [
+                                                            ],
+                                                        "all": true
+                                                    },
+                                                    {
+                                                        "label": "Bachelors Degree",
+                                                        "level": 3,
+                                                        "axisCoordinate": 1,
+                                                        "children":
+                                                            [
+                                                            ],
+                                                        "all": false
+                                                    },
+                                                    {
+                                                        "label": "Graduate Degree",
+                                                        "level": 3,
+                                                        "axisCoordinate": 2,
+                                                        "children":
+                                                            [
+                                                            ],
+                                                        "all": false
+                                                    },
+                                                    {
+                                                        "label": "High School Degree",
+                                                        "level": 3,
+                                                        "axisCoordinate": 3,
+                                                        "children":
+                                                            [
+                                                            ],
+                                                        "all": false
+                                                    },
+                                                    {
+                                                        "label": "Partial College",
+                                                        "level": 3,
+                                                        "axisCoordinate": 4,
+                                                        "children":
+                                                            [
+                                                            ],
+                                                        "all": false
+                                                    },
+                                                    {
+                                                        "label": "Partial High School",
+                                                        "level": 3,
+                                                        "axisCoordinate": 5,
+                                                        "children":
+                                                            [
+                                                            ],
+                                                        "all": false
+                                                    }
+                                                ],
+                                            "all": true
+                                        },
+                                        {
+                                            "label": "F",
+                                            "level": 2,
+                                            "axisCoordinate": -1,
+                                            "children":
+                                                [
+                                                    {
+                                                        "label": "",
+                                                        "level": 3,
+                                                        "axisCoordinate": 6,
+                                                        "children":
+                                                            [
+                                                            ],
+                                                        "all": true
+                                                    },
+                                                    {
+                                                        "label": "Bachelors Degree",
+                                                        "level": 3,
+                                                        "axisCoordinate": 7,
+                                                        "children":
+                                                            [
+                                                            ],
+                                                        "all": false
+                                                    },
+                                                    {
+                                                        "label": "Graduate Degree",
+                                                        "level": 3,
+                                                        "axisCoordinate": 8,
+                                                        "children":
+                                                            [
+                                                            ],
+                                                        "all": false
+                                                    },
+                                                    {
+                                                        "label": "High School Degree",
+                                                        "level": 3,
+                                                        "axisCoordinate": 9,
+                                                        "children":
+                                                            [
+                                                            ],
+                                                        "all": false
+                                                    },
+                                                    {
+                                                        "label": "Partial College",
+                                                        "level": 3,
+                                                        "axisCoordinate": 10,
+                                                        "children":
+                                                            [
+                                                            ],
+                                                        "all": false
+                                                    },
+                                                    {
+                                                        "label": "Partial High School",
+                                                        "level": 3,
+                                                        "axisCoordinate": 11,
+                                                        "children":
+                                                            [
+                                                            ],
+                                                        "all": false
+                                                    }
+                                                ],
+                                            "all": false
+                                        },
+                                        {
+                                            "label": "M",
+                                            "level": 2,
+                                            "axisCoordinate": -1,
+                                            "children":
+                                                [
+                                                    {
+                                                        "label": "",
+                                                        "level": 3,
+                                                        "axisCoordinate": 12,
+                                                        "children":
+                                                            [
+                                                            ],
+                                                        "all": true
+                                                    },
+                                                    {
+                                                        "label": "Bachelors Degree",
+                                                        "level": 3,
+                                                        "axisCoordinate": 13,
+                                                        "children":
+                                                            [
+                                                            ],
+                                                        "all": false
+                                                    },
+                                                    {
+                                                        "label": "Graduate Degree",
+                                                        "level": 3,
+                                                        "axisCoordinate": 14,
+                                                        "children":
+                                                            [
+                                                            ],
+                                                        "all": false
+                                                    },
+                                                    {
+                                                        "label": "High School Degree",
+                                                        "level": 3,
+                                                        "axisCoordinate": 15,
+                                                        "children":
+                                                            [
+                                                            ],
+                                                        "all": false
+                                                    },
+                                                    {
+                                                        "label": "Partial College",
+                                                        "level": 3,
+                                                        "axisCoordinate": 16,
+                                                        "children":
+                                                            [
+                                                            ],
+                                                        "all": false
+                                                    },
+                                                    {
+                                                        "label": "Partial High School",
+                                                        "level": 3,
+                                                        "axisCoordinate": 17,
+                                                        "children":
+                                                            [
+                                                            ],
+                                                        "all": false
+                                                    }
+                                                ],
+                                            "all": false
+                                        }
+                                    ],
+                                "all": false
+                            }
+                        ],
+                    "all": true
+                }
+            ]
+    }
+}
+

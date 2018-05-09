@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+	<!-- parent map -->
+	<!--
+		This is the map containing localized font maps. 
+		Keys are Strings representing the language hold by the session context's Locale object.
+		Values are font maps.
+		Please feel free to uncomment, add simmilar elements, or modify the commented entries below.
+	 -->
+	
+	<util:map id="localePdfFontMap">
+	<!-- 
+	    <entry key="en" value-ref="enPdfFontMap"/>
+	    <entry key="ja_JP" value-ref="jaJpPdfFontMap"/>
+	-->
+	</util:map>
+	
+	<!-- end parent map -->
+	
+	<!-- localized font maps -->
+	<!--
+		Font maps are maps with specific structure: 
+		Keys are FontKey objects; values are PdfFont objects.
+	 -->
+	
+	<!-- 
+	<util:map id="enPdfFontMap">
+	    <entry key-ref="enArialFontKey" value-ref="enArialPdfFont"/>
+	    <entry key-ref="enComicSansMsFontKey" value-ref="enComicSansMsPdfFont"/>
+	</util:map>	
+	
+	<util:map id="jaJpPdfFontMap">
+	    <entry key-ref="jaJpArialFontKey" value-ref="jaJpArialPdfFont"/>
+	    <entry key-ref="jaJpComicSansMsFontKey" value-ref="jaJpComicSansMsPdfFont"/>
+	</util:map>	
+	-->
+	<!-- end localized font maps -->
+	
+	<!-- localized font keys -->
+	<!-- 
+	<bean id="enArialFontKey" class="net.sf.jasperreports.engine.export.FontKey">
+		<constructor-arg index="0" value="Arial"/>
+		<constructor-arg index="1" value="false"/>
+		<constructor-arg index="2" value="false"/>
+	</bean>
+
+	<bean id="enComicSansMsFontKey" class="net.sf.jasperreports.engine.export.FontKey">
+		<constructor-arg index="0" value="Comic Sans MS"/>
+		<constructor-arg index="1" value="false"/>
+		<constructor-arg index="2" value="false"/>
+	</bean>
+
+	<bean id="jaJpArialFontKey" class="net.sf.jasperreports.engine.export.FontKey">
+		<constructor-arg index="0" value="Arial"/>
+		<constructor-arg index="1" value="false"/>
+		<constructor-arg index="2" value="false"/>
+	</bean>
+
+	<bean id="jaJpComicSansMsFontKey" class="net.sf.jasperreports.engine.export.FontKey">
+		<constructor-arg index="0" value="Comic Sans MS"/>
+		<constructor-arg index="1" value="false"/>
+		<constructor-arg index="2" value="false"/>
+	</bean>
+	-->
+	<!-- end localized font keys -->
+	
+	<!-- localized pdf fonts -->
+	<!--
+		The best practice is to save first the desired pdfFont in the repository, 
+		and then to reference it in the 0-index constructor argument.
+		Another way, less safer is to save the .TTF object on your disk, and store its 
+		absolute path in the 0-index constructor argument.
+	 -->
+	
+	<!-- 
+	<bean id="enArialPdfFont" class="net.sf.jasperreports.engine.export.PdfFont">
+		<constructor-arg index="0" value="repo:/fonts/arial.ttf"/>
+		<constructor-arg index="1" value="Cp1252"/>
+		<constructor-arg index="2" value="false"/>
+		<constructor-arg index="3" value="false"/>
+		<constructor-arg index="4" value="false"/>
+	</bean>
+
+	<bean id="enComicSansMsPdfFont" class="net.sf.jasperreports.engine.export.PdfFont">
+		<constructor-arg index="0" value="../fonts/COMIC.TTF"/>
+		<constructor-arg index="1" value="Cp1252"/>
+		<constructor-arg index="2" value="false"/>
+		<constructor-arg index="3" value="false"/>
+		<constructor-arg index="4" value="false"/>
+	</bean>
+
+	<bean id="jaJpArialPdfFont" class="net.sf.jasperreports.engine.export.PdfFont">
+		<constructor-arg index="0" value="../fonts/ARIAL.TTF"/>
+		<constructor-arg index="1" value="Cp930"/>
+		<constructor-arg index="2" value="false"/>
+		<constructor-arg index="3" value="false"/>
+		<constructor-arg index="4" value="false"/>
+	</bean>
+
+	<bean id="jaJpComicSansMsPdfFont" class="net.sf.jasperreports.engine.export.PdfFont">
+		<constructor-arg index="0" value="../fonts/COMICBD.TTF"/>
+		<constructor-arg index="1" value="Cp930"/>
+		<constructor-arg index="2" value="false"/>
+	</bean>
+	-->
+	
+	<!-- end localized pdf fonts -->
+	
+</beans>

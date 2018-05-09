@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:util="http://www.springframework.org/schema/util"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+    <import resource="base-fixtures-config.xml"/>
+
+    <!-- sampleTestCase -->
+
+    <bean id="getValue1" class="java.util.HashMap" parent="baseTestCaseMap">
+        <constructor-arg index="0">
+            <map merge="true">
+                <entry key-ref="CONTROLS" value-ref="allControlsDefinition"/>
+                <entry key-ref="PARAMETER_TYPES" value-ref="parameterTypes"/>
+                <entry key-ref="QUERY_EXECUTOR" value-ref="queryExecutor"/>
+                <entry key-ref="TYPED_PARAMS_MAP">
+                    <map>
+                        <entry key="country"><null/></entry>
+                        <entry key="state"><null/></entry>
+                        <entry key="accountType"><null/></entry>
+                        <entry key="industry"><null/></entry>
+                        <entry key="name"><null/></entry>
+                    </map>
+                </entry>
+                <entry key-ref="EXPECTED_RESULT" value-ref="expectedResult"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="parameterTypes" class="java.util.HashMap">
+        <constructor-arg>
+            <map>
+                <entry key="country"><value type="java.lang.Class">java.util.Collection</value></entry>
+                <entry key="state"><value type="java.lang.Class">java.util.Collection</value></entry>
+                <entry key="accountType"><value type="java.lang.Class">java.lang.String</value></entry>
+                <entry key="industry"><value type="java.lang.Class">java.lang.String</value></entry>
+                <entry key="name"><value type="java.lang.Class">java.lang.String</value></entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <!-- input controls -->
+    <bean id="multiSelectQuery_inputControl" class="com.jaspersoft.jasperserver.war.cascade.utils.InputControlMock">
+        <property name="inputControlType" ref="TYPE_MULTI_SELECT_QUERY"/>
+    </bean>
+    <bean id="singleSelectQuery_inputControl" class="com.jaspersoft.jasperserver.war.cascade.utils.InputControlMock">
+        <property name="inputControlType" ref="TYPE_SINGLE_SELECT_QUERY"/>
+    </bean>
+
+    <bean id="query" class="com.jaspersoft.jasperserver.api.metadata.common.domain.client.QueryImpl"/>
+
+    <bean id="queryCountry" parent="query">
+        <property name="sql" value=""/>
+    </bean>
+    <bean id="queryRefCountry" class="com.jaspersoft.jasperserver.api.metadata.common.domain.ResourceReference">
+        <constructor-arg ref="queryCountry"/>
+    </bean>
+
+    <bean id="queryState" parent="query">
+        <property name="sql" value="country"/>
+    </bean>
+    <bean id="queryRefState" class="com.jaspersoft.jasperserver.api.metadata.common.domain.ResourceReference">
+        <constructor-arg ref="queryState"/>
+    </bean>
+
+    <bean id="queryAccountType" parent="query">
+        <property name="sql" value="country,state"/>
+    </bean>
+    <bean id="queryRefAccountType" class="com.jaspersoft.jasperserver.api.metadata.common.domain.ResourceReference">
+        <constructor-arg ref="queryAccountType"/>
+    </bean>
+
+    <bean id="queryIndustry" parent="query">
+        <property name="sql" value="country,state,accountType"/>
+    </bean>
+    <bean id="queryRefIndustry" class="com.jaspersoft.jasperserver.api.metadata.common.domain.ResourceReference">
+        <constructor-arg ref="queryIndustry"/>
+    </bean>
+
+    <bean id="queryName" parent="query">
+        <property name="sql" value="country,state,accountType,industry"/>
+    </bean>
+    <bean id="queryRefName" class="com.jaspersoft.jasperserver.api.metadata.common.domain.ResourceReference">
+        <constructor-arg ref="queryName"/>
+    </bean>
+
+    <bean id="country_inputControl" parent="multiSelectQuery_inputControl">
+        <property name="name" value="country"/>
+        <property name="label" value="Billing Country"/>
+        <property name="queryValueColumn" value="country"/>
+        <property name="queryVisibleColumnsList">
+            <list><value>country</value></list>
+        </property>
+        <property name="query" ref="queryRefCountry"/>
+    </bean>
+
+    <bean id="state_inputControl" parent="multiSelectQuery_inputControl">
+        <property name="name" value="state"/>
+        <property name="label" value="Billing State"/>
+        <property name="query" ref="queryRefState"/>
+        <property name="queryValueColumn" value="state"/>
+        <property name="queryVisibleColumnsList">
+            <list><value>state</value></list>
+        </property>
+    </bean>
+    <bean id="accountType_inputControl" parent="singleSelectQuery_inputControl">
+        <property name="name" value="accountType"/>
+        <property name="label" value="Account Type"/>
+        <property name="query" ref="queryRefAccountType"/>
+    </bean>
+    <bean id="industry_inputControl" parent="singleSelectQuery_inputControl">
+        <property name="name" value="industry"/>
+        <property name="label" value="Industry"/>
+        <property name="query" ref="queryRefIndustry"/>
+    </bean>
+    <bean id="name_inputControl" parent="singleSelectQuery_inputControl">
+        <property name="name" value="name"/>
+        <property name="label" value="Company Name"/>
+        <property name="query" ref="queryRefName"/>
+    </bean>
+
+    <!-- control infos -->
+
+    <bean id="stringCollection_controlInfo" class="com.jaspersoft.jasperserver.war.cascade.utils.ReportInputControlInformationMock">
+        <property name="valueType" value="java.util.Collection"/>
+        <property name="nestedType" value="java.lang.String"/>
+    </bean>
+    <bean id="string_controlInfo" class="com.jaspersoft.jasperserver.war.cascade.utils.ReportInputControlInformationMock">
+        <property name="valueType" value="java.lang.String"/>
+    </bean>
+
+    <bean id="country_controlInfo" parent="stringCollection_controlInfo">
+        <property name="parameterName" value="country"/>
+        <property name="promptLabel" value="Billing Country"/>
+        <property name="defaultValue">
+            <list value-type="java.lang.String">
+                <value>USA</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="state_controlInfo" parent="stringCollection_controlInfo">
+        <property name="parameterName" value="state"/>
+        <property name="promptLabel" value="Billing State"/>
+        <property name="defaultValue">
+            <list value-type="java.lang.String">
+                <value>CA</value>
+                <value>WA</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="accountType_controlInfo" parent="string_controlInfo">
+        <property name="parameterName" value="state"/>
+        <property name="promptLabel" value="Billing State"/>
+        <property name="defaultValue" value="Manufactoring"/>
+    </bean>
+    <bean id="industry_controlInfo" parent="string_controlInfo">
+        <property name="parameterName" value="industry"/>
+        <property name="promptLabel" value="Industry"/>
+        <property name="defaultValue" value="Telecommunications"/>
+    </bean>
+    <bean id="name_controlInfo" parent="string_controlInfo">
+        <property name="parameterName" value="name"/>
+        <property name="promptLabel" value="Company Name"/>
+        <property name="defaultValue" value="Fulcher-Berg Engineering Corp"/>
+    </bean>
+
+    <!-- control definitions -->
+    <bean id="countryControlDefinition" class="java.util.HashMap">
+        <constructor-arg index="0">
+            <map>
+                <entry key-ref="INPUT_CONTROL">
+                    <bean parent="country_inputControl">
+                        <property name="mandatory" value="true"/>
+                    </bean>
+                </entry>
+                <entry key-ref="CONTROL_INFO">
+                    <bean parent="country_controlInfo">
+                        <property name="defaultValue">
+                            <list>
+                                <value>Ukraine</value>
+                            </list>
+                        </property>
+                    </bean>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+    <bean id="stateControlDefinition" class="java.util.HashMap">
+        <constructor-arg index="0">
+            <map>
+                <entry key-ref="INPUT_CONTROL"> <!-- InputControl implementation -->
+                    <bean parent="state_inputControl">
+                        <property name="mandatory" value="true"/>
+                    </bean>
+                </entry>
+                <entry key-ref="CONTROL_INFO"> <!-- ReportInputControlInformation -->
+                    <bean parent="state_controlInfo">
+                        <property name="defaultValue">
+                            <list>
+                                <value>Zakarpatska</value>
+                            </list>
+                        </property>
+                    </bean>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+    <bean id="accountTypeControlDefinition" class="java.util.HashMap">
+        <constructor-arg index="0">
+            <map>
+                <entry key-ref="INPUT_CONTROL"> <!-- InputControl implementation -->
+                    <bean parent="accountType_inputControl">
+                        <property name="mandatory" value="true"/>
+                        <property name="defaultValue" value="Manufactoring"/>
+                    </bean>
+                </entry>
+                <entry key-ref="CONTROL_INFO"> <!-- ReportInputControlInformation -->
+                    <bean parent="accountType_controlInfo"/>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+    <bean id="industryControlDefinition" class="java.util.HashMap">
+        <constructor-arg index="0">
+            <map>
+                <entry key-ref="INPUT_CONTROL"> <!-- InputControl implementation -->
+                    <bean parent="industry_inputControl">
+                        <property name="mandatory" value="true"/>
+                        <property name="defaultValue" value="Telecommunications"/>
+                    </bean>
+                </entry>
+                <entry key-ref="CONTROL_INFO"> <!-- ReportInputControlInformation -->
+                    <bean parent="industry_controlInfo"/>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+    <bean id="nameControlDefinition" class="java.util.HashMap">
+        <constructor-arg index="0">
+            <map>
+                <entry key-ref="INPUT_CONTROL"> <!-- InputControl implementation -->
+                    <bean parent="name_inputControl">
+                        <property name="mandatory" value="true"/>
+                        <property name="defaultValue" value="Fulcher-Berg Engineering Corp"/>
+                    </bean>
+                </entry>
+                <entry key-ref="CONTROL_INFO"> <!-- ReportInputControlInformation -->
+                    <bean parent="name_controlInfo"/>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="allControlsDefinition" class="java.util.HashMap">
+        <constructor-arg index="0">
+            <map>
+                <entry key="country"> <!-- Control name -->
+                    <bean parent="countryControlDefinition"/>
+                </entry>
+                <entry key="state"> <!-- Control name -->
+                    <bean parent="stateControlDefinition"/>
+                </entry>
+                <entry key="accountType"> <!-- Control name -->
+                    <bean parent="accountTypeControlDefinition"/>
+                </entry>
+                <entry key="industry"> <!-- Control name -->
+                    <bean parent="industryControlDefinition"/>
+                </entry>
+                <entry key="name"> <!-- Control name -->
+                    <bean parent="nameControlDefinition"/>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="queryExecutor" class="java.util.HashMap">
+        <constructor-arg index="0">
+            <map>
+                <entry key="country">
+                    <map>
+                        <entry key="{}" value-ref="countries_queryResult"/>
+                    </map>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <!-- query results -->
+    <bean id="countries_queryResult" class="com.jaspersoft.jasperserver.war.cascade.utils.OrderedMapMock">
+        <constructor-arg>
+            <map>
+                <entry key="USA">
+                    <list><value>USA</value></list>
+                </entry>
+                <entry key="Ukraine">
+                    <list><value>Ukraine</value></list>
+                </entry>
+                <entry key="Canada">
+                    <list><value>Canada</value></list>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <!-- Expected results -->
+    <bean id="expectedResult" class="com.jaspersoft.jasperserver.dto.reports.inputcontrols.InputControlState">
+        <property name="value"><null/></property>
+        <property name="error"><null/></property>
+        <property name="id" value="country"/>
+        <property name="uri" value="/country"/>
+        <property name="options">
+            <list>
+                <bean class="com.jaspersoft.jasperserver.dto.reports.inputcontrols.InputControlOption">
+                    <property name="label" value="USA"/>
+                    <property name="value" value="USA"/>
+                    <property name="selected" value="false"/>
+                </bean>
+                <bean class="com.jaspersoft.jasperserver.dto.reports.inputcontrols.InputControlOption">
+                    <property name="label" value="Ukraine"/>
+                    <property name="value" value="Ukraine"/>
+                    <property name="selected" value="true"/>
+                </bean>
+                <bean class="com.jaspersoft.jasperserver.dto.reports.inputcontrols.InputControlOption">
+                    <property name="label" value="Canada"/>
+                    <property name="value" value="Canada"/>
+                    <property name="selected" value="false"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+</beans>
+
+
+
+

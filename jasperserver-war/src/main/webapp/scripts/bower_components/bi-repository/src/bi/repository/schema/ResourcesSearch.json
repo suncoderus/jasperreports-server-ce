@@ -1,0 +1,75 @@
+{
+    "type": "object",
+    "properties": {
+        "server": {
+            "type": "string",
+            "description": "Url to JRS instance."
+        },
+        "q": {
+            "type": "string",
+            "description": "Query string. Search for occurrence in label or description of resource."
+        },
+        "folderUri": {
+            "type": "string",
+            "description": "Parent folder URI."
+        },
+        "types": {
+            "type": "array",
+            "description": "Type of resources to search.",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "folder", "dataType", "jdbcDataSource", "awsDataSource", "jndiJdbcDataSource", "virtualDataSource",
+                    "customDataSource", "beanDataSource", "xmlaConnection", "listOfValues", "file", "reportOptions",
+                    "dashboard", "adhocDataView", "query", "olapUnit", "reportUnit", "domainTopic", "semanticLayerDataSource",
+                    "secureMondrianConnection", "mondrianXmlaDefinition", "mondrianConnection", "inputControl", "legacyDashboard"
+                ]
+            }
+        },
+        "offset": {
+            "type": "integer",
+            "description": "Pagination. Index of first resource to show.",
+            "minimum": 0
+        },
+        "limit": {
+            "type": "integer",
+            "description": "Pagination. Resources count per page.",
+            "minimum": 0
+        },
+        "recursive": {
+            "type": "boolean",
+            "description": "Flag indicates if search should be recursive."
+        },
+        "sortBy": {
+            "type": "string",
+            "description": "Field to sort on.",
+            "enum": [
+                "uri",
+                "label",
+                "description",
+                "type",
+                "creationDate",
+                "updateDate",
+                "accessTime",
+                "popularity"
+            ]
+        },
+        "accessType": {
+            "type": "string",
+            "description": "Filtering by type of access, e.g. what was done with resource.",
+            "enum": [
+                "viewed",
+                "modified"
+            ]
+        },
+        "showHiddenItems": {
+            "type": "boolean",
+            "description": "Flag indicates if hidden items should present in results."
+        },
+        "forceTotalCount": {
+            "type": "boolean",
+            "description": "If true, Total-Count header is always set (impact on performance), otherwise - in first page only"
+        }
+    },
+    "required": ["server"]
+}

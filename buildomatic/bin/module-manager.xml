@@ -1,0 +1,490 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+
+<project name="module-manager">
+
+
+    <!-- start module source package layout. Update these if layout structure or naming changes -->
+    <property name="delete-list" value="delete-list"/>
+    <property name="docs" value="docs"/>
+    <property name="extra" value="extra"/>
+    <property name="module-metadata" value="module-metadata"/>
+    <property name="process-src" value="process-src"/>
+    <property name="war" value="war"/>
+
+    <!-- default module location and name -->
+    <!-- assumed location is basedir (ie buildomatic/js-module.zip) -->
+    <property name="defaultModuleName" value="js-module"/>
+
+    <!-- SAMPLE PROPERTIES -->
+    <!-- <property name="webAppContext" value="CE"/> -->
+    <!-- <property name="webAppContext" value="Pro"/> -->
+
+
+    <!-- you have to know whether file is of type file or dir before deleting -->
+    <macrodef name="delete-any">
+        <attribute name="file"/>
+        <sequential>
+            <echo message="macrodef: delete-any"/>
+            <if>
+                <available type="dir" file="@{file}"/>
+                <then>
+                    <echo message="deleting @{file}"/>
+                    <delete dir="@{file}"/>
+                </then>
+                <else>
+                    <if>
+                        <available type="file" file="@{file}"/>
+                        <then>
+                            <echo message="deleting @{file}"/>
+                            <delete file="@{file}"/>
+                        </then>
+                    </if>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="check-any">
+        <attribute name="file"/>
+        <attribute name="type"/>
+        <sequential>
+            <if>
+                <not>
+                    <available type="@{type}" file="@{file}"/>
+                </not>
+                <then>
+                    <fail message="@{type} @{file} not found"/>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="check-dir">
+        <attribute name="dir"/>
+        <sequential>
+            <check-any type="dir" file="@{dir}"/>
+        </sequential>
+    </macrodef>
+
+
+    <macrodef name="check-file">
+        <attribute name="file"/>
+        <sequential>
+            <check-any type="file" file="@{file}"/>
+        </sequential>
+    </macrodef>
+    
+    <macrodef name="copy-war" 
+            description="copies a WAR -- arguments: warSource (WAR file or dir), warTarget">
+        <attribute name="warSource"/>
+        <attribute name="warTarget"/>
+        <sequential>
+            <echo message="macrodef: copy-war"/>
+            <!-- clobber old webapp -->
+            <delete-any file="@{warTarget}"/>
+            <!-- now copy war (file or dir) -->
+            <if>
+                <available type="dir" file="@{warSource}"/>
+                <then>
+                    <echo message="copying WAR directory @{warSource} to @{warTarget}"/>
+                    <copy toDir="@{warTarget}">
+                        <fileset dir="@{warSource}"/>
+                    </copy>
+                </then>
+                <elseif>
+                    <available type="file" file="@{warSource}"/>
+                    <then>
+                        <echo message="unarchiving WAR file @{warSource} to @{warTarget}"/>
+                        <copy toDir="@{warTarget}" preservelastmodified="true">
+                            <zipfileset src="@{warSource}"/>
+                        </copy>
+                    </then>
+                </elseif>
+                <else>
+                    <fail message="WAR file @{warSource} not found"/>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="apply-module" 
+            description="apply a module on top of a WAR -- arguments: 
+                                           moduleBase, moduleName, moduleSource, warSource, warTarget">
+        <attribute name="moduleBase"/>
+        <attribute name="moduleName"/>
+        <attribute name="moduleSource"/>
+        <attribute name="warSource"/>
+        <attribute name="warTarget"/>
+        <sequential>
+            <echo message="apply-module macro: start"/>
+            <!-- validate moduleSource and warTarget -->
+            <check-dir dir="@{moduleBase}"/>
+            <check-dir dir="@{moduleSource}"/>
+            <check-dir dir="@{warSource}"/>
+            <check-dir dir="@{warTarget}"/>
+
+            <!-- check for presence of module.properties file and load it -->
+            <var name="moduleProps" value="@{moduleBase}/${moduleName}/${module-metadata}/module.properties"/>
+            <check-file file="${moduleProps}"/>
+            <var file="${moduleProps}"/>
+
+            <!-- delete files in files-to-delete.txt -->
+            <var name="filesToDelete" value="@{moduleBase}/${moduleName}/${delete-list}/files-to-delete.txt"/>
+            <if>
+                <available file="${filesToDelete}"/>
+                <then>
+                    <echo message="apply-module macro: about to delete from files-to-delete.txt list"/>
+                    <delete verbose="true">
+                        <fileset dir="@{warTarget}" includesfile="${filesToDelete}"/>
+                    </delete>
+                </then>
+            </if>
+
+            <!-- copy new files -->
+            <var name="newFileSourceDir" value="@{moduleSource}"/>
+            <if>
+                <available type="dir" file="${newFileSourceDir}"/>
+                <then>
+                    <copy toDir="@{warTarget}" overwrite="true">
+                        <fileset dir="${newFileSourceDir}"/>
+                    </copy>
+                </then>
+            </if>
+            <!-- do various file mods -->
+            <echo message="apply-module macro: run tweekWar here"/>
+       
+            <java classname="org.mozilla.javascript.tools.shell.Main">
+              <arg value="${basedir}/conf_source/standAloneJS/tweakWar.js"/>
+              <arg value="@{warTarget}"/>
+              <arg value="@{moduleBase}/@{moduleName}/${process-src}/warUpdates"/>
+              <classpath>
+                <fileset dir="${basedir}/conf_source/standAloneJS/lib">
+                  <include name="**/*.jar"/>
+                </fileset>
+              </classpath>
+            </java>
+ 
+        </sequential>
+    </macrodef>
+   
+
+    <!-- check-webapp-context:                                                            -->
+    <!--   The module manage needs to know whether the module to be applied is CE or Pro  -->
+    <!--   This is because we need to know the war file name to copy from. In the future, -->
+    <!--   if we have more packages with more war names we can manage this with this      -->
+    <!--   kind of check-webapp-context logic.                                            -->
+    <!--   If no webAppContext is set, set default to: CE                                 -->
+
+    <macrodef name="check-webapp-context">
+        <sequential>
+            <echo message="check-webapp-context: checking webapp context"/>
+            <if>
+                <not>
+                    <isset property="webAppContext"/>
+                </not>
+                <then>
+                    <echo message="check-webapp-context: webAppContext property is not set"/>
+                    <echo message="check-webapp-context: setting to a default value: CE"/>
+                    <var name="webAppContext" value="CE"/>
+                </then>
+                <else>
+                    <echo message="check-webapp-context: webAppContext exists webAppContext=${webAppContext}"/>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+
+    <!-- check-for-moduleBase:                                                  -->  
+    <!--   To specify the location of a module, two properties should be set in -->
+    <!--   your default_master.properties file (moduleBase, moduleName).        --> 
+    <!--   If these properties are are not set, then we can try and look at     -->
+    <!--   the "default" module location (buildomatic/js-module.zip).           -->
+    <!--     If a module is found in the default location ask user if he        -->
+    <!--     wants to use it.                                                   --> 
+    <!--   If a valid module is found, unzip the module                         -->
+
+    <macrodef name="check-for-moduleBase">
+        <sequential>
+
+            <echo message="check-for-moduleBase: checking if moduleBase is defined"/>
+            <if>
+                <not>
+                    <isset property="moduleBase"/>
+                </not>
+                <then>
+                    <echo message="check-for-moduleBase: moduleBase property is not set"/>
+                    <echo message="check-for-moduleBase: setting to a default value: basedir, basedir=${basedir}"/>
+                    <var name="moduleBase" value="${basedir}"/>
+                    <var name="moduleBaseNotSet" value="true"/>
+                </then>
+                <else>
+                    <if>
+                        <not>
+                            <isset property="moduleName"/>
+                        </not>
+                        <then>
+                            <echo message="check-for-moduleBase: ERROR: moduleName property is not set"/>
+                            <fail message="check-for-moduleBase: moduleName property is not set"/>
+                        </then>
+                        <else>
+                            <echo message="check-for-moduleBase: moduleName exists: moduleName=${moduleName}"/>
+                            <var name="moduleBase" value="${moduleBase}"/>
+                            <var name="moduleName" value="${moduleName}"/>
+                            <var name="haveGoodModuleProps" value="true"/>
+                        </else>
+                    </if>
+                </else>
+            </if>
+            <if>
+                <!-- user can put a default module here: buildomatic/js-module.zip -->
+                <equals arg1="${moduleBaseNotSet}" arg2="true" />
+                <then>
+                    <echo message="check-for-moduleBase: look for default module file"/>
+                    <if>
+                        <available file="${moduleBase}/${defaultModuleName}.zip"/>
+                        <then>
+                            <echo message="check-for-moduleBase: js-module.zip exists"/>
+                            <echo message="check-for-moduleBase: set default moduleBase and moduleName properties"/>
+
+                            <!-- check if user wants to use this default module -->
+
+                            <echo message=" "/>
+                            <input message="A default module has been found at buildomatic/js-module.zip. Use this?"
+                                   validargs="y,n"
+                                   addproperty="do.yes"/>
+                            <if>
+                                <equals arg1="${do.yes}" arg2="n" />
+                                <then>
+                                    <echo message="check-for-moduleBase: don't use the default module js-module.zip"/>
+                                    <var name="haveGoodModuleProps" value="false"/>
+                                </then>
+                                <else>
+                                    <echo message="check-for-moduleBase: using default module buildomatic/js-module.zip"/>
+                                    <var name="moduleBase" value="${basedir}"/>
+                                    <var name="moduleName" value="${defaultModuleName}"/>
+                                    <var name="haveGoodModuleProps" value="true"/>
+                                </else>
+                            </if>
+                        </then>
+                        <else>
+                            <echo message="check-for-moduleBase: ERROR: default module does not exist:"/>
+                            <echo message="check-for-moduleBase: ${basedir}/${defaultModuleName}.zip "/>
+                            <fail message="check-for-moduleBase: don't have valid module properties"/>
+                        </else>
+                    </if>
+                </then>
+            </if>
+            <if>
+                <equals arg1="${haveGoodModuleProps}" arg2="true" />
+                <then>
+                    <echo message="check-for-moduleBase: have good module properties: unzip the module"/>
+
+                    <unzip dest="${moduleBase}/${moduleName}"
+                           src="${moduleBase}/${moduleName}.zip"
+                           overwrite="true"/> 
+                </then>
+                <else>
+                    <echo message="check-for-moduleBase: ERROR: don't have good module properties"/>
+                    <fail message="check-for-moduleBase: ERROR: don't have good module properties"/>
+                </else>
+            </if>
+
+        </sequential>
+    </macrodef>
+
+    <macrodef name="check-for-moduleBase-assemble">
+        <sequential>
+            <echo message="check-for-moduleBase-assemble: checking if moduleBase,moduleName are defined"/>
+            <if>
+                <not>
+                    <isset property="moduleBase"/>
+                </not>
+                <then>
+                    <echo message="check-for-moduleBase-assemble: ERROR: need valued moduleBase and moduleName properties"/>
+                    <fail message="moduleBase property is not set"/>
+                </then>
+                <else>
+                    <if>
+                        <not>
+                            <isset property="moduleName"/>
+                        </not>
+                        <then>
+                            <echo 
+                             message="check-for-moduleBase-assemble: ERROR: need valid moduleBase and moduleName properties"/>
+                            <fail message="moduleName property is not set"/>
+                        </then>
+                        <else>
+                            <var name="moduleBase" value="${moduleBase}"/>
+                            <var name="moduleName" value="${moduleName}"/>
+                        </else>
+                    </if>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+
+    <!-- ================================================================================= -->
+    <!-- apply-module:                                                                     -->
+    <!--   This target is used for applying a module to an already deployed                -->
+    <!--   JasperServer instance.                                                          -->
+    <!--                                                                                   -->
+    <!--   set a property in your default_master.properties to point to module             -->
+    <!--    moduleBase = <path-to-folder-holding-module>                                   -->
+    <!--    moduleName = <name-of-module> (don't include ".zip")                           -->
+    <!--                 (module is assumed to be a .zip file)                             -->
+    <!--    (or logic will look for a default module here: buildomatic/js-module.zip)      -->
+    <!-- ================================================================================= -->
+
+    <target name="apply-module"
+            depends="init-source-paths"
+            description="apply specified module to specified app server location">
+
+        <check-webapp-context/>   <!-- macro to set the webapp context value: CE or Pro --> 
+
+        <check-for-moduleBase/>   <!-- macro to help find location of the module to use -->
+       
+        <!-- in code below, we need to get the right names for the source and target webappnames  -->
+        <!-- for instance, for ce we use the following:                                           -->
+        <!-- webAppNameSrcCE (from conf_source/default.properties)                                -->
+        <!-- webAppNameCE    (from user setting in default_master.properties - can be customized) -->
+        <if>
+            <equals arg1="${webAppContext}" arg2="CE" />
+            <then>
+                <property name="moduleSource" value="${moduleBase}/${moduleName}/${war}/${webAppNameSrcCE}"/>
+                <property name="warSource" value="${warDir}/${webAppNameSrcCE}"/>  
+                <!-- call macro to set app server deployment location for tomcat, jboss, etc -->
+                <set-webapp-name webAppNameParam="${webAppNameCE}" webAppNameSrcParam="${webAppNameSrcCE}"
+                                 webAppNameDelParam="${webAppNameCE}"/>
+            </then>
+            <elseif>
+                <equals arg1="${webAppContext}" arg2="Pro" />
+                <then>
+                    <property name="moduleSource" value="${moduleBase}/${moduleName}/${war}/${webAppNameSrcPro}"/>
+                    <property name="warSource" value="${warDir}/${webAppNameSrcPro}"/>  
+                    <!-- call macro to set app server deployment location for tomcat, jboss, etc -->
+                    <set-webapp-name webAppNameParam="${webAppNamePro}" webAppNameSrcParam="${webAppNameSrcPro}"
+                                     webAppNameDelParam="${webAppNamePro}"/>
+                </then>
+            </elseif>
+            <else>
+                <echo message="WARNING: unable to determine webAppContext, ${webAppContext}"/>
+            </else>
+        </if>
+
+        <property name="warTarget" value="${warTargetDir}"/> <!-- value set from <set-webapp-name> -->
+
+        <echo message="apply-module: Settings:"/>
+        <echo message="moduleBase=${moduleBase}"/>
+        <echo message="moduleName=${moduleName}"/>
+        <echo message="moduleSource=${moduleSource}"/>
+        <echo message="warSource=${warSource}"/>
+        <echo message="warTarget=${warTarget}"/>
+
+        <check-dir dir="${moduleSource}"/>
+        <check-dir dir="${warSource}"/>
+        <check-dir dir="${warTarget}"/>
+
+        <!-- <copy-war warSource="${warSource}" warTarget="${warTarget}" /> -->
+        <apply-module moduleBase="${moduleBase}" 
+                      moduleName="${moduleName}" 
+                      moduleSource="${moduleSource}" 
+                      warSource="${warSource}" 
+                      warTarget="${warTarget}"/>
+    </target>
+
+    <!-- ======================================================================================= -->
+    <!-- assemble-module-war:                                                                    -->
+    <!--   This target is specific for building a war file that                                  -->
+    <!--   will be used by the final packages such as installers                                 -->
+    <!--   1) moduleBase: need the module location path (from default_master.props)              -->
+    <!--   2) moduleName: need the module location name (from default_master.props)              -->
+    <!--   3) warSource and warTarget are the same location in buildomatic/install_resources/war -->
+    <!--      a) so, we apply the moduleSource on top of the warTarget                           -->
+    <!--      b) warSource is not really needed in this case                                     -->
+    <!-- ======================================================================================= -->
+    <target name="assemble-module-war"
+            depends="init-source-paths"
+            description="apply specified module to buildomatic/install_resources/war location">
+
+        <!-- macro to set the webapp context value: CE or Pro -->
+
+        <check-webapp-context/> 
+    
+        <check-for-moduleBase-assemble/>
+
+        <!-- in code below, we need to get the right names for the source and target webappnames  -->
+        <!-- for instance, for ce we use the following:                                           -->
+        <!-- webAppNameSrcCE (from conf_source/default.properties)                                -->
+        <!-- webAppNameCE    (from user setting in default_master.properties - can be customized) -->
+        <if>
+            <equals arg1="${webAppContext}" arg2="CE" />
+            <then>
+                <property name="moduleSource" value="${moduleBase}/${moduleName}/${war}/${webAppNameSrcCE}"/>
+                <property name="warSource" value="${warDir}/${webAppNameSrcCE}"/>  
+                <property name="warTarget" value="${warDir}/${webAppNameCE}"/>
+            </then>
+            <elseif>
+                <equals arg1="${webAppContext}" arg2="Pro" />
+                <then>
+                    <echo message="webAppContext is: Pro"/>
+                    <property name="moduleSource" value="${moduleBase}/${moduleName}/${war}/${webAppNameSrcPro}"/>
+                    <property name="warSource" value="${warDir}/${webAppNameSrcPro}"/>  
+                    <property name="warTarget" value="${warDir}/${webAppNamePro}"/>
+                </then>
+            </elseif>
+            <else>
+                <echo message="WARNING: unable to determine webAppContext, ${webAppContext}"/>
+            </else>
+        </if>
+
+        <!-- print out paths we are using -->
+        <echo message="assemble-module-war: Path settings used: "/>
+        <echo message="moduleBase=${moduleBase}"/>
+        <echo message="moduleName=${moduleName}"/>
+        <echo message="moduleSource=${moduleSource}"/>
+        <echo message="warSource=${warSource}"/>
+        <echo message="warTarget=${warTarget}"/>
+
+        <check-dir dir="${moduleSource}"/>
+        <check-dir dir="${warSource}"/>
+        <check-dir dir="${warTarget}"/>
+
+        <if>
+            <equals arg1="${warSource}" arg2="${warTarget}" />
+            <then>
+                <echo message="warSource, warTarget are the same. Do not need to copy from source"/>
+            </then>
+            <else>
+                <echo message="copying from source to target"/>
+                <copy-war warSource="${warSource}" warTarget="${warTarget}" />
+            </else>
+        </if>
+
+        <apply-module moduleBase="${moduleBase}" 
+                      moduleName="${moduleName}" 
+                      moduleSource="${moduleSource}" 
+                      warSource="${warSource}"
+                      warTarget="${warTarget}"/>
+    </target>
+
+
+</project>

@@ -1,0 +1,93 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<project name="db">
+
+  <import file="${buildBin}/db-common.xml"/>
+
+  <!-- database tasks -->
+
+  <macrodef name="validateDBMSConnection">
+    <attribute name="jdbcUrl"/>
+    <attribute name="systemName" default="before"/>
+    <attribute name="phase" default="before"/>
+    <attribute name="failOnConnectionError" default="true"/>
+    <attribute name="failOnDBNotExists" default="false"/>
+    <attribute name="failOnUnrecoverableConnectionError" default="true"/>
+    <attribute name="connectionErrorOccurredProperty" default="connectionErrorOccurredProperty@{phase}"/>
+    <attribute name="errorSqlStateCodeProperty" default="errorSqlStateCodeProperty@{phase}"/>
+    <attribute name="errorNativeCodeProperty" default="errorNativeCodeProperty@{phase}"/>
+    <attribute name="errorMessageProperty" default="errorMessageProperty@{phase}"/>
+
+    <sequential>
+      <var name="dbExists" value=""/>
+
+      <runSQL jdbcUrl="@{jdbcUrl}"
+          print="false"
+          onerror="abort"
+          failOnConnectionError="@{failOnConnectionError}"
+          connectionErrorOccurredProperty="@{connectionErrorOccurredProperty}"
+          errorSqlStateCodeProperty="@{errorSqlStateCodeProperty}"
+          errorNativeCodeProperty="@{errorNativeCodeProperty}"
+          errorMessageProperty="@{errorMessageProperty}">
+        SELECT 0;
+      </runSQL>
+
+      <if>
+        <isset property="@{connectionErrorOccurredProperty}"/>
+        <then>
+          <connectionValidationFailureInfoListener
+              errorSqlStateCodeProperty="@{errorSqlStateCodeProperty}"
+              errorNativeCodeProperty="@{errorNativeCodeProperty}"
+              errorMessageProperty="@{errorMessageProperty}"/>
+          <if>
+            <matches pattern="^08.*" string="${@{errorSqlStateCodeProperty}}"/>
+            <then>
+              <hostPortValidationFailureListener
+                  failOnUnrecoverableConnectionError="@{failOnUnrecoverableConnectionError}"/>
+            </then>
+            <elseif>
+              <equals arg1="${@{errorSqlStateCodeProperty}}" arg2="28000"/>
+              <then>
+                <usernamePasswordValidationFailureListener
+                    failOnUnrecoverableConnectionError="@{failOnUnrecoverableConnectionError}"
+                    userName="${dbUsername}"
+                    password="${dbPassword}"/>
+              </then>
+            </elseif>
+            <elseif>
+              <equals arg1="${@{errorSqlStateCodeProperty}}" arg2="3D000"/>
+              <then>
+                <dBExistsValidationFailureListener failOnDBNotExists="@{failOnDBNotExists}"/>
+              </then>
+            </elseif>
+            <else>
+              <genericConnectionValidationFailureListener
+                  failOnUnrecoverableConnectionError="@{failOnUnrecoverableConnectionError}"
+                  errorMessageProperty="@{errorMessageProperty}"/>
+            </else>
+          </if>
+        </then>
+        <else>
+          <connectionOKValidationListener/>
+        </else>
+      </if>
+    </sequential>
+  </macrodef>
+
+</project>

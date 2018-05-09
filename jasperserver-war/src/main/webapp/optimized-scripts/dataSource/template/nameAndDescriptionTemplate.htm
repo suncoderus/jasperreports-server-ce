@@ -1,0 +1,25 @@
+<fieldset class="group shortFields">
+
+    <legend class="offLeft"><span>{{- i18n['resource.dataSource.nameanddesc']}}</span></legend>
+
+    <label title="{{- i18n['resource.dataSource.labelIDtitle']}}" class="control input text ">
+        <span class="wrap">{{- i18n['resource.dataSource.name']}} ({{- i18n['required.field']}}):</span>
+        <input type="text" value="{{- modelAttributes.label }}" name="label">
+        <span class="message warning"></span>
+    </label>
+
+
+    <label title="{{- i18n['resource.dataSource.nameIDtitle']}}" class="control input text ">
+        <span class="wrap">{{- i18n['resource.dataSource.resource']}} ({{- i18n['required.field']}}):</span>
+        <input type="text" {{ if (isEditMode) { }}readonly="readonly"{{ } }} value="{{- modelAttributes.name }}" name="name">
+        <span class="message warning"></span>
+    </label>
+
+
+    <label title="{{- i18n['resource.dataSource.descriptionTitle']}}" class="control textArea">
+        <span class="wrap">{{- i18n['resource.dataSource.description']}}</span>
+        <textarea type="text" name="description">{{- modelAttributes.description }}</textarea>
+        <span class="message warning"></span>
+    </label>
+
+</fieldset>

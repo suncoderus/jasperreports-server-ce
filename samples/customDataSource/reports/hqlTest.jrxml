@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="test" pageWidth="612" pageHeight="792" columnWidth="552" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20">
+	<property name="com.jaspersoft.ji.adhoc" value="1"/>
+	<style name="ReportDefault" isDefault="true" forecolor="#000000" backcolor="#FFFFFF" hAlign="Left" vAlign="Middle" fontName="SansSerif" fontSize="10" pdfFontName="Helvetica">
+		<box>
+			<pen lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="PageHeaderFooter" isDefault="false" style="ReportDefault" forecolor="#000000" vAlign="Top" fontName="SansSerif" fontSize="9">
+		<pen lineWidth="1.0" lineStyle="Solid"/>
+	</style>
+	<style name="Group1HeaderFooter" isDefault="false" style="ReportDefault" mode="Opaque" forecolor="#000000" backcolor="#FFFFFF" fontName="SansSerif" fontSize="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="Group1Header" isDefault="false" style="Group1HeaderFooter"/>
+	<style name="Group1Footer" isDefault="false" style="Group1HeaderFooter"/>
+	<style name="Group2HeaderFooter" isDefault="false" style="ReportDefault" mode="Opaque" forecolor="#000000" backcolor="#D0D0D0" fontName="SansSerif" fontSize="11" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="Group2Header" isDefault="false" style="Group2HeaderFooter"/>
+	<style name="Group2Footer" isDefault="false" style="Group2HeaderFooter"/>
+	<style name="Group3HeaderFooter" isDefault="false" style="ReportDefault" fontName="SansSerif" fontSize="11" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="Group3Header" isDefault="false" style="Group3HeaderFooter"/>
+	<style name="Group3Footer" isDefault="false" style="Group3HeaderFooter"/>
+	<style name="ColumnHeaderFooter" isDefault="false" style="ReportDefault" mode="Opaque" forecolor="#000000" backcolor="#C0C0C0" fontName="SansSerif" fontSize="11" isBold="true" pdfFontName="Helvetica-Bold">
+		<pen lineWidth="0.5" lineStyle="Solid"/>
+		<box>
+			<pen lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineStyle="Solid"/>
+			<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+		</box>
+	</style>
+	<style name="TableSummaries" isDefault="false" style="ReportDefault" mode="Opaque" forecolor="#000000" backcolor="#C0C0C0" fontName="SansSerif" fontSize="11" isBold="true" pdfFontName="Helvetica-Bold">
+		<pen lineWidth="0.5" lineStyle="Solid"/>
+		<box>
+			<pen lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineStyle="Solid"/>
+			<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+		</box>
+	</style>
+	<style name="Title" isDefault="false" style="ReportDefault" mode="Opaque" backcolor="#FFFFFF" hAlign="Center" fontName="SansSerif" fontSize="18" isBold="true" pdfFontName="Helvetica-Bold">
+		<pen lineWidth="0.5" lineStyle="Solid"/>
+		<box>
+			<pen lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineStyle="Solid"/>
+		</box>
+	</style>
+	<style name="Details" isDefault="false" style="ReportDefault" mode="Opaque" forecolor="#000000" backcolor="#FFFFFF">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{InnerRowCount}.intValue() % 2 == 0)]]></conditionExpression>
+			<style isDefault="false" style="Details" mode="Opaque" forecolor="#000000" backcolor="#EFEFEF"/>
+		</conditionalStyle>
+	</style>
+	<style name="CrosstabDefaults" isDefault="false" style="ReportDefault" mode="Opaque" forecolor="#000000" vAlign="Middle" fontName="SansSerif" fontSize="11" pdfFontName="Helvetica-Bold">
+		<box>
+			<pen lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="CrosstabTitleStyle" isDefault="false" style="ReportDefault" mode="Transparent" forecolor="#000000" hAlign="Center" vAlign="Middle" fontName="SansSerif" fontSize="13" isBold="true" pdfFontName="Helvetica-Bold">
+		<box>
+			<pen lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="CrosstabColumn1" isDefault="false" style="ReportDefault" mode="Opaque" forecolor="#000000" backcolor="#C0C0C0" hAlign="Center" vAlign="Middle" fontName="SansSerif" fontSize="11" isBold="true" pdfFontName="Helvetica-Bold">
+		<box>
+			<pen lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="CrosstabColumn2" isDefault="false" style="ReportDefault" mode="Opaque" forecolor="#000000" backcolor="#EFEFEF" hAlign="Center" vAlign="Middle" fontName="SansSerif" fontSize="11" isBold="true" pdfFontName="Helvetica-Bold">
+		<box>
+			<pen lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="CrosstabColumn3" isDefault="false" style="ReportDefault" mode="Opaque" forecolor="#000000" backcolor="#F5F2F2" hAlign="Center" vAlign="Middle" fontName="SansSerif" fontSize="11" isBold="true" pdfFontName="Helvetica-Bold">
+		<box>
+			<pen lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="CrosstabRow1" isDefault="false" style="ReportDefault" mode="Opaque" forecolor="#000000" backcolor="#FFFFFF" hAlign="Left" vAlign="Middle" fontName="SansSerif" fontSize="11" isBold="true" pdfFontName="Helvetica-Bold">
+		<box>
+			<pen lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="CrosstabRow2" isDefault="false" style="ReportDefault" mode="Opaque" forecolor="#000000" backcolor="#D0D0D0" hAlign="Left" vAlign="Middle" fontName="SansSerif" fontSize="11" isBold="true" pdfFontName="Helvetica-Bold">
+		<box>
+			<pen lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="CrosstabRow3" isDefault="false" style="ReportDefault" mode="Opaque" forecolor="#000000" backcolor="#F5F2F2" hAlign="Left" vAlign="Middle" fontName="SansSerif" fontSize="11" isBold="true" pdfFontName="Helvetica-Bold">
+		<box>
+			<pen lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="CrosstabGrandTotal" isDefault="false" style="ReportDefault" mode="Opaque" forecolor="#000000" backcolor="#C0C0C0" hAlign="Center" vAlign="Middle" fontName="SansSerif" fontSize="11" isBold="true" pdfFontName="Helvetica-Bold">
+		<box>
+			<pen lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="CrosstabColumnWidth" isDefault="false" style="ReportDefault" mode="Opaque" forecolor="#000000" vAlign="Middle" fontName="SansSerif" fontSize="11" pdfFontName="Helvetica-Bold">
+		<box>
+			<pen lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="CrosstabRowWidth" isDefault="false" style="ReportDefault" mode="Opaque" forecolor="#000000" vAlign="Middle" fontName="SansSerif" fontSize="11" pdfFontName="Helvetica-Bold">
+		<box>
+			<pen lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="CrosstabMeasureCell" isDefault="false" style="ReportDefault" mode="Opaque" forecolor="#000000" backcolor="#FFFFFF" vAlign="Middle" fontName="SansSerif" fontSize="10" pdfFontName="Helvetica-Bold">
+		<box>
+			<pen lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="ChartReportTitle" isDefault="false" style="ReportDefault" mode="Opaque" backcolor="#FFFFFF" hAlign="Center" fontName="SansSerif" fontSize="18" isBold="true" pdfFontName="Helvetica-Bold">
+		<pen lineWidth="0.5" lineStyle="Solid"/>
+		<box>
+			<pen lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineStyle="Solid"/>
+			<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+		</box>
+	</style>
+	<style name="ChartTitle" isDefault="false" forecolor="#000000" fontName="SansSerif" fontSize="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="ChartSubtitle" isDefault="false" forecolor="#000000" fontName="SansSerif" fontSize="9" isBold="false" pdfFontName="Helvetica"/>
+	<style name="ChartLegend" isDefault="false" forecolor="#000000" backcolor="#FFFFFF" fontName="SansSerif" fontSize="9" isBold="false" pdfFontName="Helvetica"/>
+	<style name="ChartSeriesColor0" isDefault="false" backcolor="#3333FF"/>
+	<style name="ChartSeriesColor1" isDefault="false" backcolor="#FF3333"/>
+	<style name="ChartSeriesColor2" isDefault="false" backcolor="#C2C2C2"/>
+	<style name="ChartSeriesColor3" isDefault="false" backcolor="#FFF333"/>
+	<style name="ChartSeriesColor4" isDefault="false" backcolor="#0BC349"/>
+	<style name="ChartSeriesColor5" isDefault="false" backcolor="#9A2CAB"/>
+	<style name="ChartSeriesColor6" isDefault="false" backcolor="#919191"/>
+	<style name="ChartSeriesColor7" isDefault="false" backcolor="#FF9C00"/>
+	<style name="ChartSeriesColor8" isDefault="false" backcolor="#00BFF3"/>
+	<style name="ChartSeriesColor9" isDefault="false" backcolor="#007205"/>
+	<style name="ChartSeriesColor10" isDefault="false" backcolor="#EC00B2"/>
+	<style name="ChartSeriesColor11" isDefault="false" backcolor="#4F0E73"/>
+	<style name="ChartSeriesColor12" isDefault="false" backcolor="#F25618"/>
+	<style name="ChartSeriesColor13" isDefault="false" backcolor="#2EE5E5"/>
+	<style name="ChartSeriesColor14" isDefault="false" backcolor="#35379C"/>
+	<style name="ChartSeriesColor15" isDefault="false" backcolor="#E8FF68"/>
+	<style name="ChartCategoryAxisLabelFormat" isDefault="false" forecolor="#000000" fontName="SansSerif" fontSize="11" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="ChartCategoryAxisTickFormat" isDefault="false" forecolor="#000000" fontName="SansSerif" fontSize="9" isBold="false" pdfFontName="Helvetica"/>
+	<style name="ChartValueAxisLabelFormat" isDefault="false" forecolor="#000000" fontName="SansSerif" fontSize="11" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="ChartValueAxisTickFormat" isDefault="false" forecolor="#000000" fontName="SansSerif" fontSize="9" isBold="false" pdfFontName="Helvetica"/>
+	<queryString language="hql">
+		<![CDATA[from com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.impl.RepoReportUnit]]>
+	</queryString>
+	<field name="version" class="java.lang.Integer">
+		<property name="adhoc.display" value="Version"/>
+	</field>
+	<field name="name" class="java.lang.String">
+		<property name="adhoc.display" value="Name"/>
+	</field>
+	<field name="label" class="java.lang.String">
+		<property name="adhoc.display" value="Label"/>
+	</field>
+	<field name="description" class="java.lang.String">
+		<property name="adhoc.display" value="Description"/>
+	</field>
+	<field name="creationDate" class="java.util.Date">
+		<property name="adhoc.display" value="Creation Date"/>
+	</field>
+	<field name="inputControlRenderingView" class="java.lang.String">
+		<property name="adhoc.display" value="Input control rendering view"/>
+	</field>
+	<field name="reportRenderingView" class="java.lang.String">
+		<property name="adhoc.display" value="Report rendering view"/>
+	</field>
+	<field name="alwaysPromptControls" class="java.lang.Boolean">
+		<property name="adhoc.display" value="Always prompt with controls"/>
+	</field>
+	<variable name="InnerRowCount" class="java.lang.Integer" resetType="None">
+		<variableExpression><![CDATA[$V{REPORT_COUNT}]]></variableExpression>
+	</variable>
+	<columnHeader>
+		<band height="25" splitType="Stretch">
+			<frame>
+				<reportElement style="ColumnHeaderFooter" x="0" y="0" width="1000" height="25"/>
+				<staticText>
+					<reportElement style="ColumnHeaderFooter" x="0" y="0" width="125" height="25"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right"/>
+					<text><![CDATA[Version]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="ColumnHeaderFooter" x="125" y="0" width="125" height="25"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<text><![CDATA[Name]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="ColumnHeaderFooter" x="250" y="0" width="125" height="25"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<text><![CDATA[Label]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="ColumnHeaderFooter" x="375" y="0" width="125" height="25"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<text><![CDATA[Description]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="ColumnHeaderFooter" x="500" y="0" width="125" height="25"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<text><![CDATA[CreationDate]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="ColumnHeaderFooter" x="625" y="0" width="125" height="25"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<text><![CDATA[InputControlRenderingView]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="ColumnHeaderFooter" x="750" y="0" width="125" height="25"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<text><![CDATA[ReportRenderingView]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="ColumnHeaderFooter" x="875" y="0" width="125" height="25"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<text><![CDATA[AlwaysPromptControls]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<frame>
+				<reportElement style="Details" x="0" y="0" width="1000" height="20"/>
+				<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+					<reportElement key="textField" x="0" y="0" width="125" height="20"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$F{version}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement key="textField" x="125" y="0" width="125" height="20"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement key="textField" x="250" y="0" width="125" height="20"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{label}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement key="textField" x="375" y="0" width="125" height="20"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{description}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="medium,hide" isBlankWhenNull="true">
+					<reportElement key="textField" x="500" y="0" width="125" height="20"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression class="java.util.Date"><![CDATA[$F{creationDate}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement key="textField" x="625" y="0" width="125" height="20"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{inputControlRenderingView}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement key="textField" x="750" y="0" width="125" height="20"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{reportRenderingView}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement key="textField" x="875" y="0" width="125" height="20"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression class="java.lang.Boolean"><![CDATA[$F{alwaysPromptControls}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</detail>
+	<summary>
+		<band height="25" splitType="Stretch">
+			<frame>
+				<reportElement key="frame-3" style="TableSummaries" x="0" y="0" width="1000" height="25"/>
+				<staticText>
+					<reportElement key="staticText-1" style="TableSummaries" stretchType="RelativeToBandHeight" x="10" y="0" width="0" height="25"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement/>
+					<text><![CDATA[Totals:]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<flow xmlns="http://www.springframework.org/schema/webflow" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+      ns0:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd"
+      start-state="startAddFileResource">
+
+    <!-- example:
+        "http://localhost:8080/jasperserver-pro/flow.html?_flowId=addFileResourceFlow"
+    -->
+
+    <view-state id="addFileResource" view="modules/addResource/fileResource/addFileResource">
+        <transition on="getNode" to="getNode"/>
+        <transition on="getChildren" to="getChildren"/>
+        <transition on="save" to="saveResource" >
+            <evaluate expression="fileResourceAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateAll"/>
+            </evaluate>
+        </transition>
+        <transition on="cancel" to="cancel" />
+        <transition on="error" to="errorPage"/>
+    </view-state>
+
+    <decision-state id="startAddFileResource">
+        <if test="requestParameters.method != null" then="${requestParameters.method}" else="initAction"/>
+    </decision-state>
+
+    <action-state id="initAction">
+        <evaluate expression="fileResourceAction"/>
+        <transition on="success" to="addFileResource"/>
+    </action-state>
+
+    <!-- folder actions-->
+    <action-state id="getNode">
+        <evaluate expression="RepositoryTreeAction"/>
+        <transition on="success" to="treeView"/>
+    </action-state>
+
+    <action-state id="getChildren">
+        <evaluate expression="RepositoryTreeAction"/>
+        <transition on="success" to="treeView"/>
+    </action-state>
+
+    <action-state id="saveResource">
+        <evaluate expression="fileResourceAction"/>
+        <transition on="success" to="finish"/>
+        <transition on="yes" to="backToSearch"/>
+    </action-state>
+
+    <!-- ajax views -->
+    <view-state id="ajaxView" view="ajax/ajaxresponse"/>
+    <view-state id="treeView" view="ajax/ajaxresponse"/>
+
+    <view-state id="ajaxError" view="ajax/ajaxerror"/>
+
+    <!-- redirect to another flow, e.g. run report, edit resource, etc. -->
+    <end-state id="backToSearch" view="flowRedirect:searchFlow?lastMode=true"/>
+    <end-state id="finish">
+        <output name="fileResource"/>
+    </end-state>
+    <end-state id="redirect" view="flowRedirect:${requestParameters.flowParams}"/>
+    <end-state id="cancel" view="flowRedirect:searchFlow?lastMode=true"/>
+    <end-state id="none"/>
+
+    <!-- exceptions handling -->
+    <decision-state id="backFromError">
+        <if test="not (flowScope.prevForm == null or flowScope.prevForm == '')" then="${flowScope.prevForm}"
+            else="cancel"/>
+    </decision-state>
+
+    <view-state id="errorPage" view="modules/system/errorPage">
+        <on-entry>
+            <evaluate expression="errorPageHandlerAction"/>
+        </on-entry>
+    </view-state>
+
+    <global-transitions>
+        <transition on="backFromErrorPage" to="backFromError"/>
+        <transition on-exception="java.lang.Throwable" to="errorPage"/>
+    </global-transitions>
+    <!-- end exceptions handling -->
+
+    <bean-import resource="spring-config.xml"/>
+    <bean-import resource="repositoryExplorerBean.xml"/>
+    <bean-import resource="fileResourceBeans.xml"/>
+
+
+</flow>

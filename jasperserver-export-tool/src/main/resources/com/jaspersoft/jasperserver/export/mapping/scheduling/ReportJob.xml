@@ -1,0 +1,279 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN" "http://castor.org/mapping.dtd">
+
+<mapping>
+
+	<class name="com.jaspersoft.jasperserver.export.modules.scheduling.beans.ReportJobBean">
+		<map-to xml="reportJob"/>
+		<field name="id" type="long">
+			<bind-xml name="jobId" node="element"/>
+		</field>
+		<field name="version" type="integer">
+			<bind-xml name="version" node="element"/>
+		</field>
+		<field name="username" type="string">
+			<bind-xml name="username" node="element"/>
+		</field>
+		<field name="label" type="string">
+			<bind-xml name="label" node="element"/>
+		</field>
+		<field name="description" type="string">
+			<bind-xml name="description" node="element"/>
+		</field>
+		<field name="trigger" type="com.jaspersoft.jasperserver.export.modules.scheduling.beans.ReportJobTriggerBean">
+			<bind-xml name="trigger" node="element"/>
+		</field>
+		<field name="source" type="com.jaspersoft.jasperserver.export.modules.scheduling.beans.ReportJobSourceBean">
+			<bind-xml name="source" node="element"/>
+		</field>
+		<field name="baseOutputFilename" type="string">
+			<bind-xml name="baseOutputFilename" node="element"/>
+		</field>
+		<field name="outputFormats" type="byte" collection="array">
+			<bind-xml name="outputFormat" node="element"/>
+		</field>
+		<field name="outputLocale" type="string">
+			<bind-xml name="outputLocale" node="element"/>
+		</field>
+		<field name="contentRepositoryDestination" type="com.jaspersoft.jasperserver.export.modules.scheduling.beans.ReportJobRepositoryDestinationBean">
+			<bind-xml name="contentRepositoryDestination" node="element"/>
+		</field>
+		<field name="mailNotification" type="com.jaspersoft.jasperserver.export.modules.scheduling.beans.ReportJobMailNotificationBean">
+			<bind-xml name="mailNotification" node="element"/>
+		</field>
+        <field name="alert" type="com.jaspersoft.jasperserver.export.modules.scheduling.beans.ReportJobAlertBean">
+			<bind-xml name="alert" node="element"/>
+		</field>
+        <field name="creationDate" type="timestamp">
+			<bind-xml name="creationDate" node="element"/>
+		</field>
+        <field name="paused" type="boolean">
+            <bind-xml name="paused" node="element"/>
+        </field>
+	</class>
+	
+	<class name="com.jaspersoft.jasperserver.export.modules.scheduling.beans.ReportJobTriggerBean" verify-constructable="false">
+		<map-to xml="reportJobTrigger"/>
+		<field name="id" type="long">
+			<bind-xml name="triggerId" node="element"/>
+		</field>
+		<field name="version" type="integer">
+			<bind-xml name="version" node="element"/>
+		</field>
+		<field name="timezone" type="string">
+			<bind-xml name="timezone" node="element"/>
+		</field>
+		<field name="startType" type="byte">
+			<bind-xml name="startType" node="element"/>
+		</field>
+		<field name="startDate" type="date">
+			<bind-xml name="startDate" node="element"/>
+		</field>
+		<field name="endDate" type="date">
+			<bind-xml name="endDate" node="element"/>
+		</field>
+        <field name="misfireInstruction" type="integer">
+			<bind-xml name="misfireInstruction" node="element"/>
+		</field>
+	</class>
+	
+	<class name="com.jaspersoft.jasperserver.export.modules.scheduling.beans.ReportJobSimpleTriggerBean" extends="com.jaspersoft.jasperserver.export.modules.scheduling.beans.ReportJobTriggerBean">
+		<map-to xml="reportJobSimpleTrigger"/>
+		<field name="occurrenceCount" type="integer">
+			<bind-xml name="occurrenceCount" node="element"/>
+		</field>
+		<field name="recurrenceInterval" type="java.lang.Integer">
+			<bind-xml name="recurrenceInterval" node="element"/>
+		</field>
+		<field name="recurrenceIntervalUnit" type="java.lang.Byte">
+			<bind-xml name="recurrenceIntervalUnit" node="element"/>
+		</field>
+	</class>
+	
+	<class name="com.jaspersoft.jasperserver.export.modules.scheduling.beans.ReportJobCalendarTriggerBean" extends="com.jaspersoft.jasperserver.export.modules.scheduling.beans.ReportJobTriggerBean">
+		<map-to xml="reportJobCalendarTrigger"/>
+		<field name="minutes" type="string">
+			<bind-xml name="minutes" node="element"/>
+		</field>
+		<field name="hours" type="string">
+			<bind-xml name="hours" node="element"/>
+		</field>
+		<field name="daysType" type="byte">
+			<bind-xml name="daysType" node="element"/>
+		</field>
+		<field name="weekDays" type="string">
+			<bind-xml name="weekDays" node="element"/>
+		</field>
+		<field name="monthDays" type="string">
+			<bind-xml name="monthDays" node="element"/>
+		</field>
+		<field name="months" type="string">
+			<bind-xml name="months" node="element"/>
+		</field>
+	</class>
+	
+	<class name="com.jaspersoft.jasperserver.export.modules.scheduling.beans.ReportJobSourceBean">
+		<map-to xml="reportJobSource"/>
+		<field name="reportUnitURI" type="string">
+			<bind-xml name="reportUnitURI" node="element"/>
+		</field>
+		<field name="parameters" collection="array" type="com.jaspersoft.jasperserver.export.modules.common.ReportParameterValueBean">
+			<bind-xml name="parameter" node="element"/>
+		</field>
+	</class>
+	
+	<class name="com.jaspersoft.jasperserver.export.modules.scheduling.beans.ReportJobRepositoryDestinationBean">
+		<map-to xml="reportJobRepositoryDestination"/>
+		<field name="id" type="long">
+			<bind-xml name="id" node="element"/>
+		</field>
+		<field name="version" type="integer">
+			<bind-xml name="version" node="element"/>
+		</field>
+		<field name="folderURI" type="string">
+			<bind-xml name="folderURI" node="element"/>
+		</field>
+		<field name="sequentialFilenames" type="boolean">
+			<bind-xml name="sequentialFilenames" node="element"/>
+		</field>
+		<field name="overwriteFiles" type="boolean">
+			<bind-xml name="overwriteFiles" node="element"/>
+		</field>
+		<field name="outputDescription" type="string">
+			<bind-xml name="outputDescription" node="element"/>
+		</field>
+		<field name="timestampPattern" type="string">
+			<bind-xml name="timestampPattern" node="element"/>
+		</field>
+        <field name="saveToRepository" type="boolean">
+			<bind-xml name="saveToRepository" node="element"/>
+		</field>
+		<field name="defaultReportOutputFolderURI" type="string">
+			<bind-xml name="defaultReportOutputFolderURI" node="element"/>
+		</field>
+		<field name="usingDefaultReportOutputFolderURI" type="boolean">
+			<bind-xml name="usingDefaultReportOutputFolderURI" node="element"/>
+		</field>
+		<field name="outputLocalFolder" type="string">
+			<bind-xml name="outputLocalFolder" node="element"/>
+		</field>
+		<field name="outputFTPInfo" type="com.jaspersoft.jasperserver.export.modules.scheduling.beans.FTPInfoBean">
+			<bind-xml name="outputFTPInfo" node="element"/>
+		</field>
+	</class>
+	
+	<class name="com.jaspersoft.jasperserver.export.modules.scheduling.beans.ReportJobMailNotificationBean">
+		<map-to xml="reportJobMailNotification"/>
+		<field name="id" type="long">
+			<bind-xml name="id" node="element"/>
+		</field>
+		<field name="version" type="integer">
+			<bind-xml name="version" node="element"/>
+		</field>
+		<field name="toAddresses" type="string" collection="array">
+			<bind-xml name="toAddress" node="element"/>
+		</field>
+		<field name="ccAddresses" type="string" collection="array">
+			<bind-xml name="ccAddress" node="element"/>
+		</field>
+		<field name="bccAddresses" type="string" collection="array">
+			<bind-xml name="bccAddress" node="element"/>
+		</field>
+		<field name="subject" type="string">
+			<bind-xml name="subject" node="element"/>
+		</field>
+		<field name="messageText" type="string">
+			<bind-xml name="messageText" node="element"/>
+		</field>
+		<field name="resultSendType" type="byte">
+			<bind-xml name="resultSendType" node="element"/>
+		</field>
+		<field name="skipEmptyReports" type="boolean">
+			<bind-xml name="skipEmptyReports" node="element"/>
+		</field>
+        <field name="messageTextWhenJobFails" type="string">
+			<bind-xml name="messageTextWhenJobFails" node="element"/>
+		</field>
+		<field name="includingStackTraceWhenJobFails" type="boolean">
+			<bind-xml name="includingStackTraceWhenJobFails" node="element"/>
+		</field>
+		<field name="skipNotificationWhenJobFails" type="boolean">
+			<bind-xml name="skipNotificationWhenJobFails" node="element"/>
+		</field>
+	</class>
+
+	<class name="com.jaspersoft.jasperserver.export.modules.scheduling.beans.ReportJobAlertBean">
+		<map-to xml="reportJobAlert"/>
+		<field name="id" type="long">
+			<bind-xml name="id" node="element"/>
+		</field>
+		<field name="version" type="integer">
+			<bind-xml name="version" node="element"/>
+		</field>
+        <field name="recipient" type="byte">
+			<bind-xml name="recipient" node="element"/>
+		</field>
+		<field name="toAddresses" type="string" collection="array">
+			<bind-xml name="toAddresses" node="element"/>
+		</field>
+        <field name="jobState" type="byte">
+			<bind-xml name="jobState" node="element"/>
+		</field>
+		<field name="subject" type="string">
+			<bind-xml name="subject" node="element"/>
+		</field>
+		<field name="messageText" type="string">
+			<bind-xml name="messageText" node="element"/>
+		</field>
+		<field name="messageTextWhenJobFails" type="string">
+			<bind-xml name="messageTextWhenJobFails" node="element"/>
+		</field>
+		<field name="includingStackTrace" type="boolean">
+			<bind-xml name="includingStackTrace" node="element"/>
+		</field>
+		<field name="includingReportJobInfo" type="boolean">
+			<bind-xml name="includingReportJobInfo" node="element"/>
+		</field>
+	</class>
+
+	<class name="com.jaspersoft.jasperserver.export.modules.scheduling.beans.FTPInfoBean">
+		<map-to xml="ftpInfo"/>
+        <field name="userName" type="string">
+            <bind-xml name="userName" node="element"/>
+        </field>
+        <field name="password" type="string">
+            <bind-xml name="password" node="element"/>
+        </field>
+        <field name="folderPath" type="string">
+            <bind-xml name="folderPath" node="element"/>
+        </field>
+        <field name="serverName" type="string">
+            <bind-xml name="serverName" node="element"/>
+        </field>
+        <field name="propertiesMapKeys" type="string" collection="array">
+			<bind-xml name="propertiesMapKeys" node="element"/>
+		</field>
+        <field name="propertiesMapValues" type="string" collection="array">
+			<bind-xml name="propertiesMapValues" node="element"/>
+		</field>
+	</class>
+
+</mapping>

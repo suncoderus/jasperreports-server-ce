@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<user>
+	<enabled>true</enabled>
+	<externallyDefined>false</externallyDefined>
+	<fullName>JUNIT_USER</fullName>
+	<password>JUNIT_USER</password>
+	<previousPasswordChangeTime>2011-10-03T16:54:30.887-07:00
+	</previousPasswordChangeTime>
+	<roles>
+		<externallyDefined>false</externallyDefined>
+		<roleName>ROLE_USER</roleName>
+	</roles>
+	<roles>
+		<externallyDefined>false</externallyDefined>
+		<roleName>ROLE_ADMINISTRATOR</roleName>
+	</roles>
+	<username>JUNIT_USER</username>
+</user>

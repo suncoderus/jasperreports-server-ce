@@ -1,0 +1,1 @@
+define({load:function(e,t,n,d){if(d.isBuild)return void n();var l=document.createElement("link");l.type="text/css",l.rel="stylesheet",l.href=t.toUrl(e),0!==l.href.indexOf("font")&&(l.className="jrWebFont"),document.getElementsByTagName("head")[0].appendChild(l),n()}});

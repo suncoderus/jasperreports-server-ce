@@ -1,0 +1,1 @@
+define(["require","backbone.marionette","serverSettingsCommon/enum/confirmDialogTypesEnum"],function(e){var n=e("backbone.marionette"),i=e("serverSettingsCommon/enum/confirmDialogTypesEnum");return n.Behavior.extend({events:{"click .delete":"_onDeleteClick"},_onDeleteClick:function(e){this.view.trigger("open:confirm",i.DELETE_CONFIRM,this.view,this.view.model)}})});

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<actions>
+    <!--context for home-->
+    <context name="main_home_mutton"/>
+
+    <context name="main_library_mutton"/>
+
+    <!--context for view option on primary menu-->
+        <context name="main_view_mutton" test="!banUserRole">
+            <selectAction labelKey="menu.repository">
+                <option labelKey="menu.search" action="primaryNavModule.navigationOption" actionArgs="search"/>
+                <option labelKey="menu.all" action="primaryNavModule.navigationOption" actionArgs="browse"/>
+                <option labelKey="menu.jobs" action="primaryNavModule.navigationOption" actionArgs="jobs"/>
+<!--
+                <option labelKey="menu.reports" action="primaryNavModule.navigationOption" actionArgs="report"/>
+                <condition test="isCEVersion">
+                    <option labelKey="menu.olap.views" action="primaryNavModule.navigationOption" actionArgs="olap"/>
+                </condition>
+                <condition test="isProVersion">
+                    <condition test="isAvailableProFeature" testArgs="ANA">
+                        <option labelKey="menu.olap.views" action="primaryNavModule.navigationOption" actionArgs="olap"/>
+                    </condition>
+                </condition>
+-->
+                <option labelKey="menu.events" action="primaryNavModule.navigationOption" actionArgs="event"/>
+            </selectAction>
+        </context>
+
+    <!--context for manage option on primary menu-->
+    <context name="main_manage_mutton" test="checkAuthenticationRoles" testArgs="ROLE_ADMINISTRATOR">
+        <condition test="isSupportedDevice">
+            <selectAction labelKey="menu.administration">
+                <!--pro only-->
+                <condition test="isProVersion">
+<!--
+                    <condition test="!banUserRole">
+                      <option labelKey="NAV_035_MANAGE_HOME_PAGE" action="primaryNavModule.navigationOption" actionArgs="adminHome"/>
+                    </condition>
+-->
+                    <condition test="showMTMenuItem">
+                        <option labelKey="NAV_055_TENANT" action="primaryNavModule.navigationOption" actionArgs="organization"/>
+                    </condition>
+                    <condition test="checkAuthenticationRoles" testArgs="ROLE_ETL_ADMIN">
+                      <condition test="!banUserRole">
+                          <option labelKey="NAV_037_ETL_ADMIN" action="primaryNavModule.navigationOption" actionArgs="etl"/>
+                       </condition>
+                    </condition>
+                </condition>
+                <!-- end pro only -->
+                <option labelKey="menu.users" action="primaryNavModule.navigationOption" actionArgs="user"/>
+                <condition test="!banUserRole">
+                  <option labelKey="menu.roles" action="primaryNavModule.navigationOption" actionArgs="role"/>
+                </condition>
+
+                <!--pro only-->
+<!--
+                <condition test="isProVersion">
+                <condition test="!banUserRole">
+                    <condition test="checkAuthenticationRoles" testArgs="ROLE_SUPERUSER">
+                        <condition test="isAvailableProFeature" testArgs="ANA">
+                            <option labelKey="menu.mondrian.properties" action="primaryNavModule.navigationOption" actionArgs="analysisOptions"/>
+                        </condition>
+                        <option labelKey="menu.adhoc.options" action="primaryNavModule.navigationOption" actionArgs="designerOptions"/>
+                        <option labelKey="menu.adhoc.cache" action="primaryNavModule.navigationOption" actionArgs="designerCache"/>
+                    </condition>
+                </condition>
+                </condition>
+-->
+                <!--end pro only-->
+                <condition test="isProVersion">
+                <condition test="!banUserRole">
+                    <condition test="checkAuthenticationRoles" testArgs="ROLE_SUPERUSER">
+                        <option labelKey="menu.server.settings" action="primaryNavModule.navigationOption" actionArgs="logSettings"/>
+                    </condition>
+                </condition>
+                </condition>
+                <condition test="isCEVersion">
+<!--
+                    <option labelKey="menu.mondrian.properties" action="primaryNavModule.navigationOption" actionArgs="mondrianProperties"/>
+-->
+                    <option labelKey="menu.server.settings" action="primaryNavModule.navigationOption" actionArgs="logSettings"/>
+                </condition>
+            </selectAction>
+        </condition>
+    </context>
+
+    <!--jasperserver designer pro only-->
+        <context name="main_create_mutton" test="isProVersion">
+          <condition test="!banUserRole">
+            <condition test="!isMainFeaturesDisabled">
+                <selectAction labelKey="NAV_005_CREATE">
+                    <condition test="isAvailableProFeature" testArgs="AHD">
+                        <option labelKey="NAV_051_ADHOC_REPORT" action="primaryNavModule.navigationOption"
+                                actionArgs="designer"/>
+                        <option labelKey="NAV_057_REPORT" action="JRS.CreateReport.selectADV"
+                                actionArgs="createReport"/>
+                    </condition>
+                    <condition test="isSupportedDevice">
+                        <condition test="isAvailableProFeature" testArgs="DB">
+                            <option labelKey="NAV_050_DASHBOARD" action="primaryNavModule.navigationOption"
+                                    actionArgs="dashboard"/>
+                        </condition>
+                        <condition test="isAvailableProFeature" testArgs="AHD">
+                            <condition test="checkAuthenticationRoles" testArgs="ROLE_ADMINISTRATOR">
+                                <option labelKey="NAV_056_DOMAIN" action="primaryNavModule.navigationOption"
+                                        actionArgs="domain"/>
+                                <option labelKey="NAV_058_DATA_SOURCE" action="primaryNavModule.navigationOption"
+                                        actionArgs="dataSource"/>
+                            </condition>
+                        </condition>
+                    </condition>
+                </selectAction>
+            </condition>
+          </condition>
+        </context>
+
+</actions>

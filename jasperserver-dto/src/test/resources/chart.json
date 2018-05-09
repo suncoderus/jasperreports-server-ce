@@ -1,0 +1,499 @@
+
+
+{
+    "uuid": "eefe5342-c786-412e-8974-2b26c54f8dcf",
+    "adHocViewUri": "/public/Samples/Ad_Hoc_Views/1_Geographic_Results_by_Segment",
+    "view":
+    {
+        "title": "Super REST",
+        "type": "ichart",
+        "isOLAP": false,
+        "measures":
+            [
+                {
+                    "id": "sales_fact_ALL.sales_fact_ALL__store_sales_2013",
+                    "label": "Store Sales 2013",
+                    "isMeasure": true
+                },
+                {
+                    "id": "sales_fact_ALL.sales_fact_ALL__store_cost_2013",
+                    "label": "Store Cost 2013",
+                    "isMeasure": true
+                },
+                {
+                    "id": "field_2",
+                    "label": "Store Sales 2013 / SQFT",
+                    "isMeasure": true
+                }
+            ],
+        "columns":
+            [
+                {
+                    "id": "Measures",
+                    "label": "Measures",
+                    "isNumeric": false
+                }
+            ],
+        "rows":
+            [
+                {
+                    "id": "sales_fact_ALL.sales__store.sales__store__store_type",
+                    "label": "Store Type"
+                },
+                {
+                    "id": "sales_fact_ALL.sales__store.sales__store__region.sales__store__region__sales_country",
+                    "label": "Country"
+                }
+            ],
+        "chartType": "multi_axis_column",
+        "xAxisRotation": 0,
+        "YAxisRotation": 0,
+        "xAxisStep": 1,
+        "yAxisStep": 1,
+        "showMeasureOnValueAxis": false,
+        "showDataPoints": true
+    },
+    "query":
+    {
+        "measures":
+            [
+                {
+                    "id": "sales_fact_ALL.sales_fact_ALL__store_sales_2013"
+                },
+                {
+                    "id": "sales_fact_ALL.sales_fact_ALL__store_cost_2013"
+                },
+                {
+                    "id": "field_2"
+                }
+            ],
+        "axes":
+        {
+            "rows":
+                [
+                    {
+                        "id": "sales_fact_ALL.sales__store.sales__store__store_type",
+                        "expanded": true
+                    },
+                    {
+                        "id": "sales_fact_ALL.sales__store.sales__store__region.sales__store__region__sales_country",
+                        "expanded": true
+                    }
+                ],
+            "columns":
+                [
+                    {
+                        "id": "Measures",
+                        "expanded": false
+                    }
+                ]
+        },
+        "sortBy":
+            [
+            ],
+        "fields":
+            [
+                {
+                    "id": "filter_1",
+                    "fieldName": "sales_fact_ALL.sales_fact_ALL__store_sales_2013",
+                    "operatorName": "greater",
+                    "totalCount": 0,
+                    "value": "19"
+                },
+                {
+                    "id": "filter_2",
+                    "fieldName": "sales_fact_ALL.sales__product.sales__product__low_fat",
+                    "operatorName": "in",
+                    "totalCount": 0,
+                    "options":
+                        [
+                            {
+                                "value": "true",
+                                "selected": true
+                            }
+                        ]
+                },
+                {
+                    "id": "filter_3",
+                    "fieldName": "sales_fact_ALL.sales__product.sales__product__recyclable_package",
+                    "operatorName": "in",
+                    "totalCount": 0,
+                    "options":
+                        [
+                            {
+                                "value": "false",
+                                "selected": true
+                            }
+                        ]
+                },
+                {
+                    "id": "filter_4",
+                    "fieldName": "sales_fact_ALL.sales__product.sales__product__product_name",
+                    "operatorName": "isAnyValue",
+                    "totalCount": 0
+                }
+            ],
+        "complexExpression": "A and D and (B or C)"
+    },
+    "fields":
+        [
+            {
+                "id": "filter_1",
+                "fieldName": "sales_fact_ALL.sales_fact_ALL__store_sales_2013",
+                "operatorName": "greater",
+                "totalCount": 0,
+                "value": "19"
+            },
+            {
+                "id": "filter_2",
+                "fieldName": "sales_fact_ALL.sales__product.sales__product__low_fat",
+                "operatorName": "in",
+                "totalCount": 2,
+                "options":
+                    [
+                        {
+                            "value": true,
+                            "selected": false
+                        },
+                        {
+                            "value": false,
+                            "selected": false
+                        }
+                    ]
+            },
+            {
+                "id": "filter_3",
+                "fieldName": "sales_fact_ALL.sales__product.sales__product__recyclable_package",
+                "operatorName": "in",
+                "totalCount": 2,
+                "options":
+                    [
+                        {
+                            "value": true,
+                            "selected": false
+                        },
+                        {
+                            "value": false,
+                            "selected": false
+                        }
+                    ]
+            },
+            {
+                "id": "filter_4",
+                "fieldName": "sales_fact_ALL.sales__product.sales__product__product_name",
+                "operatorName": "isAnyValue",
+                "totalCount": 0
+            }
+        ],
+    "dataset":
+    {
+        "dataCount": 15,
+        "data":
+            [
+                [
+                    215.8,
+                    89.539,
+                    0.0008488309890179049
+                ],
+                [
+                    704.7,
+                    277.5115,
+                    0.0008840786801170742
+                ],
+                [
+                    257.98,
+                    105.229,
+                    0.0006398789592479599
+                ],
+                [
+                    1178.48,
+                    472.2795,
+                    0.0008102286485486795
+                ],
+                [
+                    78.35,
+                    32.9595,
+                    0.0008244244286375689
+                ],
+                [
+                    136.9,
+                    54.9575,
+                    0.0008256139335166691
+                ],
+                [
+                    215.25,
+                    87.917,
+                    0.000825180562157852
+                ],
+                [
+                    58.75,
+                    20.752,
+                    0.0005684237006076087
+                ],
+                [
+                    116.45,
+                    45.9955,
+                    0.0005226660682226212
+                ],
+                [
+                    19.05,
+                    6.6675,
+                    null
+                ],
+                [
+                    194.25,
+                    73.415,
+                    0.0005955738971535094
+                ],
+                [
+                    194.35,
+                    82.2235,
+                    0.0006411694455624541
+                ],
+                [
+                    800,
+                    318.77,
+                    0.0008919383269243848
+                ],
+                [
+                    994.35,
+                    400.9935,
+                    0.0008285966896131049
+                ],
+                [
+                    2582.33,
+                    1034.605,
+                    0.0007966338346569791
+                ]
+            ],
+        "treeNodes":
+            [
+                {
+                    "label": "Totals",
+                    "level": 0,
+                    "axisCoordinate": -1,
+                    "children":
+                        [
+                            {
+                                "label": "Deluxe Supermarket",
+                                "level": 1,
+                                "axisCoordinate": -1,
+                                "children":
+                                    [
+                                        {
+                                            "label": "Canada",
+                                            "level": 2,
+                                            "axisCoordinate": 0,
+                                            "children":
+                                                [
+                                                ],
+                                            "all": false
+                                        },
+                                        {
+                                            "label": "Mexico",
+                                            "level": 2,
+                                            "axisCoordinate": 1,
+                                            "children":
+                                                [
+                                                ],
+                                            "all": false
+                                        },
+                                        {
+                                            "label": "USA",
+                                            "level": 2,
+                                            "axisCoordinate": 2,
+                                            "children":
+                                                [
+                                                ],
+                                            "all": false
+                                        },
+                                        {
+                                            "label": "Totals",
+                                            "level": 2,
+                                            "axisCoordinate": 3,
+                                            "children":
+                                                [
+                                                ],
+                                            "all": true
+                                        }
+                                    ],
+                                "all": false
+                            },
+                            {
+                                "label": "Gourmet Supermarket",
+                                "level": 1,
+                                "axisCoordinate": -1,
+                                "children":
+                                    [
+                                        {
+                                            "label": "Mexico",
+                                            "level": 2,
+                                            "axisCoordinate": 4,
+                                            "children":
+                                                [
+                                                ],
+                                            "all": false
+                                        },
+                                        {
+                                            "label": "USA",
+                                            "level": 2,
+                                            "axisCoordinate": 5,
+                                            "children":
+                                                [
+                                                ],
+                                            "all": false
+                                        },
+                                        {
+                                            "label": "Totals",
+                                            "level": 2,
+                                            "axisCoordinate": 6,
+                                            "children":
+                                                [
+                                                ],
+                                            "all": true
+                                        }
+                                    ],
+                                "all": false
+                            },
+                            {
+                                "label": "Mid-Size Grocery",
+                                "level": 1,
+                                "axisCoordinate": -1,
+                                "children":
+                                    [
+                                        {
+                                            "label": "Canada",
+                                            "level": 2,
+                                            "axisCoordinate": 7,
+                                            "children":
+                                                [
+                                                ],
+                                            "all": false
+                                        },
+                                        {
+                                            "label": "Mexico",
+                                            "level": 2,
+                                            "axisCoordinate": 8,
+                                            "children":
+                                                [
+                                                ],
+                                            "all": false
+                                        },
+                                        {
+                                            "label": "USA",
+                                            "level": 2,
+                                            "axisCoordinate": 9,
+                                            "children":
+                                                [
+                                                ],
+                                            "all": false
+                                        },
+                                        {
+                                            "label": "Totals",
+                                            "level": 2,
+                                            "axisCoordinate": 10,
+                                            "children":
+                                                [
+                                                ],
+                                            "all": true
+                                        }
+                                    ],
+                                "all": false
+                            },
+                            {
+                                "label": "Supermarket",
+                                "level": 1,
+                                "axisCoordinate": -1,
+                                "children":
+                                    [
+                                        {
+                                            "label": "Mexico",
+                                            "level": 2,
+                                            "axisCoordinate": 11,
+                                            "children":
+                                                [
+                                                ],
+                                            "all": false
+                                        },
+                                        {
+                                            "label": "USA",
+                                            "level": 2,
+                                            "axisCoordinate": 12,
+                                            "children":
+                                                [
+                                                ],
+                                            "all": false
+                                        },
+                                        {
+                                            "label": "Totals",
+                                            "level": 2,
+                                            "axisCoordinate": 13,
+                                            "children":
+                                                [
+                                                ],
+                                            "all": true
+                                        }
+                                    ],
+                                "all": false
+                            },
+                            {
+                                "label": "Totals",
+                                "level": 1,
+                                "axisCoordinate": -1,
+                                "children":
+                                    [
+                                        {
+                                            "label": "Totals",
+                                            "level": 2,
+                                            "axisCoordinate": 14,
+                                            "children":
+                                                [
+                                                ],
+                                            "all": true
+                                        }
+                                    ],
+                                "all": true
+                            }
+                        ],
+                    "all": true
+                },
+                {
+                    "label": "Totals",
+                    "level": 0,
+                    "axisCoordinate": -1,
+                    "children":
+                        [
+                            {
+                                "label": "Store Sales 2013",
+                                "level": 1,
+                                "axisCoordinate": 0,
+                                "children":
+                                    [
+                                    ],
+                                "all": false
+                            },
+                            {
+                                "label": "Store Cost 2013",
+                                "level": 1,
+                                "axisCoordinate": 1,
+                                "children":
+                                    [
+                                    ],
+                                "all": false
+                            },
+                            {
+                                "label": "Store Sales 2013 / SQFT",
+                                "level": 1,
+                                "axisCoordinate": 2,
+                                "children":
+                                    [
+                                    ],
+                                "all": false
+                            }
+                        ],
+                    "all": true
+                }
+            ]
+    }
+}
+

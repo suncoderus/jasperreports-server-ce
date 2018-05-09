@@ -1,0 +1,1 @@
+define(["require","jquery","underscore","requestSettings"],function(e){"use strict";var r=e("jquery"),t=e("underscore"),n=e("requestSettings");return function(){var e=t.extend({},n,arguments[0]);return n.headers&&arguments[0].headers&&(e.headers=t.extend({},n.headers,arguments[0].headers)),arguments[0]=e,r.ajax.apply(r,arguments)}});

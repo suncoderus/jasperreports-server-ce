@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<datasources>
+
+   <local-tx-datasource>
+      <jndi-name>${js.jndi}</jndi-name>
+      <connection-url>${js.jdbcUrl}</connection-url>
+      <driver-class>${jdbcDriverClass}</driver-class>
+      <user-name>${js.dbUsername}</user-name>
+      <password>${escapeXML:js.dbPassword}</password>
+      <min-pool-size>5</min-pool-size>
+      <max-pool-size>50</max-pool-size>
+      <idle-timeout-minutes>30</idle-timeout-minutes>
+   </local-tx-datasource>
+   
+   <local-tx-datasource>
+      <jndi-name>${sugarcrm.jndi}</jndi-name>
+      <connection-url>${sugarcrm.jdbcUrl}</connection-url>
+      <driver-class>${jdbcDriverClass}</driver-class>
+      <user-name>${sugarcrm.dbUsername}</user-name>
+      <password>${escapeXML:sugarcrm.dbPassword}</password>
+      <min-pool-size>5</min-pool-size>
+      <max-pool-size>50</max-pool-size>
+      <idle-timeout-minutes>30</idle-timeout-minutes>
+   </local-tx-datasource>
+   
+   <local-tx-datasource>
+      <jndi-name>${foodmart.jndi}</jndi-name>
+      <connection-url>${foodmart.jdbcUrl}</connection-url>
+      <driver-class>${jdbcDriverClass}</driver-class>
+      <user-name>${foodmart.dbUsername}</user-name>
+      <password>${escapeXML:foodmart.dbPassword}</password>
+      <min-pool-size>5</min-pool-size>
+      <max-pool-size>50</max-pool-size>
+      <idle-timeout-minutes>30</idle-timeout-minutes>
+   </local-tx-datasource>
+   
+</datasources>
+

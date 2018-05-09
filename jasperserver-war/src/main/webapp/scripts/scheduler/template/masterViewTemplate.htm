@@ -1,0 +1,65 @@
+<div class="page column decorated primary listOfJobs masterView">
+	<div class="content">
+
+		<div class="header ">
+			<div class="title">
+				{{- i18n["menu.jobs"] }}
+			</div>
+			<span data-component-type="search" data-tab-index="3" class="control searchLockup " id="secondarySearchBox">
+				<label class="offLeft" for="secondarySearchInput">{{- i18n["SEARCH_SEARCH"] }}</label>
+				<div class="wrap">
+					<input type="text" tabindex="" name="jobSearchInput" id="secondarySearchInput" class="" value="{{- searchTerm }}">
+				</div>
+				<b class="right">
+					<a name="jobSearchClear" class="button searchClear"></a>
+				</b>
+				<a class="button search up" name="jobSearchIcon"></a>
+			</span>
+			<!--
+			<ul js-stdnav="false" js-navtype="none" tabindex="-1" class="list tabSet text control horizontal" id="sortMode" style="-moz-user-select: none;">
+				<li class="label first" id="sortMode_item1" js-navtype="dynamiclist" tabindex="-1" disabled="disabled">
+					<p class="wrap">{{- i18n["report.scheduling.sortby"] }}:</p>
+				</li>
+				<li class="tab selected cursor" id="sortMode_item2" js-navtype="dynamiclist" tabindex="-1">
+					<p class="wrap button">{{- i18n["report.scheduling.name"] }}</p>
+				</li>
+				<li class="tab last" id="sortMode_item3" js-navtype="dynamiclist" tabindex="-1">
+					<p class="wrap button ">{{- i18n["report.scheduling.modified.date"] }}</p>
+				</li>
+			</ul>
+			-->
+		</div>
+
+		<div class="subheader">
+			<ul id="resultsListHeader" class="list collapsible tabular jobs header">
+				<li id="" class="jobs first leaf">
+					<div class="wrap">
+						<div class="column one">
+							<p class="jobResource">{{- i18n["report.scheduling.list.resource"] }}</p>
+						</div>
+						<div class="column two">
+							<p class="jobName">{{- i18n["report.scheduling.list.header.label"] }}</p>
+						</div>
+						<div class="column three">
+							<p class="jobID">{{- i18n["report.scheduling.list.header.id"] }}</p>
+							<p class="jobOwner">{{- i18n["report.scheduling.list.header.owner"] }}</p>
+							<p class="jobState">{{- i18n["report.scheduling.list.header.state"] }}</p>
+						</div>
+						<div class="column four">
+							<p class="lastRanDate">{{- i18n["report.scheduling.list.header.prevFireTime"] }}</p>
+
+							<p class="nextRunDate">{{- i18n["report.scheduling.list.header.nextFireTime"] }}</p>
+						</div>
+						<div class="column five">
+							<p class="jobEnabled">{{- i18n["report.scheduling.list.label.enabled"] }}</p>
+						</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+
+		<div class="body" id="jobsSummaryContainer">
+			<div name="jobsContainer" class="body"></div>
+		</div>
+	</div>
+</div>

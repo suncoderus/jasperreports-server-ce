@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<flow xmlns="http://www.springframework.org/schema/webflow" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+      ns0:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd"
+      start-state="initAction">
+
+    <input name="masterFlow"/>
+    <input name="fileResource"/>
+    <input name="parentFolder"/>
+    <input name="fileType"/>
+    <input name="lastSubflow" type="boolean"/>
+
+    <action-state id="initAction">
+        <on-entry>
+			<set name="lastSubflow" value="lastSubflow==null?false:lastSubflow"/> <!-- workaround for default value - constants not allowed in input definition -->
+		</on-entry>
+        <evaluate expression="fileResourceAction"/>
+        <transition on="success" to="displayUploadForm"/>
+    </action-state>
+
+    <view-state id="displayUploadForm" view="modules/addResource/reportStep3Resource">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'displayUploadForm'"/>
+        </on-entry>
+        <transition on="Next" to="determineType">
+            <evaluate expression="fileResourceAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateUpload"/>
+            </evaluate>
+        </transition>
+        <transition on="Back" to="back"/>
+        <transition on="cancel" to="cancel"/>
+        <transition on="BackToRepository" to="backToSearch"/>
+        <transition on="Jump" to="jumpTo"/>
+    </view-state>
+
+    <action-state id="determineType">
+        <evaluate expression="fileResourceAction"/>
+        <transition on="no" to="none"/>
+        <transition on="success" to="resourceNamingForm"/>
+    </action-state>
+
+    <view-state id="resourceNamingForm" view="modules/addResource/reportStep3ResourceNaming">
+        <on-render>
+            <set name="flowScope.prevForm" value="'resourceNamingForm'"/>
+            <evaluate expression="fileResourceAction.setupNamingForm"/>
+        </on-render>
+        <transition on="Next" to="saveResource">
+            <evaluate expression="fileResourceAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateNaming"/>
+            </evaluate>
+        </transition>
+        <transition on="Save" to="saveResource">
+            <evaluate expression="fileResourceAction.bindAndValidate">
+            </evaluate>
+        </transition>
+        <transition on="Back" to="displayUploadForm">
+            <evaluate expression="fileResourceAction.cancelFileResourceChanges"/>
+        </transition>
+        <transition on="Retry" to="displayUploadForm"/>
+        <transition on="Cancel" to="cancel"/>
+        <transition on="Jump" to="jumpTo"/>
+    </view-state>
+
+    <action-state id="saveResource">
+        <evaluate expression="fileResourceAction"/>
+        <transition on="success" to="finish"/>
+        <transition on="yes" to="backToSearch"/>
+        <transition on="error" to="resourceNamingForm"/>
+    </action-state>
+
+    <end-state id="finish">
+        <output name="fileResource"/>
+    </end-state>
+
+    <end-state id="backToSearch" view="flowRedirect:searchFlow"/>
+
+    <end-state id="none"/>
+
+    <end-state id="back"/>
+
+    <end-state id="cancel"/>
+
+    <end-state id="displayError"/>
+
+    <end-state id="jumpTo"/>
+
+    <!-- exceptions handling -->
+    <decision-state id="backFromError">
+        <if test="not (flowScope.prevForm == null or flowScope.prevForm == '')" then="${flowScope.prevForm}"
+            else="finish"/>
+    </decision-state>
+
+    <view-state id="errorPage" view="modules/system/errorPage">
+        <on-entry>
+            <evaluate expression="errorPageHandlerAction"/>
+        </on-entry>
+    </view-state>
+
+    <global-transitions>
+        <transition on="backFromErrorPage" to="backFromError"/>
+        <transition on-exception="java.lang.Throwable" to="errorPage"/>
+    </global-transitions>
+
+    <!-- end exceptions handling -->
+
+    <bean-import resource="spring-config.xml"/>
+    <bean-import resource="fileResourceBeans.xml"/>
+
+</flow>

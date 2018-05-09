@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <import resource="convertParameterValueFromRawDataWrongNumber-config.xml"/>
+
+    <bean id="getValueSomeDefaultValuesAreNotValidAgainstDataType" parent="convertParameterValueFromRawDataWrongNumber">
+        <constructor-arg index="0">
+            <map merge="true">
+                <entry key-ref="CONTROLS" value-ref="controlsWithDataType"/>
+                <entry key-ref="QUERY_EXECUTOR" value-ref="queryExecutor"/>
+                <entry key-ref="TYPED_PARAMS_MAP"><map/></entry>
+                <entry key-ref="EXPECTED_RESULT" value-ref="expectedResult"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="typedParamsEmpty" class="java.util.HashMap">
+        <constructor-arg index="0">
+            <map/>
+        </constructor-arg>
+    </bean>
+
+    <bean id="queryExecutor" class="java.util.HashMap">
+        <constructor-arg index="0">
+            <map>
+                <entry key="order">
+                    <map>
+                        <entry key="{}" value-ref="orderQueryResult"/>
+                    </map>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <!-- query results -->
+    <bean id="orderQueryResult" class="com.jaspersoft.jasperserver.war.cascade.utils.OrderedMapMock">
+        <constructor-arg>
+            <map key-type="java.lang.Integer">
+                <entry key="123">
+                    <list><value>123</value></list>
+                </entry>
+                <entry key="234">
+                    <list><value>234</value></list>
+                </entry>
+                <entry key="255">
+                    <list><value>255</value></list>
+                </entry>
+                <entry key="345">
+                    <list><value>345</value></list>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="controlsWithDataType" class="java.util.HashMap">
+        <constructor-arg index="0">
+            <map>
+                <entry key="order"> <!-- Control name -->
+                    <bean parent="orderControlDefinitionWithDataType"/>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="orderControlDefinitionWithDataType" parent="orderControlDefinition">
+        <constructor-arg index="0">
+            <map merge="true">
+                <entry key-ref="INPUT_CONTROL">
+                    <bean parent="orderInputControl">
+                        <property name="mandatory" value="true"/>
+                        <property name="dataType" ref="numberDataTypeMax300Min200Ref"/>
+                    </bean>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="numberDataTypeMax300Min200Ref" class="com.jaspersoft.jasperserver.api.metadata.common.domain.ResourceReference">
+        <constructor-arg ref="numberDataTypeMax300Min200"/>
+    </bean>
+
+    <bean id="numberDataTypeMax300Min200" class="com.jaspersoft.jasperserver.api.metadata.common.domain.client.DataTypeImpl">
+        <property name="dataTypeType" value="2"/>
+        <property name="maxValue" value="300"/>
+        <property name="minValue" value="200"/>
+    </bean>
+
+    <!-- Expected results -->
+    <bean id="expectedResult" class="com.jaspersoft.jasperserver.dto.reports.inputcontrols.InputControlState">
+        <property name="value"><null/></property>
+        <property name="error"><null/></property>
+        <property name="id" value="order"/>
+        <property name="uri" value="/order"/>
+        <property name="options">
+            <list>
+                <bean class="com.jaspersoft.jasperserver.dto.reports.inputcontrols.InputControlOption">
+                    <property name="label" value="234"/>
+                    <property name="value" value="234"/>
+                    <property name="selected" value="true"/>
+                </bean>
+                <bean class="com.jaspersoft.jasperserver.dto.reports.inputcontrols.InputControlOption">
+                    <property name="label" value="255"/>
+                    <property name="value" value="255"/>
+                    <property name="selected" value="false"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+</beans>

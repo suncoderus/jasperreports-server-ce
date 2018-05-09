@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<actions>
+    <!--Toolbar menus-->
+    <context name="toolbar_save">
+        <condition test="getCanSave">
+            <!-- We display different Save menu when Ad Hoc Designer is run from Dashboard-->
+            <condition test="isEmbeddedDesigner">
+                <simpleAction labelKey="ADH_030_MENU_SAVE_REPORT" action="adhocDesigner.handleBack"/>
+                <simpleAction labelKey="ADH_010_BUTTON_CANCEL" action="adhocDesigner.handleCancel"/>
+            </condition>
+            <!-- Ordinary Ad Hoc Save Menu-->
+            <condition test="!isEmbeddedDesigner">
+                <condition test="getIsNotWritable">
+                    <simpleAction labelKey="ADH_030_MENU_SAVE_REPORT" disabled="disabled"/>
+                </condition>
+                <condition test="getIsWritable">
+                    <simpleAction labelKey="ADH_030_MENU_SAVE_REPORT" action="designerBase.handleSave"/>
+                </condition>
+
+                <simpleAction labelKey="ADH_037_MENU_SAVE_REPORT_AS" action="designerBase.handleSaveAs"/>
+
+                <condition test="getIsNotWritable">
+                    <simpleAction labelKey="ADH_037_MENU_SAVE_DATA_VIEW_AND_REPORT" disabled="disabled"/>
+                </condition>
+                <condition test="getIsWritable">
+                    <simpleAction labelKey="ADH_037_MENU_SAVE_DATA_VIEW_AND_REPORT" action="designerBase.handleSaveAndGenerate"/>
+                </condition>
+            </condition>
+        </condition>
+    </context>
+
+    <context name="toolbar_options">
+        <selectAction labelKey="hidden">
+            <option labelKey="ADH_1150_TOOLBAR_MENU_TOGGLE_TITLE_BAR" action="adhocDesigner.toggleTitleBar"/>
+        </selectAction>
+        <simpleAction labelKey="ADH_1213_SHOW_DISPLAY_MANAGER" clientTest="!adhocDesigner.isDisplayManagerVisible" action="adhocDesigner.toggleDisplayManager"/>
+        <simpleAction labelKey="ADH_1213_HIDE_DISPLAY_MANAGER" clientTest="adhocDesigner.isDisplayManagerVisible" action="adhocDesigner.toggleDisplayManager"/>
+        <simpleAction labelKey="ADH_1151_TOOLBAR_MENU_UNMERGE_CROSSTAB_CELLS" clientTest="adhocDesigner.isCrosstabCellsMerged" action="adhocDesigner.mergeCrosstabCells" actionArgs="false"/>
+        <simpleAction labelKey="ADH_1152_TOOLBAR_MENU_MERGE_CROSSTAB_CELLS" clientTest="!adhocDesigner.isCrosstabCellsMerged" action="adhocDesigner.mergeCrosstabCells" actionArgs="true"/>
+
+        <condition test="getIsOlapMode">
+            <selectAction labelKey="hidden">
+                <option labelKey="ADH_1213_HIDE_EMPTY_ROWS" isSelectedTest="hideEmptyRowsEquals" isSelectedTestArgs="true" action="setHideEmptyRows"/>
+                <option labelKey="ADH_1213_UNHIDE_EMPTY_ROWS" isSelectedTest="hideEmptyRowsEquals" isSelectedTestArgs="false" action="setUnhideEmptyRows"/>
+            </selectAction>
+        </condition>
+
+        <condition test="allowToggleUseDomainLabels">
+
+            <simpleAction labelKey="adhoc.designer.menu.use.domain.labels" clientTest="!adhocDesigner.isUseDomainLabels"
+                          action="adhocDesigner.toggleUseDomainLabels" actionArgs="false"/>
+            <simpleAction labelKey="adhoc.designer.menu.use.previous.labels"
+                          clientTest="adhocDesigner.isUseDomainLabels" action="adhocDesigner.toggleUseDomainLabels"
+                          actionArgs="true"/>
+        </condition>
+
+    </context>
+
+    <!--menu for toolbar export-->
+    <context name="toolbar_export">
+        <condition test="getCanSave"><!-- condition is same as for save -->
+            <generatedOptions id="exportTo_${optionId}" function="getExportFormats" labelExpression="${optionValue}" action="adhocDesigner.exportReport"/>
+        </condition>
+    </context>
+
+    <!--Context menus-->
+    <!-- menu for slicing operations -->
+    <context name="memberGroupCell">
+        <condition test="getIsDesignView">
+            <simpleAction labelKey="ADH_1208_DYNAMIC_FILTER_KEEP" clientTest="AdHocCrosstab.canAddSliceFilter" action="adhocDesigner.filtersController.addSliceFilter" actionArgs="true@@${selected}"/>
+            <simpleAction labelKey="ADH_1209_DYNAMIC_FILTER_EXCLUDE" clientTest="AdHocCrosstab.canAddSliceFilter" action="adhocDesigner.filtersController.addSliceFilter" actionArgs="false@@${selected}"/>
+
+            <separator/>
+            <selectAction labelKey="ADH_1231_MENU_SORT">
+                <option labelKey="ADH_1231_MENU_SORT_ASCENDING" clientTest="AdHocCrosstab.canShowSortOptions" isSelectedTest="AdHocCrosstab.isSortOptionSelected" isSelectedTestArgs="ascending" action="AdHocCrosstab.sortingChosen" actionArgs="asc@@groupSortControlClicked"/>
+                <option labelKey="ADH_1231_MENU_SORT_DESCENDING" clientTest="AdHocCrosstab.canShowSortOptions"  isSelectedTest="AdHocCrosstab.isSortOptionSelected" isSelectedTestArgs="descending" action="AdHocCrosstab.sortingChosen" actionArgs="desc@@groupSortControlClicked"/>
+                <option labelKey="ADH_1231_MENU_SORT_NONE" clientTest="AdHocCrosstab.canShowSortOptions"  isSelectedTest="AdHocCrosstab.isSortOptionSelected" isSelectedTestArgs="natural" action="AdHocCrosstab.sortingChosen" actionArgs="none@@groupSortControlClicked"/>
+            </selectAction>
+            <separator/>
+            <selectAction labelKey="ADH_1236_MENU_TOP_BOTTOM_N_FILTER">
+                <option labelKey="ADH_1236_MENU_TOP_N_FILTER" clientTest="AdHocCrosstab.canShowTopBottomNFilterMenu" isSelectedTest="AdHocCrosstab.isTopBottomNOptionSelected" isSelectedTestArgs="top" action="AdHocCrosstab.topBottomNFilteringClicked" actionArgs="top"/>
+                <option labelKey="ADH_1236_MENU_BOTTOM_N_FILTER" clientTest="AdHocCrosstab.canShowTopBottomNFilterMenu"  isSelectedTest="AdHocCrosstab.isTopBottomNOptionSelected" isSelectedTestArgs="bottom" action="AdHocCrosstab.topBottomNFilteringClicked" actionArgs="bottom"/>
+                <option labelKey="ADH_1236_MENU_TOP_BOTTOM_N_FILTER_NONE" clientTest="AdHocCrosstab.canShowTopBottomNFilterMenu"  isSelectedTest="AdHocCrosstab.isTopBottomNOptionSelected" isSelectedTestArgs="none" action="AdHocCrosstab.topBottomNFilteringClicked" actionArgs="none"/>
+            </selectAction>
+        </condition>
+    </context>
+
+
+    <!--for row group-->
+    <context name="rowGroupLevel">
+        <condition test="getIsDesignView">
+            <condition test="!getIsOlapMode">
+                <selectAction className="flyout"  labelKey="ADH_225_CHANGE_GROUPING" clientTest="AdHocCrosstab.isDateType" >
+                    <generatedOptions function="getCatMapForType" functionArgs="date" labelExpression="${optionValue}" isSelectedTest="AdHocCrosstab.isCurrentDateType" action="AdHocCrosstab.setCatForRowGroup" actionArgs="${optionId}"/>
+                </selectAction>
+                <selectAction className="flyout"  labelKey="ADH_225_CHANGE_GROUPING" clientTest="AdHocCrosstab.isTimestampType" >
+                    <generatedOptions function="getCatMapForType" functionArgs="timestamp" labelExpression="${optionValue}" isSelectedTest="AdHocCrosstab.isCurrentDateType" action="AdHocCrosstab.setCatForRowGroup" actionArgs="${optionId}"/>
+                </selectAction>
+                <selectAction className="flyout"  labelKey="ADH_225_CHANGE_GROUPING" clientTest="AdHocCrosstab.isTimeType" >
+                    <generatedOptions function="getCatMapForType" functionArgs="time" labelExpression="${optionValue}" isSelectedTest="AdHocCrosstab.isCurrentDateType" action="AdHocCrosstab.setCatForRowGroup" actionArgs="${optionId}"/>
+                </selectAction>
+                <simpleAction selectionConstraint="singleSelect" clientTest="AdHocCrosstab.selectedGroupCanShowSummary" labelKey="ADH_242_ADD_ROW_SUMMARY" action="AdHocCrosstab.addRowGroupSummary"/>
+                <simpleAction selectionConstraint="singleSelect" clientTest="AdHocCrosstab.selectedRowGroupCanHideSummary" labelKey="ADH_240_DELETE_ROW_SUMMARY" action="AdHocCrosstab.deleteRowGroupSummary"/>
+                <separator clientTest="AdHocCrosstab.selectedRowGroupIsCollapsible"/>
+                <simpleAction selectionConstraint="singleSelect" clientTest="AdHocCrosstab.selectedRowGroupIsCollapsible" labelKey="ADH_270a_EXPAND_ALL_FOR_GROUP" action="AdHocCrosstab.expandLevel"/>
+                <simpleAction selectionConstraint="singleSelect" clientTest="AdHocCrosstab.selectedRowGroupIsCollapsible" labelKey="ADH_270b_COLLAPSE_ALL_FOR_GROUP" action="AdHocCrosstab.collapseLevel"/>
+            </condition>
+            <separator/>
+            <simpleAction labelKey="ADH_220_MENU_REMOVE_FROM_CROSSTAB" action="AdHocCrosstab.removeLevelFromRow"/>
+            <simpleAction labelKey="ADH_235_MENU_SWITCH_TO_COLUMN_GROUP" action="AdHocCrosstab.switchToColumnGroup"/>
+            <simpleAction labelKey="ADH_1212_DYNAMIC_FILTER_CREATE" clientTest="adhocDesigner.canShowFilterOption" action="adhocDesigner.filtersController.addFilter" actionArgs="${selected}"/>
+
+            <separator/>
+            <selectAction labelKey="ADH_1231_MENU_SORT">
+                <option labelKey="ADH_1231_MENU_SORT_ASCENDING" isSelectedTest="AdHocCrosstab.isSortOptionSelected" isSelectedTestArgs="ascending" action="AdHocCrosstab.sortingChosen" actionArgs="asc@@headerSortControlClicked"/>
+                <option labelKey="ADH_1231_MENU_SORT_DESCENDING" isSelectedTest="AdHocCrosstab.isSortOptionSelected" isSelectedTestArgs="descending" action="AdHocCrosstab.sortingChosen" actionArgs="desc@@headerSortControlClicked"/>
+                <option labelKey="ADH_1231_MENU_SORT_NONE" isSelectedTest="AdHocCrosstab.isSortOptionSelected" isSelectedTestArgs="natural" action="AdHocCrosstab.sortingChosen" actionArgs="none@@headerSortControlClicked"/>
+            </selectAction>
+            <separator/>
+            <simpleAction clientTest="AdHocCrosstab.canMoveUpOrLeft" labelKey="ADH_060_MENU_MOVE_LEFT" action="AdHocCrosstab.moveRowGroupLeft"/>
+            <simpleAction clientTest="AdHocCrosstab.canMoveDownOrRight" labelKey="ADH_061_MENU_MOVE_RIGHT" action="AdHocCrosstab.moveRowGroupRight"/>
+            <selectAction clientTest="AdHocCrosstab.canAddSiblingLevels" labelKey="ADH_1213_CROSSTAB_LEVEL_ADD_LEVELS" className="flyout">
+                <!-- Will be filled with options dynamically on client side -->
+            </selectAction>
+            <!--<simpleAction clientTest="canHideLevel" labelKey="ADH_1213_CROSSTAB_LEVEL_HIDE" action="hideLevel"/>-->
+        </condition>
+    </context>
+
+    <!--for column groups-->
+    <context name="columnGroupLevel">
+        <condition test="getIsDesignView">
+            <condition test="!getIsOlapMode">
+                <selectAction className="flyout" labelKey="ADH_225_CHANGE_GROUPING" clientTest="AdHocCrosstab.isDateType" >
+                    <generatedOptions function="getCatMapForType" functionArgs="date" labelExpression="${optionValue}" isSelectedTest="AdHocCrosstab.isCurrentDateType" action="AdHocCrosstab.setCatForColumnGroup" actionArgs="${optionId}"/>
+                </selectAction>
+                <selectAction className="flyout" labelKey="ADH_225_CHANGE_GROUPING" clientTest="AdHocCrosstab.isTimestampType" >
+                    <generatedOptions function="getCatMapForType" functionArgs="timestamp" labelExpression="${optionValue}" isSelectedTest="AdHocCrosstab.isCurrentDateType" action="AdHocCrosstab.setCatForColumnGroup" actionArgs="${optionId}"/>
+                </selectAction>
+                <selectAction className="flyout" labelKey="ADH_225_CHANGE_GROUPING" clientTest="AdHocCrosstab.isTimeType" >
+                    <generatedOptions function="getCatMapForType" functionArgs="time" labelExpression="${optionValue}" isSelectedTest="AdHocCrosstab.isCurrentDateType" action="AdHocCrosstab.setCatForColumnGroup" actionArgs="${optionId}"/>
+                </selectAction>
+                <simpleAction selectionConstraint="singleSelect" clientTest="AdHocCrosstab.selectedGroupCanShowSummary" labelKey="ADH_243_ADD_COLUMN_SUMMARY" action="AdHocCrosstab.addColumnGroupSummary"/>
+                <simpleAction selectionConstraint="singleSelect" clientTest="AdHocCrosstab.selectedColumnGroupCanHideSummary" labelKey="ADH_241_DELETE_COLUMN_SUMMARY" action="AdHocCrosstab.deleteColumnGroupSummary"/>
+                <separator clientTest="AdHocCrosstab.selectedColumnGroupIsCollapsible"/>
+                <simpleAction selectionConstraint="singleSelect" clientTest="AdHocCrosstab.selectedColumnGroupIsCollapsible" labelKey="ADH_270a_EXPAND_ALL_FOR_GROUP" action="AdHocCrosstab.expandLevel"/>
+                <simpleAction selectionConstraint="singleSelect" clientTest="AdHocCrosstab.selectedColumnGroupIsCollapsible" labelKey="ADH_270b_COLLAPSE_ALL_FOR_GROUP" action="AdHocCrosstab.collapseLevel"/>
+            </condition>
+            <separator className="separator"/>
+            <simpleAction labelKey="ADH_220_MENU_REMOVE_FROM_CROSSTAB" action="AdHocCrosstab.removeLevelFromColumn"/>
+            <simpleAction labelKey="ADH_235a_MENU_SWITCH_TO_ROW_GROUP" clientTest="AdHocCrosstab.canSwitchToRow" action="AdHocCrosstab.switchToRowGroup"/>
+            <simpleAction labelKey="ADH_1212_DYNAMIC_FILTER_CREATE" clientTest="adhocDesigner.canShowFilterOption" action="adhocDesigner.filtersController.addFilter" actionArgs="${selected}"/>
+
+            <separator/>
+            <selectAction labelKey="ADH_1231_MENU_SORT">
+                <option labelKey="ADH_1231_MENU_SORT_ASCENDING" isSelectedTest="AdHocCrosstab.isSortOptionSelected" isSelectedTestArgs="ascending" action="AdHocCrosstab.sortingChosen" actionArgs="asc@@headerSortControlClicked"/>
+                <option labelKey="ADH_1231_MENU_SORT_DESCENDING" isSelectedTest="AdHocCrosstab.isSortOptionSelected" isSelectedTestArgs="descending" action="AdHocCrosstab.sortingChosen" actionArgs="desc@@headerSortControlClicked"/>
+                <option labelKey="ADH_1231_MENU_SORT_NONE" isSelectedTest="AdHocCrosstab.isSortOptionSelected" isSelectedTestArgs="natural" action="AdHocCrosstab.sortingChosen" actionArgs="none@@headerSortControlClicked"/>
+            </selectAction>
+            <separator/>
+            <simpleAction clientTest="AdHocCrosstab.canMoveUpOrLeft" labelKey="ADH_084_MOVE_UP" action="AdHocCrosstab.moveColumnGroupUp" />
+            <simpleAction clientTest="AdHocCrosstab.canMoveDownOrRight" labelKey="ADH_085_MOVE_DOWN" action="AdHocCrosstab.moveColumnGroupDown" />
+            <selectAction clientTest="AdHocCrosstab.canAddSiblingLevels" labelKey="ADH_1213_CROSSTAB_LEVEL_ADD_LEVELS" className="flyout">
+                 <!-- Will be filled with options dynamically on client side -->
+            </selectAction>
+            <!--<simpleAction clientTest="canHideLevel" labelKey="ADH_1213_CROSSTAB_LEVEL_HIDE" action="hideLevel"/>-->
+        </condition>
+    </context>
+
+    <!--for row group-->
+    <context name="measuresDimensionInRows">
+        <condition test="getIsDesignView">
+            <simpleAction labelKey="ADH_235_MENU_SWITCH_TO_COLUMN_GROUP" action="AdHocCrosstab.switchToColumnGroup"/>
+            <simpleAction clientTest="AdHocCrosstab.canMoveUpOrLeft" labelKey="ADH_1213_MENU_MOVE_MEASURES_LEFT" action="AdHocCrosstab.moveRowGroupLeft"/>
+            <simpleAction clientTest="AdHocCrosstab.canMoveDownOrRight" labelKey="ADH_1213_MENU_MOVE_MEASURES_RIGHT" action="AdHocCrosstab.moveRowGroupRight"/>
+
+            <separator/>
+            <selectAction labelKey="ADH_1231_MENU_SORT">
+                <option labelKey="ADH_1231_MENU_SORT_ASCENDING" isSelectedTest="AdHocCrosstab.isSortOptionSelected" isSelectedTestArgs="ascending" action="AdHocCrosstab.sortingChosen" actionArgs="asc@@headerMeasureSortControlClicked"/>
+                <option labelKey="ADH_1231_MENU_SORT_DESCENDING" isSelectedTest="AdHocCrosstab.isSortOptionSelected" isSelectedTestArgs="descending" action="AdHocCrosstab.sortingChosen" actionArgs="desc@@headerMeasureSortControlClicked"/>
+            </selectAction>
+        </condition>
+    </context>
+
+    <context name="measuresDimensionInColumns">
+        <condition test="getIsDesignView">
+            <simpleAction labelKey="ADH_235a_MENU_SWITCH_TO_ROW_GROUP" clientTest="AdHocCrosstab.canSwitchToRow" action="AdHocCrosstab.switchToRowGroup"/>
+            <simpleAction clientTest="AdHocCrosstab.canMoveUpOrLeft" labelKey="ADH_1213_MENU_MOVE_MEASURES_UP" action="AdHocCrosstab.moveColumnGroupLeft"/>
+            <simpleAction clientTest="AdHocCrosstab.canMoveDownOrRight" labelKey="ADH_1213_MENU_MOVE_MEASURES_DOWN" action="AdHocCrosstab.moveColumnGroupRight"/>
+
+            <separator/>
+            <selectAction labelKey="ADH_1231_MENU_SORT">
+                <option labelKey="ADH_1231_MENU_SORT_ASCENDING" isSelectedTest="AdHocCrosstab.isSortOptionSelected" isSelectedTestArgs="ascending" action="AdHocCrosstab.sortingChosen" actionArgs="asc@@headerMeasureSortControlClicked"/>
+                <option labelKey="ADH_1231_MENU_SORT_DESCENDING" isSelectedTest="AdHocCrosstab.isSortOptionSelected" isSelectedTestArgs="descending" action="AdHocCrosstab.sortingChosen" actionArgs="desc@@headerMeasureSortControlClicked"/>
+            </selectAction>
+        </condition>
+    </context>
+
+    <!--for row group-->
+    <context name="measureRow">
+        <condition test="getIsDesignView">
+            <condition test="!getIsOlapMode">
+                <selectAction className="flyout" labelKey="ADH_230_MENU_CHANGE_FUNCTION" clientTest="AdHocCrosstab.selectedMeasureShowsSummaryOptions" selectionConstraint="singleSelect">
+                </selectAction>
+                <selectAction className="flyout" clientTest="AdHocCrosstab.selectedMeasureShowsSummaryOptions"  clientTestArgs="${templateInjectionIndex}" labelKey="ADH_TIME_CALC_SUMMARY_SELECTION">
+                    <option labelKey="ADH_TIME_CALC_SUM" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="AdHocCrosstab.isSelectedTimeSummaryFunction" isSelectedTestArgs="TimeBalanceDefault@@${templateInjectionIndex}" action="AdHocCrosstab.selectTimeFunction" actionArgs="TimeBalanceDefault@@${templateInjectionIndex}"/>
+                    <option labelKey="ADH_TIME_CALC_FIRST" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="AdHocCrosstab.isSelectedTimeSummaryFunction" isSelectedTestArgs="TimeBalanceFirst@@${templateInjectionIndex}" action="AdHocCrosstab.selectTimeFunction" actionArgs="TimeBalanceFirst@@${templateInjectionIndex}"/>
+                    <option labelKey="ADH_TIME_CALC_LAST" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="AdHocCrosstab.isSelectedTimeSummaryFunction" isSelectedTestArgs="TimeBalanceLast@@${templateInjectionIndex}" action="AdHocCrosstab.selectTimeFunction" actionArgs="TimeBalanceLast@@${templateInjectionIndex}"/>
+                </selectAction>
+                <selectAction className="flyout" selectionConstraint="singleSelect" labelKey="ADH_040_MENU_CHANGE_DATA_FORMAT">
+                    <generatedOptions selectionConstraint="singleSelect" clientTest="AdHocCrosstab.isSelectedMeasureItemType" clientTestArgs="int" function="getMaskMapForType" functionArgs="int" action="AdHocCrosstab.selectMeasureMask" actionArgs="${optionId}" isSelectedTest="AdHocCrosstab.isSelectedMeasureMask" isSelectedTestArgs="${optionId}"/>
+                    <generatedOptions selectionConstraint="singleSelect" clientTest="AdHocCrosstab.isSelectedMeasureItemType" clientTestArgs="dec" function="getMaskMapForType" functionArgs="dec" action="AdHocCrosstab.selectMeasureMask" actionArgs="${optionId}" isSelectedTest="AdHocCrosstab.isSelectedMeasureMask" isSelectedTestArgs="${optionId}"/>
+                    <generatedOptions selectionConstraint="singleSelect" clientTest="AdHocCrosstab.isSelectedMeasureItemType" clientTestArgs="date" function="getMaskMapForType" functionArgs="int" action="AdHocCrosstab.selectMeasureMask" actionArgs="${optionId}" isSelectedTest="AdHocCrosstab.isSelectedMeasureMask" isSelectedTestArgs="${optionId}"/>
+                    <generatedOptions selectionConstraint="singleSelect" clientTest="AdHocCrosstab.isSelectedMeasureItemType" clientTestArgs="NaN" function="getMaskMapForType" functionArgs="int" action="AdHocCrosstab.selectMeasureMask" actionArgs="${optionId}" isSelectedTest="AdHocCrosstab.isSelectedMeasureMask" isSelectedTestArgs="${optionId}"/>
+					<generatedOptions selectionConstraint="singleSelect" clientTest="AdHocCrosstab.isSelectedMeasureItemType" clientTestArgs="time" function="getMaskMapForType" functionArgs="time" action="AdHocCrosstab.selectMeasureMask" actionArgs="${optionId}" isSelectedTest="AdHocCrosstab.isSelectedMeasureMask" isSelectedTestArgs="${optionId}"/>
+                </selectAction>
+            </condition>
+            <simpleAction labelKey="ADH_220_MENU_REMOVE_FROM_CROSSTAB" action="AdHocCrosstab.removeLevelFromRow"/>
+            <simpleAction labelKey="ADH_1212_DYNAMIC_FILTER_CREATE" clientTest="adhocDesigner.canShowFilterOption" action="adhocDesigner.filtersController.addFilter" actionArgs="${selected}"/>
+            <separator/>
+            <simpleAction clientTest="AdHocCrosstab.canMoveMeasureUpOrLeft" labelKey="ADH_084_MOVE_UP" action="AdHocCrosstab.moveMeasureLeft"/>
+            <simpleAction clientTest="AdHocCrosstab.canMoveMeasureDownOrRight" labelKey="ADH_085_MOVE_DOWN" action="AdHocCrosstab.moveMeasureRight"/>
+        </condition>
+    </context>
+
+    <!--for column groups-->
+    <context name="measureColumn">
+        <condition test="getIsDesignView">
+            <condition test="!getIsOlapMode">
+                <selectAction className="flyout" labelKey="ADH_230_MENU_CHANGE_FUNCTION" clientTest="AdHocCrosstab.selectedMeasureShowsSummaryOptions" selectionConstraint="singleSelect">
+                </selectAction>
+                <selectAction className="flyout" clientTest="AdHocCrosstab.selectedMeasureShowsSummaryOptions"  clientTestArgs="${templateInjectionIndex}" labelKey="ADH_TIME_CALC_SUMMARY_SELECTION">
+                    <option labelKey="ADH_TIME_CALC_SUM" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="AdHocCrosstab.isSelectedTimeSummaryFunction" isSelectedTestArgs="TimeBalanceDefault@@${templateInjectionIndex}" action="AdHocCrosstab.selectTimeFunction" actionArgs="TimeBalanceDefault@@${templateInjectionIndex}"/>
+                    <option labelKey="ADH_TIME_CALC_FIRST" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="AdHocCrosstab.isSelectedTimeSummaryFunction" isSelectedTestArgs="TimeBalanceFirst@@${templateInjectionIndex}" action="AdHocCrosstab.selectTimeFunction" actionArgs="TimeBalanceFirst@@${templateInjectionIndex}"/>
+                    <option labelKey="ADH_TIME_CALC_LAST" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="AdHocCrosstab.isSelectedTimeSummaryFunction" isSelectedTestArgs="TimeBalanceLast@@${templateInjectionIndex}" action="AdHocCrosstab.selectTimeFunction" actionArgs="TimeBalanceLast@@${templateInjectionIndex}"/>
+                </selectAction>
+                <selectAction className="flyout" selectionConstraint="singleSelect" labelKey="ADH_040_MENU_CHANGE_DATA_FORMAT">
+                    <generatedOptions selectionConstraint="singleSelect" clientTest="AdHocCrosstab.isSelectedMeasureItemType" clientTestArgs="int" function="getMaskMapForType" functionArgs="int" action="AdHocCrosstab.selectMeasureMask" actionArgs="${optionId}" isSelectedTest="AdHocCrosstab.isSelectedMeasureMask" isSelectedTestArgs="${optionId}"/>
+                    <generatedOptions selectionConstraint="singleSelect" clientTest="AdHocCrosstab.isSelectedMeasureItemType" clientTestArgs="dec" function="getMaskMapForType" functionArgs="dec" action="AdHocCrosstab.selectMeasureMask" actionArgs="${optionId}" isSelectedTest="AdHocCrosstab.isSelectedMeasureMask" isSelectedTestArgs="${optionId}"/>
+                    <generatedOptions selectionConstraint="singleSelect" clientTest="AdHocCrosstab.isSelectedMeasureItemType" clientTestArgs="date" function="getMaskMapForType" functionArgs="int" action="AdHocCrosstab.selectMeasureMask" actionArgs="${optionId}" isSelectedTest="AdHocCrosstab.isSelectedMeasureMask" isSelectedTestArgs="${optionId}"/>
+                    <generatedOptions selectionConstraint="singleSelect" clientTest="AdHocCrosstab.isSelectedMeasureItemType" clientTestArgs="NaN" function="getMaskMapForType" functionArgs="int" action="AdHocCrosstab.selectMeasureMask" actionArgs="${optionId}" isSelectedTest="AdHocCrosstab.isSelectedMeasureMask" isSelectedTestArgs="${optionId}"/>
+					<generatedOptions selectionConstraint="singleSelect" clientTest="AdHocCrosstab.isSelectedMeasureItemType" clientTestArgs="time" function="getMaskMapForType" functionArgs="time" action="AdHocCrosstab.selectMeasureMask" actionArgs="${optionId}" isSelectedTest="AdHocCrosstab.isSelectedMeasureMask" isSelectedTestArgs="${optionId}"/>
+                </selectAction>
+            </condition>
+            <simpleAction labelKey="ADH_220_MENU_REMOVE_FROM_CROSSTAB" action="AdHocCrosstab.removeLevelFromColumn"/>
+            <simpleAction labelKey="ADH_1212_DYNAMIC_FILTER_CREATE" clientTest="adhocDesigner.canShowFilterOption" action="adhocDesigner.filtersController.addFilter" actionArgs="${selected}"/>
+
+            <separator/>
+            <selectAction labelKey="ADH_1231_MENU_SORT">
+                <option labelKey="ADH_1231_MENU_SORT_ASCENDING" clientTest="AdHocCrosstab.canShowSortOptions" isSelectedTest="AdHocCrosstab.isSortOptionSelected" isSelectedTestArgs="ascending" action="AdHocCrosstab.sortingChosen" actionArgs="asc@@groupSortControlClicked"/>
+                <option labelKey="ADH_1231_MENU_SORT_DESCENDING" clientTest="AdHocCrosstab.canShowSortOptions"  isSelectedTest="AdHocCrosstab.isSortOptionSelected" isSelectedTestArgs="descending" action="AdHocCrosstab.sortingChosen" actionArgs="desc@@groupSortControlClicked"/>
+                <option labelKey="ADH_1231_MENU_SORT_NONE" clientTest="AdHocCrosstab.canShowSortOptions"  isSelectedTest="AdHocCrosstab.isSortOptionSelected" isSelectedTestArgs="natural" action="AdHocCrosstab.sortingChosen" actionArgs="none@@groupSortControlClicked"/>
+            </selectAction>
+            <separator/>
+            <selectAction labelKey="ADH_1236_MENU_TOP_BOTTOM_N_FILTER">
+                <option labelKey="ADH_1236_MENU_TOP_N_FILTER" clientTest="AdHocCrosstab.canShowTopBottomNFilterMenu" isSelectedTest="AdHocCrosstab.isTopBottomNOptionSelected" isSelectedTestArgs="top" action="AdHocCrosstab.topBottomNFilteringClicked" actionArgs="top"/>
+                <option labelKey="ADH_1236_MENU_BOTTOM_N_FILTER" clientTest="AdHocCrosstab.canShowTopBottomNFilterMenu"  isSelectedTest="AdHocCrosstab.isTopBottomNOptionSelected" isSelectedTestArgs="bottom" action="AdHocCrosstab.topBottomNFilteringClicked" actionArgs="bottom"/>
+                <option labelKey="ADH_1236_MENU_TOP_BOTTOM_N_FILTER_NONE" clientTest="AdHocCrosstab.canShowTopBottomNFilterMenu"  isSelectedTest="AdHocCrosstab.isTopBottomNOptionSelected" isSelectedTestArgs="none" action="AdHocCrosstab.topBottomNFilteringClicked" actionArgs="none"/>
+            </selectAction>
+            <separator/>
+            <simpleAction clientTest="AdHocCrosstab.canMoveMeasureUpOrLeft" labelKey="ADH_060_MENU_MOVE_LEFT" action="AdHocCrosstab.moveMeasureLeft"/>
+            <simpleAction clientTest="AdHocCrosstab.canMoveMeasureDownOrRight" labelKey="ADH_061_MENU_MOVE_RIGHT" action="AdHocCrosstab.moveMeasureRight"/>
+        </condition>
+    </context>
+
+    <!--Display Manager column clicked-->
+    <context name="displayManagerColumn">
+        <condition test="getIsDesignView">
+            <condition test="!getIsOlapMode">
+                <selectAction className="flyout" labelKey="ADH_230_MENU_CHANGE_FUNCTION" clientTest="AdHocCrosstab.selectedMeasureShowsSummaryOptions" selectionConstraint="singleSelect">
+                </selectAction>
+                <selectAction className="flyout" clientTest="AdHocCrosstab.selectedMeasureShowsSummaryOptions"  clientTestArgs="${templateInjectionIndex}" labelKey="ADH_TIME_CALC_SUMMARY_SELECTION">
+                    <option labelKey="ADH_TIME_CALC_SUM" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="AdHocCrosstab.isSelectedTimeSummaryFunction" isSelectedTestArgs="TimeBalanceDefault@@${templateInjectionIndex}" action="AdHocCrosstab.selectTimeFunction" actionArgs="TimeBalanceDefault@@${templateInjectionIndex}"/>
+                    <option labelKey="ADH_TIME_CALC_FIRST" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="AdHocCrosstab.isSelectedTimeSummaryFunction" isSelectedTestArgs="TimeBalanceFirst@@${templateInjectionIndex}" action="AdHocCrosstab.selectTimeFunction" actionArgs="TimeBalanceFirst@@${templateInjectionIndex}"/>
+                    <option labelKey="ADH_TIME_CALC_LAST" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="AdHocCrosstab.isSelectedTimeSummaryFunction" isSelectedTestArgs="TimeBalanceLast@@${templateInjectionIndex}" action="AdHocCrosstab.selectTimeFunction" actionArgs="TimeBalanceLast@@${templateInjectionIndex}"/>
+                </selectAction>
+                <selectAction className="flyout" labelKey="ADH_225_CHANGE_GROUPING" clientTest="AdHocCrosstab.isDateType" >
+                    <generatedOptions function="getCatMapForType" functionArgs="date" labelExpression="${optionValue}" isSelectedTest="AdHocCrosstab.isCurrentDateType" action="AdHocCrosstab.setCatForColumnGroup" actionArgs="${optionId}"/>
+                </selectAction>
+                <selectAction className="flyout" labelKey="ADH_225_CHANGE_GROUPING" clientTest="AdHocCrosstab.isTimestampType" >
+                    <generatedOptions function="getCatMapForType" functionArgs="timestamp" labelExpression="${optionValue}" isSelectedTest="AdHocCrosstab.isCurrentDateType" action="AdHocCrosstab.setCatForColumnGroup" actionArgs="${optionId}"/>
+                </selectAction>
+                <selectAction className="flyout" labelKey="ADH_225_CHANGE_GROUPING" clientTest="AdHocCrosstab.isTimeType" >
+                    <generatedOptions function="getCatMapForType" functionArgs="time" labelExpression="${optionValue}" isSelectedTest="AdHocCrosstab.isCurrentDateType" action="AdHocCrosstab.setCatForColumnGroup" actionArgs="${optionId}"/>
+                </selectAction>
+            </condition>
+            <separator className="separator"/>
+            <simpleAction labelKey="ADH_220_MENU_REMOVE_FROM_CROSSTAB" action="AdHocCrosstab.removeLevelFromColumn"/>
+            <simpleAction labelKey="ADH_235a_MENU_SWITCH_TO_ROW_GROUP" clientTest="AdHocCrosstab.canSwitchToRow" action="AdHocCrosstab.switchToRowGroup"/>
+            <simpleAction labelKey="ADH_1212_DYNAMIC_FILTER_CREATE" clientTest="adhocDesigner.canShowFilterOption" action="adhocDesigner.filtersController.addFilter" actionArgs="${selected}"/>
+            <separator/>
+        </condition>
+        <simpleAction clientTest="AdHocCrosstab.canMoveUpOrLeft" labelKey="ADH_060_MENU_MOVE_LEFT" action="AdHocCrosstab.moveColumnGroupLeft"/>
+        <simpleAction clientTest="AdHocCrosstab.canMoveDownOrRight" labelKey="ADH_061_MENU_MOVE_RIGHT" action="AdHocCrosstab.moveColumnGroupRight"/>
+        <selectAction clientTest="AdHocCrosstab.canAddSiblingLevels" labelKey="ADH_1213_CROSSTAB_LEVEL_ADD_LEVELS" className="flyout">
+            <!-- Will be filled with options dynamically on client side -->
+        </selectAction>
+        <!--<separator/>
+        <simpleAction clientTest="canHideLevel" labelKey="ADH_1213_CROSSTAB_LEVEL_HIDE" action="hideLevel"/>
+        <simpleAction clientTest="canShowLevel" labelKey="ADH_1213_CROSSTAB_LEVEL_SHOW" action="showLevel"/>-->
+    </context>
+
+    <!--Display Manager row clicked-->
+    <context name="displayManagerRow">
+        <condition test="getIsDesignView">
+            <condition test="!getIsOlapMode">
+                <selectAction className="flyout" labelKey="ADH_230_MENU_CHANGE_FUNCTION" clientTest="AdHocCrosstab.selectedMeasureShowsSummaryOptions" selectionConstraint="singleSelect">
+                </selectAction>
+                <selectAction className="flyout" clientTest="AdHocCrosstab.selectedMeasureShowsSummaryOptions"  clientTestArgs="${templateInjectionIndex}" labelKey="ADH_TIME_CALC_SUMMARY_SELECTION">
+                    <option labelKey="ADH_TIME_CALC_SUM" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="AdHocCrosstab.isSelectedTimeSummaryFunction" isSelectedTestArgs="TimeBalanceDefault@@${templateInjectionIndex}" action="AdHocCrosstab.selectTimeFunction" actionArgs="TimeBalanceDefault@@${templateInjectionIndex}"/>
+                    <option labelKey="ADH_TIME_CALC_FIRST" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="AdHocCrosstab.isSelectedTimeSummaryFunction" isSelectedTestArgs="TimeBalanceFirst@@${templateInjectionIndex}" action="AdHocCrosstab.selectTimeFunction" actionArgs="TimeBalanceFirst@@${templateInjectionIndex}"/>
+                    <option labelKey="ADH_TIME_CALC_LAST" clientTest="isMeasureNumeric" clientTestArgs="${templateInjectionIndex}" isSelectedTest="AdHocCrosstab.isSelectedTimeSummaryFunction" isSelectedTestArgs="TimeBalanceLast@@${templateInjectionIndex}" action="AdHocCrosstab.selectTimeFunction" actionArgs="TimeBalanceLast@@${templateInjectionIndex}"/>
+                </selectAction>
+                <selectAction className="flyout" labelKey="ADH_225_CHANGE_GROUPING" clientTest="AdHocCrosstab.isDateType" >
+                    <generatedOptions function="getCatMapForType" functionArgs="date" labelExpression="${optionValue}" isSelectedTest="AdHocCrosstab.isCurrentDateType" action="AdHocCrosstab.setCatForRowGroup" actionArgs="${optionId}"/>
+                </selectAction>
+                <selectAction className="flyout" labelKey="ADH_225_CHANGE_GROUPING" clientTest="AdHocCrosstab.isTimestampType" >
+                    <generatedOptions function="getCatMapForType" functionArgs="timestamp" labelExpression="${optionValue}" isSelectedTest="AdHocCrosstab.isCurrentDateType" action="AdHocCrosstab.setCatForRowGroup" actionArgs="${optionId}"/>
+                </selectAction>
+                <selectAction className="flyout" labelKey="ADH_225_CHANGE_GROUPING" clientTest="AdHocCrosstab.isTimeType" >
+                    <generatedOptions function="getCatMapForType" functionArgs="time" labelExpression="${optionValue}" isSelectedTest="AdHocCrosstab.isCurrentDateType" action="AdHocCrosstab.setCatForRowGroup" actionArgs="${optionId}"/>
+                </selectAction>
+            </condition>
+            <separator className="separator"/>
+            <simpleAction labelKey="ADH_220_MENU_REMOVE_FROM_CROSSTAB" action="AdHocCrosstab.removeLevelFromRow"/>
+            <simpleAction labelKey="ADH_235_MENU_SWITCH_TO_COLUMN_GROUP" action="AdHocCrosstab.switchToColumnGroup"/>
+            <simpleAction labelKey="ADH_1212_DYNAMIC_FILTER_CREATE" clientTest="adhocDesigner.canShowFilterOption" action="adhocDesigner.filtersController.addFilter" actionArgs="${selected}"/>
+            <separator/>
+        </condition>
+        <simpleAction clientTest="AdHocCrosstab.canMoveUpOrLeft" labelKey="ADH_060_MENU_MOVE_LEFT" action="AdHocCrosstab.moveRowGroupLeft"/>
+        <simpleAction clientTest="AdHocCrosstab.canMoveDownOrRight" labelKey="ADH_061_MENU_MOVE_RIGHT" action="AdHocCrosstab.moveRowGroupRight"/>
+        <selectAction clientTest="AdHocCrosstab.canAddSiblingLevels" labelKey="ADH_1213_CROSSTAB_LEVEL_ADD_LEVELS" className="flyout">
+            <!-- Will be filled with options dynamically on client side -->
+        </selectAction>
+        <!--<separator/>
+        <simpleAction clientTest="canHideLevel" labelKey="ADH_1213_CROSSTAB_LEVEL_HIDE" action="hideLevel"/>
+        <simpleAction clientTest="canShowLevel" labelKey="ADH_1213_CROSSTAB_LEVEL_SHOW" action="showLevel"/>-->
+    </context>
+
+    <!-- dimension tree -->
+    <!-- add with the topmost level visible -->
+    <context name="dimensionsTree_dimension">
+    	<simpleAction selectionConstraint="singleSelect" labelKey="ADH_1213_AVAILABLE_FIELDS_ADD_TO_COLUMNS" clientTest="AdHocCrosstab.canAddDimensionAsColumnGroup" action="AdHocCrosstab.appendDimensionToColumnAxisWithLevel"/>
+        <simpleAction selectionConstraint="singleSelect" labelKey="ADH_1213_AVAILABLE_FIELDS_ADD_TO_ROWS" clientTest="AdHocCrosstab.canAddDimensionAsRowGroup"  action="AdHocCrosstab.appendDimensionToRowAxisWithLevel"/>
+    </context>
+
+    <!-- TBD; if dim already added, you can toggle show/hide; otherwise, add dim to end of axis with this level showing  -->
+    <context name="dimensionsTree_level">
+        <simpleAction selectionConstraint="singleSelect" labelKey="ADH_1213_AVAILABLE_FIELDS_ADD_TO_COLUMNS" clientTest="AdHocCrosstab.canAddLevelAsColumnGroup" action="AdHocCrosstab.appendDimensionToColumnAxisWithLevel"/>
+        <simpleAction selectionConstraint="singleSelect" labelKey="ADH_1213_AVAILABLE_FIELDS_ADD_TO_ROWS" clientTest="AdHocCrosstab.canAddLevelAsRowGroup" action="AdHocCrosstab.appendDimensionToRowAxisWithLevel"/>
+        <simpleAction labelKey="ADH_1212_DYNAMIC_FILTER_CREATE" clientTest="adhocDesigner.canShowFilterOption" action="adhocDesigner.filtersController.addFilter" actionArgs="${selected}"/>
+        <condition test="!getIsOlapMode">
+            <condition test="getIsDesignView">
+                <separator />
+                <simpleAction labelKey="ADH_1213_USE_AS_MEASURE" clientTest="adhocDesigner.canMoveToMeasures" action="adhocDesigner.moveToMeasures"/>
+                <separator clientTest="adhocDesigner.isSelectedFieldCustom" />
+                <simpleAction labelKey="ADH_400_MENU_EDIT_CALCULATED_FIELD" clientTest="adhocDesigner.isSelectedFieldCustom" action="adhocDesigner.editCalculatedField" className="requiresInput"/>
+                <simpleAction labelKey="ADH_400_MENU_DELETE_CALCULATED_FIELD" clientTest="adhocDesigner.isDeleteAllowed" action="adhocDesigner.deleteCalculatedField"/>
+            </condition>
+        </condition>
+    </context>
+
+    <!-- dimension tree -->
+    <!-- add with the topmost level visible -->
+    <context name="measuresTree_group">
+        <condition test="!getIsOlapMode">
+    	    <simpleAction selectionConstraint="singleSelect" labelKey="ADH_1213_AVAILABLE_FIELDS_ADD_TO_COLUMNS" clientTest="AdHocCrosstab.canAddDimensionAsColumnGroup" action="AdHocCrosstab.appendDimensionToColumnAxisWithLevel"/>
+            <simpleAction selectionConstraint="singleSelect" labelKey="ADH_1213_AVAILABLE_FIELDS_ADD_TO_ROWS" clientTest="AdHocCrosstab.canAddDimensionAsRowGroup"  action="AdHocCrosstab.appendDimensionToRowAxisWithLevel"/>
+        </condition>
+    </context>
+
+    <!-- TBD  -->
+    <context name="measuresTree">
+    	<simpleAction labelKey="ADH_1213_AVAILABLE_FIELDS_ADD_TO_COLUMNS" clientTest="AdHocCrosstab.canAddLevelAsColumnGroup" action="AdHocCrosstab.appendMeasureToColumn"/>
+        <simpleAction labelKey="ADH_1213_AVAILABLE_FIELDS_ADD_TO_ROWS" clientTest="AdHocCrosstab.canAddLevelAsRowGroup" action="AdHocCrosstab.appendMeasureToRow"/>
+        <simpleAction labelKey="ADH_1212_DYNAMIC_FILTER_CREATE" clientTest="adhocDesigner.canShowFilterOption" action="adhocDesigner.filtersController.addFilter" actionArgs="${selected}"/>
+        <condition test="!getIsOlapMode">
+            <condition test="getIsDesignView">
+                <separator />
+                <simpleAction labelKey="ADH_1213_USE_AS_FIELD" clientTest="adhocDesigner.canMoveToDimensions" action="adhocDesigner.moveToDimensions"/>
+                <separator clientTest="adhocDesigner.isSelectedFieldCustom" />
+                <simpleAction labelKey="ADH_400_MENU_EDIT_CALCULATED_FIELD" clientTest="adhocDesigner.isSelectedFieldCustom" action="adhocDesigner.editCalculatedField" className="requiresInput"/>
+                <simpleAction labelKey="ADH_400_MENU_DELETE_CALCULATED_FIELD" clientTest="adhocDesigner.isDeleteAllowed" action="adhocDesigner.deleteCalculatedField"/>
+            </condition>
+        </condition>
+    </context>
+
+    <!-- Context menu for level inside crosstab -->
+    <!--<context name="crossTab_level">
+        <simpleAction selectionConstraint="singleSelect" labelKey="ADH_1213_AVAILABLE_FIELDS_ADD_TO_ROWS" clientTest="canAddLevelAsGroup" action="appendDimensionToRowAxisWithLevel"/>
+        <simpleAction selectionConstraint="singleSelect" labelKey="ADH_1213_AVAILABLE_FIELDS_ADD_TO_COLUMNS" clientTest="canAddLevelAsGroup" action="appendDimensionToColumnAxisWithLevel"/>
+        <simpleAction labelKey="ADH_1213_AVAILABLE_FIELDS_CREATE_FILTER" clientTest="adhocDesigner.canShowFilterOption" action="adHocFilterModule.addFilter"/>
+    </context>-->
+
+    <!--menu for filer pod-->
+    <context name="filterPodMenu">
+        <simpleAction labelKey="ADH_1218_DYNAMIC_FILTER_SHOW_OPERATION" clientTest="adHocFilterModule.isFilterThisPodOptionsHidden" action="adHocFilterModule.toggleFilterCondition"/>
+        <simpleAction labelKey="ADH_1218_DYNAMIC_FILTER_HIDE_OPERATION" clientTest="adHocFilterModule.isFilterThisPodOptionsVisible" action="adHocFilterModule.toggleFilterCondition"/>
+        <separator />
+        <simpleAction labelKey="ADH_1217_DYNAMIC_FILTER_REMOVE_FILTER" clientTest="adHocFilterModule.isRemoveFilterAllowed" action="adHocFilterModule.removeFilter"/>
+    </context>
+
+    <!--menu for filter panel-->
+    <context name="filterPanelMenu">
+        <simpleAction labelKey="ADH_1220_DYNAMIC_FILTER_MINIMIZE_ALL" clientTest="adHocFilterModule.isMinimizeAllFilterPodsAllowed" action="adHocFilterModule.minimizeAllPods"/>
+        <simpleAction labelKey="ADH_1221_DYNAMIC_FILTER_MAXIMIZE_ALL" clientTest="adHocFilterModule.isMaximizeAllFilterPodsAllowed" action="adHocFilterModule.maximizeAllPods"/>
+        <condition test="!getIsOlapMode">
+            <simpleAction labelKey="ADH_1225_DYNAMIC_FILTER_ADVANCED_SHOW" clientTest="adHocFilterModule.isShowComplexExpressionPodAllowed" action="adHocFilterModule.showHideComplexExpressionPod"/>
+            <simpleAction labelKey="ADH_1225_DYNAMIC_FILTER_ADVANCED_HIDE" clientTest="adHocFilterModule.isHideComplexExpressionPodAllowed" action="adHocFilterModule.showHideComplexExpressionPod"/>
+        </condition>
+        <separator />
+        <simpleAction labelKey="ADH_1219_DYNAMIC_FILTER_REMOVE_ALL" clientTest="adHocFilterModule.isRemoveAllFilterAllowed" action="adHocFilterModule.deleteAllAdhocFilters"/>
+    </context>
+
+    <!--menu for topic (available fields panel header)-->
+    <context name="topicMenu">
+        <simpleAction labelKey="ADH_1222_DYNAMIC_FILTER_CHANGE_SOURCE" action="adhocDesigner.goToTopicView"/>
+        <condition test="!getIsOlapMode">
+            <simpleAction labelKey="ADH_1223_DYNAMIC_FILTER_SELECT_FIELDS" clientTest="adhocDesigner.isSelectFieldsAllowed" action="adhocDesigner.selectFields"/>
+        </condition>
+    </context>
+
+    <!--menu for available fields-->
+    <context name="availableFieldsMenu">
+        <condition test="!getIsOlapMode">
+            <simpleAction labelKey="ADH_400_MENU_CREATE_CALCULATED_FIELD" action="adhocDesigner.createCalculatedField"/>
+        </condition>
+    </context>
+
+    <!--menu for available measures-->
+    <context name="availableMeasuresMenu">
+        <condition test="!getIsOlapMode">
+            <simpleAction labelKey="ADH_400_MENU_CREATE_CALCULATED_MEASURE" action="adhocDesigner.createCalculatedMeasure"/>
+        </condition>
+    </context>
+
+</actions>
+

@@ -1,0 +1,1 @@
+jQuery(function(){isIPad()&&(document.body.addEventListener("touchstart",function(e){window.calendar&&window.calendar.hide&&!window.calendar.hidden&&window.calendar.hide(),"undefined"!=typeof TouchController&&(TouchController.element_scrolled=!1)},!1),document.body.addEventListener("touchmove",function(e){e.preventDefault()},!1))});

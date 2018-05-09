@@ -1,0 +1,161 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<resourceDescriptor name="SupermartDashboard30"
+	wsType="dashboard" uriString="/JUNIT_NEW_FOLDER/SupermartDashboard30" isNew="false">
+	<label>SuperMart Dashboard</label>
+	<description>Designed using JasperServer Pro dashboard builder.
+	</description>
+	<creationDate>1318380317305</creationDate>
+	<resourceProperty name="PROP_RESOURCE_TYPE">
+		<value>com.jaspersoft.ji.adhoc.DashboardResource</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_PARENT_FOLDER">
+		<value>/supermart</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_VERSION">
+		<value>0</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_HAS_DATA">
+		<value>false</value>
+	</resourceProperty>
+	<resourceDescriptor name="" wsType="dashboardState"
+		uriString="" isNew="false">
+		<label>null</label>
+		<creationDate>1318380317305</creationDate>
+		<resourceProperty name="PROP_RESOURCE_TYPE">
+			<value>dashboardState</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_PARENT_FOLDER">
+			<value>/JUNIT_NEW_FOLDER/SupermartDashboard30</value>
+		</resourceProperty>
+		<resourceProperty name="ADHOC_PAPER_SIZE">
+			<value>content</value>
+		</resourceProperty>
+		<resourceProperty name="ADHOC_FRAMES">
+			<value>frame_1,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameLeft=0;
+				frame_1,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameTop=0;
+				frame_1,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameWidth=246;
+				frame_1,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameHeight=405;
+				frame_1,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameResourceType=com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.ReportUnit;
+				frame_1,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameResourceName=Top
+				Fives Report;
+				frame_1,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameSource=%2Fflow.html%3F_flowId%3DviewReportFlow%26viewAsDashboardFrame%3Dtrue%26reportUnit%3D;
+				frame_1,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashResourceIndex=0;
+				frame_1,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameScrollBars=false;
+				frame_2,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameLeft=254;
+				frame_2,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameTop=0;
+				frame_2,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameWidth=450;
+				frame_2,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameHeight=418;
+				frame_2,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameResourceType=com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.ReportUnit;
+				frame_2,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameResourceName=Sales
+				By Month Report;
+				frame_2,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameSource=%2Fflow.html%3F_flowId%3DviewReportFlow%26viewAsDashboardFrame%3Dtrue%26reportUnit%3D;
+				frame_2,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashResourceIndex=1;
+				frame_2,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameScrollBars=false;
+				frame_3,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameLeft=712;
+				frame_3,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameTop=0;
+				frame_3,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameWidth=200;
+				frame_3,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameHeight=350;
+				frame_3,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameResourceType=com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.ReportUnit;
+				frame_3,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameResourceName=Sales
+				Gauges Report;
+				frame_3,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameSource=%2Fflow.html%3F_flowId%3DviewReportFlow%26viewAsDashboardFrame%3Dtrue%26reportUnit%3D;
+				frame_3,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashResourceIndex=2;
+				frame_3,com.jaspersoft.ji.adhoc.DashboardContentFrame,dashFrameScrollBars=false;
+				text_2,com.jaspersoft.ji.adhoc.DashboardTextFrame,dashFrameLeft=736;
+				text_2,com.jaspersoft.ji.adhoc.DashboardTextFrame,dashFrameTop=352;
+				text_2,com.jaspersoft.ji.adhoc.DashboardTextFrame,dashFrameWidth=66;
+				text_2,com.jaspersoft.ji.adhoc.DashboardTextFrame,dashFrameHeight=16;
+				text_2,com.jaspersoft.ji.adhoc.DashboardTextFrame,dashTextFrameLabel=Start
+				Month;
+				text_2,com.jaspersoft.ji.adhoc.DashboardTextFrame,fontResizes=false;
+				text_2,com.jaspersoft.ji.adhoc.DashboardTextFrame,dashTextFrameFontSize=11;
+				text_2,com.jaspersoft.ji.adhoc.DashboardTextFrame,maxFontSize=11;
+				control_2,com.jaspersoft.ji.adhoc.DashboardControlFrame,dashFrameLeft=816;
+				control_2,com.jaspersoft.ji.adhoc.DashboardControlFrame,dashFrameTop=352;
+				control_2,com.jaspersoft.ji.adhoc.DashboardControlFrame,dashFrameWidth=85;
+				control_2,com.jaspersoft.ji.adhoc.DashboardControlFrame,dashFrameHeight=16;
+				control_2,com.jaspersoft.ji.adhoc.DashboardControlFrame,dashControlFrameParamName=startMonth;
+				control_2,com.jaspersoft.ji.adhoc.DashboardControlFrame,dashControlFrameParamValue=1;
+				control_2,com.jaspersoft.ji.adhoc.DashboardControlFrame,dashControlFrameDefaultParamValue=1;
+				control_2,com.jaspersoft.ji.adhoc.DashboardControlFrame,dashControlFrameDataType=String;
+				text_3,com.jaspersoft.ji.adhoc.DashboardTextFrame,dashFrameLeft=744;
+				text_3,com.jaspersoft.ji.adhoc.DashboardTextFrame,dashFrameTop=376;
+				text_3,com.jaspersoft.ji.adhoc.DashboardTextFrame,dashFrameWidth=59;
+				text_3,com.jaspersoft.ji.adhoc.DashboardTextFrame,dashFrameHeight=16;
+				text_3,com.jaspersoft.ji.adhoc.DashboardTextFrame,dashTextFrameLabel=End
+				Month;
+				text_3,com.jaspersoft.ji.adhoc.DashboardTextFrame,fontResizes=false;
+				text_3,com.jaspersoft.ji.adhoc.DashboardTextFrame,dashTextFrameFontSize=11;
+				text_3,com.jaspersoft.ji.adhoc.DashboardTextFrame,maxFontSize=11;
+				control_3,com.jaspersoft.ji.adhoc.DashboardControlFrame,dashFrameLeft=816;
+				control_3,com.jaspersoft.ji.adhoc.DashboardControlFrame,dashFrameTop=376;
+				control_3,com.jaspersoft.ji.adhoc.DashboardControlFrame,dashFrameWidth=85;
+				control_3,com.jaspersoft.ji.adhoc.DashboardControlFrame,dashFrameHeight=16;
+				control_3,com.jaspersoft.ji.adhoc.DashboardControlFrame,dashControlFrameParamName=endMonth;
+				control_3,com.jaspersoft.ji.adhoc.DashboardControlFrame,dashControlFrameParamValue=12;
+				control_3,com.jaspersoft.ji.adhoc.DashboardControlFrame,dashControlFrameDefaultParamValue=12;
+				control_3,com.jaspersoft.ji.adhoc.DashboardControlFrame,dashControlFrameDataType=String;
+				button_1,com.jaspersoft.ji.adhoc.DashboardClickableFrame,dashFrameLeft=832;
+				button_1,com.jaspersoft.ji.adhoc.DashboardClickableFrame,dashFrameTop=400;
+				button_1,com.jaspersoft.ji.adhoc.DashboardClickableFrame,dashFrameWidth=72;
+				button_1,com.jaspersoft.ji.adhoc.DashboardClickableFrame,dashFrameHeight=24;
+				button_1,com.jaspersoft.ji.adhoc.DashboardClickableFrame,dashClickableFrameID=submit;
+				button_1,com.jaspersoft.ji.adhoc.DashboardClickableFrame,dashClickableFrameType=button;
+				button_2,com.jaspersoft.ji.adhoc.DashboardClickableFrame,dashFrameLeft=744;
+				button_2,com.jaspersoft.ji.adhoc.DashboardClickableFrame,dashFrameTop=400;
+				button_2,com.jaspersoft.ji.adhoc.DashboardClickableFrame,dashFrameWidth=72;
+				button_2,com.jaspersoft.ji.adhoc.DashboardClickableFrame,dashFrameHeight=24;
+				button_2,com.jaspersoft.ji.adhoc.DashboardClickableFrame,dashClickableFrameID=reset;
+				button_2,com.jaspersoft.ji.adhoc.DashboardClickableFrame,dashClickableFrameType=button;
+			</value>
+		</resourceProperty>
+		<resourceProperty name="ADHOC_PROPERTIES">
+			<value>layoutSize=1024x768;
+				useAbsoluteSizing=true;
+				paperSize=content;
+				LayoutLeft=286;
+				paramValuesChanged=true;
+				LayoutTop=176;
+				localDatePattern=MM-dd-yyyy;
+</value>
+		</resourceProperty>
+	</resourceDescriptor>
+	<resourceDescriptor name="" wsType="reference"
+		uriString="" isNew="false">
+		<label>null</label>
+		<resourceProperty name="PROP_REFERENCE_URI">
+			<value>/supermart/details/TopFivesReport</value>
+		</resourceProperty>
+	</resourceDescriptor>
+	<resourceDescriptor name="" wsType="reference"
+		uriString="" isNew="false">
+		<label>null</label>
+		<resourceProperty name="PROP_REFERENCE_URI">
+			<value>/supermart/salesByMonth/SalesByMonthReport</value>
+		</resourceProperty>
+	</resourceDescriptor>
+	<resourceDescriptor name="" wsType="reference"
+		uriString="" isNew="false">
+		<label>null</label>
+		<resourceProperty name="PROP_REFERENCE_URI">
+			<value>/supermart/revenueAndProfit/SalesGaugesReport</value>
+		</resourceProperty>
+	</resourceDescriptor>
+</resourceDescriptor>

@@ -1,0 +1,8 @@
+--
+--
+-- 5.1.0 to 5.2.0
+--
+-- There are no database changes between 5.1 and 5.2
+--
+-- This is a dummy placeholder file for the js-upgrade-samedb.sh/bat script
+--

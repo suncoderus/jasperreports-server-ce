@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+                http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+                http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+    <!-- REST v.2-->
+    <context:component-scan base-package="com.jaspersoft.jasperserver.jaxrs">
+        <context:exclude-filter type="regex" expression=".*UserWorkflowStorage"/>
+    </context:component-scan>
+
+    <alias name="${bean.configurationAllowedRoles}" alias="configurationAllowedRoles"/>
+
+    <bean id="restLoggingSettings" class="com.jaspersoft.jasperserver.jaxrs.logging.RestLoggingSettings">
+        <!-- See detailed description of fields in javadoc of following constructor
+        org.glassfish.jersey.logging.LoggingFeature.LoggingFeature(java.util.logging.Logger, java.util.logging.Level, org.glassfish.jersey.logging.LoggingFeature.Verbosity, java.lang.Integer)
+        -->
+        <property name="loggerName" value="com.jaspersoft.jasperserver.jaxrs.RestSpringApplication"/>
+        <!-- change value below to INFO to enable REST requests/responses logging -->
+        <property name="level" value="ALL"/>
+        <!--Supported values for verbosity are: HEADERS_ONLY, PAYLOAD_TEXT, PAYLOAD_ANY. See more information in javadoc of org.glassfish.jersey.logging.LoggingFeature.Verbosity-->
+        <property name="verbosity" value="PAYLOAD_ANY"/>
+        <property name="maxEntitySize" value="1024"/>
+    </bean>
+
+    <bean id="userWorkflowStorage" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="interceptorNames">
+            <list>
+                <idref bean="filterOutNotPermittedWorkflows"/>
+                <idref bean="userWorkflowStorageTarget"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="filterOutNotPermittedWorkflows"
+          class="org.springframework.security.access.intercept.aopalliance.MethodSecurityInterceptor">
+        <property name="authenticationManager">
+            <ref bean="authenticationManager"/>
+        </property>
+        <property name="afterInvocationManager">
+            <ref local="workflowsAfterInvocationManager"/>
+        </property>
+        <property name="accessDecisionManager">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.service.EmptyAccessDecisionManager"/>
+        </property>
+
+        <property name="securityMetadataSource">
+            <security:method-security-metadata-source>
+                <security:protect method="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.data.UserWorkflowStorage.findByName" access="ADMINISTRATION_ALLOWED,CONFIGURATION_ALLOWED"/>
+                <security:protect method="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.data.UserWorkflowStorage.findAllByParentName" access="ADMINISTRATION_ALLOWED,CONFIGURATION_ALLOWED"/>
+            </security:method-security-metadata-source>
+        </property>
+    </bean>
+
+    <bean id="workflowsAfterInvocationManager" class="org.springframework.security.access.intercept.AfterInvocationProviderManager">
+        <property name="providers">
+            <list>
+                <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.service.WorkflowsSecurityFilter">
+                    <property name="supportedAttribute" value="CONFIGURATION_ALLOWED"/>
+                    <property name="allowedRoles" ref="configurationAllowedRoles"/>
+                    <property name="workflowsToSecure">
+                        <list>
+                            <value>serverSettings</value>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.service.WorkflowsSecurityFilter">
+                    <property name="supportedAttribute" value="ADMINISTRATION_ALLOWED"/>
+                    <property name="allowedRoles" ref="${bean.administrationAllowedRoles}"/>
+                    <property name="workflowsToSecure">
+                        <list>
+                            <value>admin</value>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="userWorkflowStorageTarget" class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.data.UserWorkflowStorage"/>
+
+    <bean id="rolesJaxrsService" class="com.jaspersoft.jasperserver.jaxrs.authority.RolesJaxrsService">
+        <property name="service" ref="${bean.userAndRoleService}" />
+    </bean>
+    <bean id="usersJaxrsService"  class="com.jaspersoft.jasperserver.jaxrs.authority.UsersJaxrsService">
+        <property name="service" ref="${bean.userAndRoleService}" />
+    </bean>
+
+    <util:map id="contentTypeMapping">
+        <entry key="pdf" value="application/pdf"/>
+        <entry key="html" value="text/html"/>
+        <entry key="xls" value="application/xls"/>
+        <entry key="rtf" value="application/rtf"/>
+        <entry key="csv" value="text/csv"/>
+        <entry key="odt" value="application/vnd.oasis.opendocument.text"/>
+        <entry key="txt" value="text/plain"/>
+        <entry key="docx" value="application/vnd.openxmlformats-officedocument.wordprocessingml.document"/>
+        <entry key="ods" value="application/vnd.oasis.opendocument.spreadsheet"/>
+        <entry key="xlsx" value="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>
+        <entry key="font" value="font/*"/>
+        <entry key="jrxml" value="application/xml"/>
+        <entry key="jar" value="application/zip"/>
+        <entry key="prop" value="text/plain"/>
+        <entry key="jrtx" value="application/xml"/>
+        <entry key="xml" value="application/xml"/>
+        <entry key="json" value="application/json"/>
+        <entry key="css" value="text/css"/>
+        <entry key="accessGrantSchema" value="application/xml"/>
+        <entry key="olapMondrianSchema" value="application/xml"/>
+        <entry key="pptx" value="application/vnd.openxmlformats-officedocument.presentationml.presentation"/>
+        <entry key="json" value="application/json"/>
+        <entry key="dashboardComponent" value="application/dashboardComponentsSchema+json"/>
+    </util:map>
+
+    <bean id="exposedMessageSource" parent="messageSource" class="com.jaspersoft.jasperserver.jaxrs.bundle.ExposedResourceBundleMessageSource"  >
+        <property name="defaultEncoding" value="UTF-8"/>
+        <property name="basenamePrefix" value="WEB-INF/bundles/"/>
+    </bean>
+
+    <!-- REST v.1-->
+    <bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"/>
+
+    <!--Hypermedia-->
+
+    <!--Root Hypermedia Document-->
+
+    <bean id="rootDocumentActivity" scope="prototype"  class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.root.activity.ReadRootDocumentActivity">
+       <!--Mapping to activities-->
+        <constructor-arg index="0">
+            <util:map key-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.common.Relation"
+                      value-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.common.activity.Activity">
+                <entry key="contentReferences" value-ref="contentCollectionActivity"/>
+                <entry key="resources" value-ref="searchResourceLookupActivity"/>
+                <entry key="workflows" value-ref="workflowCollectionActivity"/>
+            </util:map>
+        </constructor-arg>
+       <!--Treat next relations as links-->
+        <constructor-arg index="1">
+            <util:list value-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.common.Relation">
+                <value>contentReferences</value>
+                <value>resources</value>
+                <value>workflows</value>
+            </util:list>
+        </constructor-arg>
+       <!--Relations resolver-->
+        <property name="visitor">
+            <bean id="rootVisitor" scope="prototype" class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.root.visitor.RootDocumentRelationsVisitor"/>
+        </property>
+    </bean>
+
+    <!--Workflow Collection configuration -->
+
+    <bean id="workflowCollectionActivity" scope="prototype"
+          class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.activity.ReadUserWorkflowCollectionActivity">
+        <!--Mapping to activities-->
+        <constructor-arg index="0">
+            <util:map key-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.common.Relation"
+                      value-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.common.activity.Activity">
+                <entry key="workflow"><null/></entry><!--Workaround for circular dependency, resolved in 'proceed' method-->
+            </util:map>
+        </constructor-arg>
+        <!--Treat next relations as links-->
+        <constructor-arg index="1">
+            <util:list value-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.common.Relation"/>
+        </constructor-arg>
+        <!--Relations resolver-->
+        <property name="visitor">
+            <bean id="workflowCollectionVisitor" scope="prototype" class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.visitor.UserWorkflowCollectionRelationsVisitor"/>
+        </property>
+    </bean>
+
+    <!-- Single Workflow configuration -->
+
+    <bean id="workflowActivity" scope="prototype"
+          class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.activity.ReadUserWorkflowActivity">
+        <!--Mapping to activities-->
+        <constructor-arg index="0">
+            <util:map key-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.common.Relation"
+                      value-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.common.activity.Activity">
+                <entry key="workflows"><null/></entry><!--Workaround for circular dependency, resolved in 'proceed' method-->
+                <entry key="resources" value-ref="searchResourceLookupActivity"/>
+                <entry key="folder" value-ref="browseResourceLookupActivity"/>
+                <entry key="create" value-ref="createResourceActivity"/>
+                <entry key="contentReference" value-ref="contentReferenceActivity"/>
+                <entry key="admin" value-ref="defaultReadAdminActivity"/>
+            </util:map>
+        </constructor-arg>
+        <!--Treat next relations as links-->
+        <constructor-arg index="1">
+            <util:list value-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.common.Relation">
+                <value>workflows</value>
+                <value>resources</value>
+                <value>folder</value>
+                <value>create</value>
+                <value>admin</value>
+            </util:list>
+        </constructor-arg>
+        <!--Relations resolver-->
+        <property name="visitor">
+            <bean id="workflowCollectionVisitor" scope="prototype" class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.visitor.UserWorkflowRelationVisitor"/>
+        </property>
+    </bean>
+
+    <!--Wrapper for not existed dto model around server settings-->
+    <bean id="defaultReadAdminActivity"
+          scope="prototype"
+          class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.admin.ReadAdminActivity">
+    </bean>
+
+    <!--Search Hypermedia Activity configuration-->
+
+    <util:list id="hypermediaSearchCustomFilters" scope="prototype">
+       <ref bean="${bean.excludeFolderFilter}"/>
+    </util:list>
+
+    <bean id="searchResourceLookupActivity"
+          scope="prototype"
+          class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.resource.activity.SearchResourcesActivity">
+        <!--Mapping to activities-->
+        <constructor-arg index="0">
+            <util:map key-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.common.Relation"
+                      value-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.common.activity.Activity">
+                <entry key="resource" value-ref="resourceLookupActivity"/>
+            </util:map>
+        </constructor-arg>
+        <!--Treat next relations as links-->
+        <constructor-arg index="1">
+            <util:list value-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.common.Relation"/>
+        </constructor-arg>
+        <!--Relations resolver-->
+        <property name="visitor">
+            <bean id="searchRelationsVisitor" scope="prototype" class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.resource.visitor.SearchRelationVisitor"/>
+        </property>
+        <!--Default search criteria-->
+        <property name="criteria">
+            <bean class="com.jaspersoft.jasperserver.search.service.impl.RepositorySearchCriteriaImpl">
+                <property name="searchMode" value="SEARCH" />
+                <property name="startIndex" value="0" />
+                <property name="maxCount" value="100" />
+                <property name="showHidden" value="false" />
+                <property name="customFilters" ref="hypermediaSearchCustomFilters"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="browseResourceLookupActivity"
+          scope="prototype"
+          class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.resource.activity.BrowseResourcesActivity">
+        <property name="criteria">
+            <bean class="com.jaspersoft.jasperserver.search.service.impl.RepositorySearchCriteriaImpl">
+                <property name="searchMode" value="BROWSE" />
+            </bean>
+        </property>
+    </bean>
+
+    <!--ResourceLookup Hypermedia configuration-->
+
+    <bean id="resourceLookupActivity"
+          scope="prototype"
+          class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.resource.activity.ReadResourceActivity">
+        <!--Mapping to activities-->
+        <constructor-arg index="0">
+            <util:map key-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.common.Relation"
+                      value-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.common.activity.Activity">
+                <entry key="run" value-ref="runResourceActivity"/>
+                <entry key="edit" value-ref="editResourceLookupActivity"/>
+                <entry key="open" value-ref="openResourceActivity"/>
+            </util:map>
+        </constructor-arg>
+        <!--Treat next relations as links-->
+        <constructor-arg index="1">
+            <util:list value-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.common.Relation">
+                <value>run</value>
+                <value>edit</value>
+                <value>open</value>
+            </util:list>
+        </constructor-arg>
+        <!--Relations resolver-->
+        <property name="visitor">
+            <bean id="readResourceLookupRelationVisitor" scope="prototype" class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.resource.visitor.ResourceLookupRelationsVisitor"/>
+        </property>
+    </bean>
+
+
+    <bean id="editResourceLookupActivity"
+          scope="prototype"
+          class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.resource.activity.EditResourceActivity">
+    </bean>
+
+    <bean id="runResourceActivity"
+          scope="prototype"
+          class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.resource.activity.RunResourceActivity">
+    </bean>
+
+    <bean id="openResourceActivity"
+          scope="prototype"
+          class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.resource.activity.OpenResourceActivity">
+    </bean>
+
+    <bean id="createResourceActivity"
+          scope="prototype"
+          class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.resource.activity.CreateResourceActivity">
+    </bean>
+
+    <!--Content Reference configuration -->
+
+    <bean id="contentReferenceActivity"
+          scope="prototype"
+          class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.content.activity.ReadContentReferenceActivity">
+    </bean>
+
+    <bean id="contentCollectionActivity"
+          scope="prototype"
+          class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.content.activity.ReadContentReferenceCollectionActivity">
+        <!--Mapping to activities-->
+        <constructor-arg index="0">
+            <util:map key-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.common.Relation"
+                      value-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.common.activity.Activity">
+                <entry key="contentReference" value-ref="contentReferenceActivity"/>
+            </util:map>
+        </constructor-arg>
+        <!--Treat next relations as links-->
+        <constructor-arg index="1">
+            <util:list value-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.common.Relation"/>
+        </constructor-arg>
+        <!--Relations resolver-->
+        <property name="visitor">
+            <bean id="contentReferenceVisitor" scope="prototype" class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.content.visitor.ContentReferenceCollectionRelationsVisitor"/>
+        </property>
+    </bean>
+
+    <!--Workflows Data-->
+
+    <util:map id="userWorkflows"
+              map-class="java.util.LinkedHashMap"
+              key-type="java.lang.String"
+              value-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.dto.UserWorkflow">
+        <entry key="main">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.dto.UserWorkflow">
+                <property name="name" value="main"/>
+                <property name="label" value="Main"/>
+                <property name="description" value="Main functionality"/>
+            </bean>
+        </entry>
+        <!--Main workflows-->
+        <entry key="dataSource">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.dto.UserWorkflow">
+                <property name="name" value="dataSource"/>
+                <property name="label" value="datasource.title"/>
+                <property name="description" value="datasource.description"/>
+                <property name="parentName" value="main"/>
+                <property name="contentReferenceId" value="datasource"/>
+            </bean>
+        </entry>
+        <entry key="domain">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.dto.UserWorkflow">
+                <property name="name" value="domain"/>
+                <property name="label" value="domain.title"/>
+                <property name="description" value="domain.description"/>
+                <property name="parentName" value="main"/>
+                <property name="contentReferenceId" value="domain"/>
+            </bean>
+        </entry>
+        <entry key="adhocView">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.dto.UserWorkflow">
+                <property name="name" value="adhocView"/>
+                <property name="label" value="adhocView.title"/>
+                <property name="description" value="adhocView.description"/>
+                <property name="parentName" value="main"/>
+                <property name="contentReferenceId" value="adhoc"/>
+            </bean>
+        </entry>
+        <entry key="report">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.dto.UserWorkflow">
+                <property name="name" value="report"/>
+                <property name="label" value="report.title"/>
+                <property name="description" value="report.description"/>
+                <property name="parentName" value="main"/>
+                <property name="contentReferenceId" value="report"/>
+
+            </bean>
+        </entry>
+        <entry key="dashboard">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.dto.UserWorkflow">
+                <property name="name" value="dashboard"/>
+                <property name="label" value="dashboard.title"/>
+                <property name="description" value="dashboard.description"/>
+                <property name="parentName" value="main"/>
+                <property name="contentReferenceId" value="dashboard"/>
+
+            </bean>
+        </entry>
+        <entry key="admin">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.dto.UserWorkflow">
+                <property name="name" value="admin"/>
+                <property name="label" value="admin.title"/>
+                <property name="description" value="admin.description"/>
+                <property name="parentName" value="main"/>
+            </bean>
+        </entry>
+
+        <!--Admin Workflows-->
+        <entry key="users">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.dto.UserWorkflow">
+                <property name="name" value="users"/>
+                <property name="label" value="users.title"/>
+                <property name="description" value="users.description"/>
+                <property name="parentName" value="admin"/>
+            </bean>
+        </entry>
+        <entry key="roles">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.dto.UserWorkflow">
+                <property name="name" value="roles"/>
+                <property name="label" value="roles.title"/>
+                <property name="description" value="roles.description"/>
+                <property name="parentName" value="admin"/>
+            </bean>
+        </entry>
+        <entry key="repository">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.dto.UserWorkflow">
+                <property name="name" value="repository"/>
+                <property name="label" value="repository.title"/>
+                <property name="description" value="repository.description"/>
+                <property name="parentName" value="admin"/>
+            </bean>
+        </entry>
+        <entry key="serverSettings">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.workflow.dto.UserWorkflow">
+                <property name="name" value="serverSettings"/>
+                <property name="label" value="server.settings.title"/>
+                <property name="description" value="server.settings.description"/>
+                <property name="parentName" value="admin"/>
+            </bean>
+        </entry>
+
+    </util:map>
+
+    <!--Content References-->
+
+    <util:map id="contentReference"
+              map-class="java.util.LinkedHashMap"
+              key-type="java.lang.String"
+              value-type="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.content.dto.ContentReference">
+
+        <!--Popular Content-->
+
+        <entry key="videos">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.content.dto.ContentReference">
+                <property name="id" value="videos"/>
+                <property name="title" value="how.to.videos"/>
+                <property name="description" value="how.to.videos"/>
+                <property name="url" value="http://community.jaspersoft.com/wiki/jasperreports-server-how-videos-playlist"/>
+                <property name="group" value="popular"/>
+            </bean>
+        </entry>
+        <entry key="articles">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.content.dto.ContentReference">
+                <property name="id" value="articles"/>
+                <property name="title" value="how.to.articles"/>
+                <property name="description" value="how.to.articles"/>
+                <property name="url" value="http://community.jaspersoft.com/wiki"/>
+                <property name="group" value="popular"/>
+            </bean>
+        </entry>
+        <entry key="portal">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.content.dto.ContentReference">
+                <property name="id" value="portal"/>
+                <property name="title" value="online.portal"/>
+                <property name="description" value="online.portal"/>
+                <property name="url" value="http://www.jaspersoft.com/bi-training-center"/>
+                <property name="group" value="popular"/>
+            </bean>
+        </entry>
+
+        <!--Video Tutorials-->
+
+        <entry key="datasource">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.content.dto.ContentReference">
+                <property name="id" value="datasource"/>
+                <property name="title" value="view.tutorial"/>
+                <property name="description" value="datasource.tutorial.description"/>
+                <property name="url" value="http://community.jaspersoft.com/wiki/jasperreports-server-data-analysis-video"/>
+                <property name="group" value="tutorial"/>
+            </bean>
+        </entry>
+        <entry key="domain">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.content.dto.ContentReference">
+                <property name="id" value="domain"/>
+                <property name="title" value="view.tutorial"/>
+                <property name="description" value="domain.tutorial.description"/>
+                <property name="url" value="http://community.jaspersoft.com/wiki/jasperreports-server-domains-video"/>
+                <property name="group" value="tutorial"/>
+            </bean>
+        </entry>
+        <entry key="adhoc">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.content.dto.ContentReference">
+                <property name="id" value="adhoc"/>
+                <property name="title" value="view.tutorial"/>
+                <property name="description" value="adhoc.tutorial.description"/>
+                <property name="url" value="http://community.jaspersoft.com/wiki/jasperreports-server-ad-hoc-views-video"/>
+                <property name="group" value="tutorial"/>
+            </bean>
+        </entry>
+        <entry key="report">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.content.dto.ContentReference">
+                <property name="id" value="report"/>
+                <property name="title" value="view.tutorial"/>
+                <property name="description" value="report.tutorial.description"/>
+                <property name="url" value="http://community.jaspersoft.com/wiki/jasperreports-server-reports-video"/>
+                <property name="group" value="tutorial"/>
+            </bean>
+        </entry>
+        <entry key="dashboard">
+            <bean class="com.jaspersoft.jasperserver.jaxrs.poc.hypermedia.content.dto.ContentReference">
+                <property name="id" value="dashboard"/>
+                <property name="title" value="view.tutorial"/>
+                <property name="description" value="dashboard.tutorial.description"/>
+                <property name="url" value="http://community.jaspersoft.com/wiki/jasperreports-server-dashboards-video"/>
+                <property name="group" value="tutorial"/>
+            </bean>
+        </entry>
+
+    </util:map>
+
+
+
+</beans>

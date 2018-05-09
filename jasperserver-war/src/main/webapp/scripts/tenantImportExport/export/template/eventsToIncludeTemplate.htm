@@ -1,0 +1,19 @@
+<div class="section events">
+    <p class="title">{{- i18n["export.dialog.events"] }}</p>
+    <div class="group">
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.dialog.events.access.events"] }}</label>
+            <input class="includeAccessEvents" name="includeAccessEvents" type="checkbox" data-bind="checked:includeAccessEvents, enabled:everything">
+        </div>
+        {{ if(!isServerCe) { }}
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.dialog.events.audit.events"] }}</label>
+            <input class="includeAuditEvents" name="includeAuditEvents" type="checkbox" data-bind="checked:includeAuditEvents">
+        </div>
+        <div class="control checkBox">
+            <label class="wrap" title="">{{- i18n["export.dialog.events.monitoring.events"] }}</label>
+            <input class="includeMonitoringEvents" name="includeMonitoringEvents" type="checkbox" data-bind="checked:includeMonitoringEvents">
+        </div>
+        {{ } }}
+    </div>
+</div>

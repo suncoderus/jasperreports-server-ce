@@ -1,0 +1,362 @@
+<?xml version="1.0"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!-- =============================================================== -->
+<!-- Ant convention to copy config files to some target              -->
+<!-- Properties expected:                                            -->
+<!-- js-path: path to CE source dir                                  -->
+<!-- js-pro-path: path to Pro source dir (here)                      -->
+<!-- target: where to copy the files                                 -->
+<!-- =============================================================== -->
+
+<project name="ce-config" default="copy-config" basedir=".">
+    <description>Copy config file sets</description>
+
+    <taskdef resource="net/sf/antcontrib/antlib.xml"/>
+
+    <!-- define dependencies -->
+    <property name="ce.webapp.deps" value="ce.webapp, ce.common, ce.ftp"/>
+    <property name="ce.unit-test.deps" value="ce.unit-test, ce.common, ce.export-shared"/>
+    <property name="ce.esapi.deps" value="ce.common.esapi"/>
+    <property name="ce.api-impl.deps" value="ce.common.esapi"/>
+    <property name="ce.production-tests.deps" value="ce.production-tests, ce.common, ce.export-shared, ce.sso"/>
+    <property name="ce.export.deps" value="ce.export, ce.export-shared, ce.common"/>
+
+    <!-- define paths -->
+    <property name="ce.common.path" value="${js-path}/common/shared-config"/>
+    <property name="ce.common.esapi.path" value="${js-path}/common/shared-config/classes/esapi"/>
+    <property name="ce.webapp.path" value="${js-path}/jasperserver-war/shared-config"/>
+    <property name="ce.unit-test.path" value="${js-path}/jasperserver-unit-test/shared-config"/>
+
+    <property name="ce.production-tests.path" value="${js-path}/production-tests/shared-config"/>
+    <!-- 1/30/2013 - New functionality to copy single application context files from <module>'s to a classpath:
+                    example - copy applicationContext-security-web.xml from jasperserver-war/shared-config to production-tests/target/target-classes-->
+    <property name="ce.production-tests.files" value="${js-path}/jasperserver-war/shared-config/applicationContext-security-web.xml"/>
+
+    <property name="ce.export.path" value="${js-path}/jasperserver-export-package/config"/>
+    <property name="ce.export-shared.path" value="${js-path}/jasperserver-export-package/shared-config"/>
+    <property name="ce.sso.path" value="${js-path}/samples/externalAuth-sample-config"/>
+
+    <property name="ce.ftp.path" value="${js-path}/jasperserver-ftp/shared-config"/>
+
+    <!-- 
+        Comma-separated list of files with platform-specific values;
+        in buildomatic these are created in the build_conf/<cfg-name>/templates directory.
+        You have to set the platform-path property to point to them
+      -->
+    <property name="platform.files" value="js.jdbc.properties, js.quartz.properties, js.diagnostic.properties, js.aws.datasource.properties, js.externalAuth.properties, js.config.properties, relativedate.properties"/>
+  
+    <target name="copy-config" description="copy config files for a specific module (requires target property to be set)">
+        <!-- lookup pathlist of deps for specified module -->
+        <propertycopy property="path-list" from="${module}.deps"/>
+        <process-config path-list="${path-list}"/>
+        <!-- after copy-deps, copy over the list of platform-specific files -->
+        <if>
+            <and>
+            <isset property="platform-path"/>
+                <or>
+                    <not>
+                        <isset property="exclude.platform.files"/>
+                    </not>
+                    <equals arg1="exclude.platform.files" arg2="false"/>
+                </or>
+            </and>
+            <then>
+                <copy toDir="${target}" overwrite="true" verbose="true">
+                    <fileset dir="${platform-path}" includes="${platform.files}"/>
+                </copy>
+            </then>
+        </if>
+    </target>
+
+    <target name="list-config">
+        <!-- lookup pathlist of deps for specified module -->
+        <propertycopy property="path-list" from="${module}.deps"/>
+        <process-config path-list="${path-list}" do-what="listfiles-relative"/>
+    </target>
+    
+    <!-- list the modules available -->
+    <target name="list-modules">
+        <!-- get all "deps" properties -->
+        <propertyselector property="mod-list"
+                             match="(.*)\.deps"
+                             select="\1"/>
+
+        <!-- sort them, then list paths for each module -->
+        <sortlist property="sorted-mod-list" override="true" value="${mod-list}"/>
+        <for list="${sorted-mod-list}" param="mod">
+            <sequential>
+                <propertycopy property="deps" override="true" from="@{mod}.deps"/>
+                <echo message="Module @{mod} has these paths:"/>
+                <process-config path-list="${deps}" do-what="list"/>
+            </sequential>
+        </for>
+    </target>
+    
+    <target name="list-files">
+        <!-- grep? -->
+        <if>
+            <isset property="grep"/>
+            <then>
+                <property name="do" value="grep"/>
+            </then>
+            <else>
+                <property name="do" value="listfiles-full"/>
+            </else>
+        </if>
+        <!-- get all "path" properties -->
+        <propertyselector property="path-list"
+                             match="(.*)\.path$"
+                             select="\1"/>
+
+        <!-- sort them, then list paths for each module -->
+        <sortlist property="sorted-path-list" override="true" value="${path-list}"/>
+        <for list="${sorted-path-list}" param="pathname">
+            <sequential>
+                <if>
+                    <and>
+                        <available file="${@{pathname}.path}"/>
+                        <not>
+                            <equals arg1="@{pathname}.path" arg2="sun.boot.library.path"/>
+                        </not>
+                    </and>
+                    <then>
+                        <echo level="debug" message="ok path @{pathname}.path: ${@{pathname}.path}"/>
+                        <process-config path-list="@{pathname}" do-what="${do}"/>
+                    </then>
+                    <else>
+                        <echo level="debug" message="weird path @{pathname}.path: ${@{pathname}.path}"/>
+                    </else>
+                </if>
+            </sequential>
+        </for>
+    </target>
+
+    <!-- this macro recurses over a path list (which can contain other path lists) and takes an action for each path.
+         "do-what" can take these values:
+         copy: copy files under the paths to ${target}
+         listfiles-relative: echo the file names relative to each path
+         listfiles-full: echo the full file names for each path
+         list: just echo the paths
+      -->
+    <macrodef name="process-config">
+        <attribute name="path-list"/>
+        <attribute name="do-what" default="copy"/>
+        <sequential>
+        <for list="@{path-list}" delimiter=", " param="path-name">
+            <sequential>
+                <if>
+                    <isset property="@{path-name}.pathlist"/>
+                    <then>
+                        <!-- echo message="path list is ${@{path-name}.pathlist}"/ -->
+                        <process-config path-list="${@{path-name}.pathlist}" do-what="@{do-what}"/>
+                    </then>
+                    <elseif>
+                        <isset property="@{path-name}.path"/>
+                        <then>
+                            <var name="path" value="${@{path-name}.path}"/>
+                            <if>
+                                <equals arg1="@{do-what}" arg2="copy"/>
+                                <then>
+                                    <!-- set copy-overwrite to default (can be set to false to just update new files) -->
+                                    <property name="copy-overwrite" value="true"/>
+                                    <copy toDir="${target}" overwrite="${copy-overwrite}">
+                                      <fileset dir="${path}"/>
+                                    </copy>
+                                </then>
+                                <elseif>
+                                    <equals arg1="@{do-what}" arg2="listfiles-relative"/>
+                                    <then>
+                                        <echo level="info" message="  ${path}"/>
+                                        <for param="file">
+                                          <fileset dir="${path}"/>
+                                          <sequential>
+                                              <var name="relpath" unset="true"/>
+                                              <pathconvert dirsep="/" property="relpath">
+                                                  <file file="@{file}"/>
+                                                  <filtermapper>
+                                                    <replacestring from="\" to="/"/>
+                                                    <replacestring from="${path}/" to=""/>
+                                                  </filtermapper>
+                                              </pathconvert>
+                                              <echo message="    ${relpath}"/>
+                                          </sequential>
+                                        </for>
+                                    </then>
+                                </elseif>
+                                <elseif>
+                                    <equals arg1="@{do-what}" arg2="listfiles-full"/>
+                                    <then>
+                                        <echo level="info" message="  ${path}"/>
+                                        <for param="file">
+                                          <fileset dir="${path}"/>
+                                          <sequential>
+                                              <var name="fullpath" unset="true"/>
+                                              <pathconvert dirsep="/" property="fullpath">
+                                                  <file file="@{file}"/>
+                                                  <filtermapper>
+                                                    <replacestring from="\" to="/"/>
+                                                  </filtermapper>
+                                              </pathconvert>
+                                              <echo message="    ${fullpath}"/>
+                                          </sequential>
+                                        </for>
+                                    </then>
+                                </elseif>
+                                <elseif>
+                                    <equals arg1="@{do-what}" arg2="grep"/>
+                                    <then>
+                                        <for param="file">
+                                          <fileset dir="${path}"/>
+                                          <sequential>
+                                            <var name="matches" unset="true"/>
+                                            <loadresource property="matches">
+                                                <concat>
+                                                    <path path="@{file}"/>
+                                                    <filterchain>
+                                                        <containsregex pattern="${grep}" flags="i"/>
+                                                        <prefixlines prefix="    "/>
+                                                    </filterchain>
+                                                </concat>
+                                            </loadresource>
+                                            <if>
+                                                <isset property="matches"/>
+                                                <then>
+                                                    <echo message="@{file}:"/>
+                                                    <echo message="${matches}"/>
+                                                    <echo/>
+                                                </then>
+                                            </if>
+                                          </sequential>
+                                        </for>
+                                    </then>
+                                </elseif>
+                                <elseif>
+                                    <equals arg1="@{do-what}" arg2="list"/>
+                                    <then>
+                                    	<echo message="    ${path}"/>
+                                    </then>
+                                </elseif>
+                            </if>
+                        </then>
+                    </elseif>
+                    <else>
+                       <fail message="Couldn't find path or pathlist for '@{path-name}'" />
+                    </else>
+                </if>
+
+                <!-- 1/30/2013 - New functionality to copy single application context files from <module>'s to a classpath:
+                example - copy applicationContext-security-web.xml from jasperserver-war/shared-config to production-tests/target/target-classes-->
+                <if>
+                    <isset property="@{path-name}.files"/>
+                    <then>
+                        <var name="file-list" value="${@{path-name}.files}"/>
+                        <if>
+                            <equals arg1="@{do-what}" arg2="copy"/>
+                            <then>
+                                <for list="${file-list}" delimiter=", " param="file">
+                                    <sequential>
+                                        <copy file="@{file}" toDir="${target}" overwrite="true"/>
+                                    </sequential>
+                                </for>
+                            </then>
+                            <elseif>
+                                <equals arg1="@{do-what}" arg2="listfiles-relative"/>
+                                <then>
+                                    <echo level="info" message="  ${file-list}"/>
+
+                                    <for list="${file-list}" delimiter=", " param="file">
+                                        <sequential>
+                                            <var name="relpath" unset="true"/>
+                                            <pathconvert dirsep="/" property="relpath">
+                                                <file file="@{file}"/>
+                                                <filtermapper>
+                                                    <replacestring from="\" to="/"/>
+                                                    <replaceregex pattern=".*/" replace=""/>
+                                                </filtermapper>
+                                            </pathconvert>
+                                            <echo message="    ${relpath}"/>
+                                        </sequential>
+                                    </for>
+                                </then>
+                            </elseif>
+                            <elseif>
+                                <equals arg1="@{do-what}" arg2="listfiles-full"/>
+                                <then>
+                                    <echo level="info" message="  ${file-list}"/>
+                                    <for list="${file-list}" delimiter=", " param="file">
+                                        <sequential>
+                                            <var name="fullpath" unset="true"/>
+                                            <pathconvert dirsep="/" property="fullpath">
+                                                <file file="@{file}"/>
+                                                <filtermapper>
+                                                    <replacestring from="\" to="/"/>
+                                                </filtermapper>
+                                            </pathconvert>
+                                            <echo message="    ${fullpath}"/>
+                                        </sequential>
+                                    </for>
+                                </then>
+                            </elseif>
+                            <elseif>
+                                <equals arg1="@{do-what}" arg2="grep"/>
+                                <then>
+                                    <for list="${file-list}" delimiter=", " param="file">
+                                        <sequential>
+                                            <var name="matches" unset="true"/>
+                                            <loadresource property="matches">
+                                                <concat>
+                                                    <path path="@{file}"/>
+                                                    <filterchain>
+                                                        <containsregex pattern="${grep}" flags="i"/>
+                                                        <prefixlines prefix="    "/>
+                                                    </filterchain>
+                                                </concat>
+                                            </loadresource>
+                                            <if>
+                                                <isset property="matches"/>
+                                                <then>
+                                                    <echo message="@{file}:"/>
+                                                    <echo message="${matches}"/>
+                                                    <echo/>
+                                                </then>
+                                            </if>
+                                        </sequential>
+                                    </for>
+                                </then>
+                            </elseif>
+                            <elseif>
+                                <equals arg1="@{do-what}" arg2="list"/>
+                                <then>
+                                    <echo message="    ${path}"/>
+                                </then>
+                            </elseif>
+                        </if>
+                    </then>
+                </if>
+                <!--  1/30/2013 -->
+
+            </sequential>
+        </for>
+        </sequential>
+    </macrodef>
+
+  
+</project>

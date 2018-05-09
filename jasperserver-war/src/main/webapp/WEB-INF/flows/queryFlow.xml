@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<flow xmlns="http://www.springframework.org/schema/webflow" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+      ns0:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd"
+      start-state="initDecision">
+
+    <input name="masterFlow"/>
+    <input name="masterFlowStep"/>
+    <input name="parentFlow"/>
+    <input name="endState"/>
+    <input name="query"/>
+    <input name="currentQuery"/>
+    <input name="parentFolder"/>
+    <input name="isEdit"/>
+
+    <decision-state id="initDecision">
+        <if test="requestScope.endState == 'finish'" then="validateQuery" else="initAction"/>
+    </decision-state>
+
+    <action-state id="initAction">
+        <evaluate expression="editQueryAction"/>
+        <transition on="success" to="editQueryForm"/>
+    </action-state>
+
+    <view-state id="editQueryForm" view="modules/addResource/queryStep1">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'editQueryForm'"/>
+        </on-entry>
+        <transition on="cancel" to="cancelDecision"/>
+        <transition on="back" to="backToSearch"/>
+        <transition on="next" to="locateDataSource">
+            <evaluate expression="editQueryAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateNameLabelDesc"/>
+            </evaluate>
+        </transition>
+        <transition on="finish" to="validateQuery">
+            <evaluate expression="editQueryAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateNameLabelDesc"/>
+            </evaluate>
+        </transition>
+        <transition on="Jump" to="jumpTo"/>
+    </view-state>
+
+    <view-state id="locateDataSource" view="modules/addResource/queryStep2">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'editQueryTextForm'"/>
+            <evaluate expression="editQueryAction.locateDataSource"/>
+        </on-entry>
+        <transition on="next" to="dataSourceSource">
+            <set name="flowScope.dataResource.source" value="requestParameters.source" />
+            <set name="flowScope.dataResource.selectedUri" value="requestParameters.selectedUri" />
+            <evaluate expression="editQueryAction.saveDatasourceFromLocate"/>
+        </transition>
+        <transition on="cancel" to="cancelDecision"/>
+        <transition on="saveDatasource" to="saveDatasource"/>
+        <transition on="back" to="editQueryForm"/>
+        <transition on="save" to="saveQuery">
+            <evaluate expression="editQueryAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateNameLabelDesc"/>
+            </evaluate>
+        </transition>
+        
+        <transition on="finish" to="validateQuery">
+            <evaluate expression="editQueryAction.bindAndValidate"/>
+        </transition>
+        <transition on="Jump" to="jumpTo"/>
+    </view-state>
+
+    <view-state id="editQueryTextForm" view="modules/addResource/queryStep3">
+        <on-entry>
+            <set name="flowScope.prevForm" value="'editQueryTextForm'"/>
+            <evaluate expression="editQueryAction.prepareQueryTextEdit"/>
+        </on-entry>
+        <transition on="cancel" to="cancelDecision"/>
+        <transition on="back" to="locateDataSource"/>
+        <transition on="save" to="saveQuery">
+            <evaluate expression="editQueryAction.bindAndValidate">
+                <attribute name="validatorMethod" value="validateNameLabelDesc"/>
+            </evaluate>
+        </transition>
+        <transition on="finish" to="validateQuery">
+            <evaluate expression="editQueryAction.bindAndValidate"/>
+        </transition>
+        <transition on="Jump" to="jumpTo"/>
+    </view-state>
+
+    <decision-state id="dataSourceSource">
+         <if test="flowScope.dataResource.source != 'LOCAL'" then="editQueryTextForm"
+            else="dataSourceSubFlow"/>    
+    </decision-state>
+
+    <subflow-state id="dataSourceSubFlow" subflow="addDataSourceFlow">
+        <input name="masterFlow" value="flowScope.masterFlow"/>
+        <input name="masterFlowStep" value="flowScope.masterFlowStep"/>
+        <input name="dataResource" value="flowScope.dataResource"/>
+        <output name="dataResource"/>
+        <transition on="done" to="saveDatasource"/>
+        <transition on="finish" to="saveDatasourceFinish"/>
+        <transition on="cancel" to="locateDataSource"/>
+        <transition on="back" to="locateDataSource"/>
+        <transition on="displayError" to="displayError"/>
+        <transition on="jumpTo" to="jumpTo"/>
+    </subflow-state>
+
+    <action-state id="saveDatasource">
+        <evaluate expression="editQueryAction.saveDatasourceFromSubflow"/>
+        <transition on="success" to="editQueryTextForm"/>
+        <transition on="no" to="dataSourceSubFlow"/>
+        <transition on="error" to="displayError"/>
+    </action-state>
+
+    <action-state id="saveDatasourceFinish">
+        <evaluate expression="editQueryAction.saveDatasourceFromSubflow"/>
+        <transition on="success" to="validateQuery"/>
+        <transition on="no" to="dataSourceSubFlow"/>
+        <transition on="error" to="displayError"/>
+    </action-state>
+
+    <action-state id="saveQuery">
+        <evaluate expression="editQueryAction"/>
+        <transition on="success" to="saved"/>
+        <transition on="yes" to="backToSearch"/>
+        <transition on="error" to="editQueryForm"/>
+    </action-state>
+
+    <action-state id="validateQuery">
+        <evaluate expression="editQueryAction"/>
+        <transition on="editQueryForm" to="editQueryForm"/>
+        <transition on="editQueryTextForm" to="editQueryTextForm"/>
+        <transition on="success" to="finish"/>
+        <transition on="error" to="displayError"/>
+    </action-state>
+
+    <action-state id="getNode">
+        <evaluate expression="RepositoryTreeAction"/>
+        <transition on="success" to="treeView"/>
+    </action-state>
+
+    <action-state id="getChildren">
+        <evaluate expression="RepositoryTreeAction"/>
+        <transition on="success" to="treeView"/>
+    </action-state>
+    <view-state id="ajaxView" view="ajax/ajaxresponse"/>
+    <view-state id="treeView" view="ajax/ajaxresponse"/>
+
+    <view-state id="ajaxError" view="ajax/ajaxerror"/>
+
+    <decision-state id="cancelDecision">
+        <if test="masterFlow != null" then="cancel" else="backToSearch" />
+    </decision-state>
+    
+    <end-state id="finish"/>
+    <end-state id="cancel"/>
+    <end-state id="saved"/>
+
+    <end-state id="backToSearch" view="flowRedirect:searchFlow"/>
+
+    <end-state id="displayError" view="query/errorPage"/>
+
+    <end-state id="jumpTo"/>
+
+    <!-- exceptions handling -->
+    <decision-state id="backFromError">
+        <if test="not (flowScope.prevForm == null or flowScope.prevForm == '')" then="${flowScope.prevForm}"
+            else="saved"/>
+    </decision-state>
+
+    <view-state id="errorPage" view="modules/system/errorPage">
+        <on-entry>
+            <evaluate expression="errorPageHandlerAction"/>
+        </on-entry>
+    </view-state>
+
+    <global-transitions>
+        <transition on="backFromErrorPage" to="backFromError"/>
+        <transition on-exception="java.lang.Throwable" to="errorPage"/>
+    </global-transitions>
+
+    <!-- end exceptions handling -->
+
+    <bean-import resource="spring-config.xml"/>
+    <bean-import resource="queryBeans.xml"/>
+    <bean-import resource="reportDataSourceBeans.xml"/>
+    <bean-import resource="repositoryExplorerBean.xml"/>
+
+</flow>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Message</title>
+    <link type="text/css" href="../../../../demos/css/jasper-ui-dev.css" rel="stylesheet">
+    <link type="text/css" href="../../../../themes/default/jquery-ui/jquery-ui.css" rel="stylesheet">
+
+    <script type="text/javascript" src="../../requireSnippetsConfig.js"></script>
+    <script type="text/javascript" src="../../../bower_components/requirejs/require.js"></script>
+    <script type="text/javascript" src="../../../../config.js"></script>
+
+    <style>
+        .containerMessageInfoIcon, .containerMessageInfo, .containerMessageWarning, .containerMessageWarningIcon,
+        .containerMessageErrorIcon, .containerMessageError, .containerMessageSuccessIcon, .containerMessageSuccess,
+        .containerMessagePlain{
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="containerMessageInfoIcon"></div>
+<div class="containerMessageInfo"></div>
+
+<div class="containerMessageWarningIcon"></div>
+<div class="containerMessageWarning"></div>
+
+<div class="containerMessageErrorIcon"></div>
+<div class="containerMessageError"></div>
+
+<div class="containerMessageSuccessIcon"></div>
+<div class="containerMessageSuccess"></div>
+
+<div class="containerMessagePlain"></div>
+<script type="text/javascript">
+
+    require(["components/message/Message"], function(Message){
+        new Message({
+            el: ".containerMessageInfoIcon",
+            icon: true,
+            title: "Where does it come from?",
+            text: "The standard chunk of Lorem Ipsum used </br> since the 1500s is reproduced below for those interested.",
+            type: Message.Type.Info
+        });
+        new Message({
+            el: ".containerMessageInfo",
+            icon: false,
+            title: "Where does it come from?",
+            text: "The standard chunk of Lorem Ipsum used </br> since the 1500s is reproduced below for those interested.",
+            type: Message.Type.Info
+        });
+
+        new Message({
+            el: ".containerMessageWarningIcon",
+            icon: true,
+            title: "Where does it come from?",
+            text: "The standard chunk of Lorem Ipsum used </br> since the 1500s is reproduced below for those interested.",
+            type: Message.Type.Warning
+        });
+        new Message({
+            el: ".containerMessageWarning",
+            icon: false,
+            title: "Where does it come from?",
+            text: "The standard chunk of Lorem Ipsum used </br> since the 1500s is reproduced below for those interested.",
+            type: Message.Type.Warning
+        });
+
+        new Message({
+            el: ".containerMessageErrorIcon",
+            icon: true,
+            title: "Where does it come from?",
+            text: "The standard chunk of Lorem Ipsum used </br> since the 1500s is reproduced below for those interested.",
+            type: Message.Type.Error
+        });
+        new Message({
+            el: ".containerMessageError",
+            icon: false,
+            title: "Where does it come from?",
+            text: "The standard chunk of Lorem Ipsum used </br> since the 1500s is reproduced below for those interested.",
+            type: Message.Type.Error
+        });
+
+        new Message({
+            el: ".containerMessageSuccessIcon",
+            icon: true,
+            title: "Where does it come from?",
+            text: "The standard chunk of Lorem Ipsum used </br> since the 1500s is reproduced below for those interested.",
+            type: Message.Type.Success
+        });
+        new Message({
+            el: ".containerMessageSuccess",
+            icon: false,
+            title: "Where does it come from?",
+            text: "The standard chunk of Lorem Ipsum used </br> since the 1500s is reproduced below for those interested.",
+            type: Message.Type.Success
+        });
+
+        new Message({
+            el: ".containerMessagePlain",
+            icon: false,
+            title: "Where does it come from?",
+            text: "The standard chunk of Lorem Ipsum used </br> since the 1500s is reproduced below for those interested.",
+            type: Message.Type.Plain
+        });
+    });
+
+</script>
+</body>
+</html>

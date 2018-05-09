@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+    <alias name="${bean.settingsGroups}" alias="settingsGroups"/>
+    <bean id="settingsGroupsCE" class="java.util.HashMap">
+        <constructor-arg index="0" type="java.util.Map">
+            <map>
+                <entry key="dataSourcePatterns" value-ref="dataSourcePatterns"/>
+                <entry key="userTimeZones" value-ref="userTimeZonesSettingsProvider"/>
+                <entry key="globalConfiguration" value-ref="configurationBean"/>
+                <entry key="awsSettings" value-ref="awsSettingsProvider"/>
+                <entry key="jasperreports" value-ref="jasperreports"/>
+                <entry key="clientLogging" value-ref="clientLogging"/>
+                <entry key="dateTimeSettings" value-ref="dateTimeSettingsProvider"/>
+                <entry key="decimalFormatSymbols" value-ref="decimalFormatSymbolsProvider"/>
+                <entry key="auth" value-ref="authSettingsProvider"/>
+                <entry key="request" value-ref="requestSettingsProvider"/>
+                <entry key="inputControls" value-ref="inputControls"/>
+                <entry key="exportResourceOptions" value-ref="${bean.exportResourceOptions}"/>
+                <entry key="clientLogging" value-ref="clientLogging"/>
+                <entry key="dateTimeSettings" value-ref="dateTimeSettingsProvider"/>
+                <entry key="decimalFormatSymbols" value-ref="decimalFormatSymbolsProvider"/>
+                <entry key="#{T(com.jaspersoft.jasperserver.dto.bridge.SettingsBridge).GROUP_NAME_PROFILE_ATTRIBUTES}"
+                       value-ref="profileAttributes"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <util:map id="dataSourcePatterns">
+        <entry key="dbHost">
+            <!-- Default pattern, which also includes pattern for the "attribute" placeholder through Spring Expression Language (SpEL) -->
+            <value><![CDATA[^([\p{L}\p{M}\p{N}_.,\-]|#{ attributePlaceholderPatternUI })+$]]></value>
+        </entry>
+        <entry key="dbPort">
+            <value><![CDATA[^([\p{L}\p{M}\p{N}_.,\-]|#{ attributePlaceholderPatternUI })+$]]></value>
+        </entry>
+        <entry key="dbName">
+            <value><![CDATA[^([\p{L}\p{M}\p{N}\s_.,\-}{]|#{ attributePlaceholderPatternUI })+$]]></value>
+        </entry>
+        <entry key="sName">
+            <value><![CDATA[^([\p{L}\p{M}\p{N}\s_.,\-}{]|#{ attributePlaceholderPatternUI })+$]]></value>
+        </entry>
+        <entry key="securityToken">
+            <value><![CDATA[^([\p{L}\p{M}\p{N}\s_.,\-}{]|#{ attributePlaceholderPatternUI })+$]]></value>
+        </entry>
+        <entry key="stmtCallLimit">
+            <value><![CDATA[^([\p{L}\p{M}\p{N}\s_.,\-}{]|#{ attributePlaceholderPatternUI })+$]]></value>
+        </entry>
+        <entry key="serverAddress">
+            <value><![CDATA[^([\p{L}\p{M}\p{N}_.:,/\-]|#{ attributePlaceholderPatternUI })+$]]></value>
+        </entry>
+        <entry key="projectId">
+            <value><![CDATA[^([\p{L}\p{M}\p{N}\s_.,\-}{]|#{ attributePlaceholderPatternUI })+$]]></value>
+        </entry>
+        <entry key="oAuthServiceAcctEmail">
+            <value><![CDATA[^([\p{L}\p{M}\p{N}_.@,\-]|#{ attributePlaceholderPatternUI })+$]]></value>
+        </entry>
+        <entry key="oAuthPvtKeyPath">
+            <value><![CDATA[^([\p{L}\p{M}\p{N}_.:,/\-]|#{ attributePlaceholderPatternUI })+$]]></value>
+        </entry>
+        <entry key="authMech">
+            <value><![CDATA[^([0|1|2]{1}|#{ attributePlaceholderPatternUI })$]]></value>
+        </entry>
+        <entry key="defaultKeySpace">
+            <value><![CDATA[^([\p{L}\p{M}\p{N}\s_.,\-}{]|#{ attributePlaceholderPatternUI })+$]]></value>
+        </entry>
+        <entry key="driverType">
+            <value><![CDATA[^([1|2|3|4]{1}|#{ attributePlaceholderPatternUI })$]]></value>
+        </entry>
+        <entry key="schemaName">
+            <value><![CDATA[^([\p{L}\p{M}\p{N}\s_.,\-}{]|#{ attributePlaceholderPatternUI })+$]]></value>
+        </entry>
+        <entry key="informixServerName">
+            <value><![CDATA[^([\p{L}\p{M}\p{N}\s_.,\-}{]|#{ attributePlaceholderPatternUI })+$]]></value>
+        </entry>
+        <entry key="dynamicUrlPartPattern" value-ref="dynamicJdbcUrlPartPattern"/>
+        <!-- Non-field helper patterns -->
+        <entry key="forbidWhitespacesPattern">
+            <value><![CDATA[^([^\s]|#{ attributePlaceholderPatternUI })*$]]></value>
+        </entry>
+        <entry key="attributePlaceholderPattern" value-ref="attributePlaceholderPatternUI"/>
+    </util:map>
+    <util:properties id="jasperreports" location="classpath:jasperreports.properties"/>
+    <bean id="dynamicJdbcUrlPartPattern" class="java.lang.String">
+        <constructor-arg type="java.lang.String">
+            <!-- /^jdbc:ingres://([\w.]*):([\w.]*)/([\w.]*)/ -->
+            <value><![CDATA[((?:#{ attributePlaceholderPatternUI }|[\p{L}\p{M}\p{N}\s\_.,\-}{])+)]]></value>
+        </constructor-arg>
+    </bean>
+
+    <util:map id="clientLogging">
+        <entry key="enabled" value="true"/>
+        <entry key="level" value="error"/>
+    </util:map>
+
+    <bean id="dateTimeSettingsProvider" class="com.jaspersoft.jasperserver.remote.settings.DateTimeSettingsProvider">
+        <property name="datePickerSettingsPattern">
+            <bean class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg index="0">
+                    <value><![CDATA[.*((\$|jQuery)\.)?datepicker.regional['"\w\-\[\]]+\s+=\s+(.*);.*((\$|jQuery)\.)?datepicker.setDefaults\(]]></value>
+                </constructor-arg>
+                <constructor-arg index="1">
+                    <util:constant static-field="java.util.regex.Pattern.DOTALL"/>
+                </constructor-arg>
+            </bean>
+        </property>
+        <property name="datePickerSettingsPatternGroup" value="3"/>
+        <property name="datePickerDefaultLocale" value="en"/>
+        <property name="datePickerSettingsPathTemplate" value="/scripts/bower_components/jquery-ui/ui/i18n/jquery.ui.datepicker-%s.js"/>
+        <property name="datePickerPropertiesMapping">
+            <map>
+                <entry key="dateFormat" value="calendar.date.format"/>
+            </map>
+        </property>
+        <property name="timePickerSettingsPattern">
+            <bean class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg index="0">
+                    <value><![CDATA[.*((\$|jQuery)\.)?timepicker.regional['"\w\-\[\]]+\s+=\s+(.*);.*((\$|jQuery)\.)?timepicker.setDefaults\(]]></value>
+                </constructor-arg>
+                <constructor-arg index="1">
+                    <util:constant static-field="java.util.regex.Pattern.DOTALL"/>
+                </constructor-arg>
+            </bean>
+        </property>
+        <property name="timePickerSettingsPatternGroup" value="3"/>
+        <property name="timePickerSettingsPathTemplate" value="/scripts/bower_components/jquery-ui/ui/i18n/jquery-ui-timepicker-%s.js"/>
+        <property name="timePickerPropertiesMapping">
+            <map>
+                <entry key="timeText" value="CAL_time"/>
+                <entry key="hourText" value="CAL_hour"/>
+                <entry key="minuteText" value="CAL_min"/>
+                <entry key="secondText" value="CAL_second"/>
+                <entry key="currentText" value="CAL_now"/>
+                <entry key="closeText" value="CAL_close"/>
+                <entry key="timeFormat" value="calendar.time.format"/>
+                <entry key="dateFormat" value="calendar.date.format"/>
+                <entry key="separator" value="calendar.datetime.separator"/>
+            </map>
+        </property>
+        <property name="messageSource" ref="messageSource"/>
+        <property name="enableCache" value="true"/>
+    </bean>
+
+    <bean id="requestSettingsProvider" class="com.jaspersoft.jasperserver.remote.settings.RequestSettingsProvider"/>
+
+    <util:map id="inputControls">
+        <entry key="useUrlParametersOnReset" value="true"/>
+    </util:map>
+
+    <util:map id="profileAttributes">
+        <entry key="#{T(com.jaspersoft.jasperserver.dto.bridge.SettingsBridge).SETTING_NAME_ATTRIBUTE_PLACEHOLDER_SIMPLE_PATTERN}"
+               value-ref="attributePlaceholderPatternUI"/>
+        <entry key="attributePlaceholderGroupingPattern" value-ref="attributePlaceholderPattern"/>
+        <entry key="attributeFunctionPattern" value-ref="attributeFunctionPattern"/>
+    </util:map>
+
+    <util:map id="exportResourceOptionsCe" >
+        <entry key="report">
+            <set>
+                <value>reportUnit</value>
+            </set>
+        </entry>
+        <entry key="dataSource">
+            <set>
+                <value>beanDataSource</value>
+                <value>customDataSource</value>
+                <value>jdbcDataSource</value>
+                <value>jndiJdbcDataSource</value>
+                <value>virtualDataSource</value>
+                <value>mondrianConnection</value>
+                <value>xmlaConnection</value>
+                <value>awsDataSource</value>
+            </set>
+        </entry>
+        <entry key="other">
+            <set>
+                <value>file</value>
+                <value>folder</value>
+                <value>listOfValues</value>
+                <value>inputControl</value>
+                <value>query</value>
+                <value>mondrianXmlaDefinition</value>
+                <value>dataType</value>
+                <value>olapUnit</value>
+            </set>
+        </entry>
+    </util:map>
+
+</beans>

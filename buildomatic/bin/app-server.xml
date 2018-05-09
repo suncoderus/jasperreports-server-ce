@@ -1,0 +1,1049 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<project name="app-server">
+
+    <macrodef name="runSQL">
+        <attribute name="jdbcUrl"/>
+        <attribute name="dbUsername" default="${dbUsername}"/>
+        <attribute name="dbPassword" default="${dbPassword}"/>
+        <attribute name="print" default="false"/>
+        <attribute name="autocommit" default="true"/>
+        <attribute name="onerror" default="${runSqlDefaultOnError}"/>
+        <attribute name="encoding" default="UTF-8"/>
+        <attribute name="failOnConnectionError" default="true"/>
+        <attribute name="connectionErrorOccurredProperty" default="connectionErrorOccurredProperty" />
+        <attribute name="errorSqlStateCodeProperty" default="errorSqlStateCodeProperty" />
+        <attribute name="errorNativeCodeProperty" default="errorNativeCodeProperty" />
+        <attribute name="errorMessageProperty" default="errorMessageProperty" />
+        <text name="sql"/>
+        <element name="transactions" implicit="yes" optional="true"/>
+
+        <sequential>
+
+            <validateJdbcJar calling-target-context="runSQL" />  <!-- chk for existence of jdbc jar -->
+
+            <advanced-sql
+                    driver="${jdbcDriverClass}"
+                    url="@{jdbcUrl}"
+                    userid="@{dbUsername}"
+                    password="@{dbPassword}"
+                    print="@{print}"
+                    autocommit="@{autocommit}"
+                    onerror="@{onerror}"
+                    encoding="@{encoding}"
+                    failOnConnectionError="@{failOnConnectionError}"
+                    connectionErrorOccurredProperty="@{connectionErrorOccurredProperty}"
+                    errorSqlStateCodeProperty="@{errorSqlStateCodeProperty}"
+                    errorNativeCodeProperty="@{errorNativeCodeProperty}"
+                    errorMessageProperty="@{errorMessageProperty}"
+                    >
+                <classpath>
+                    <fileset dir="${currentDbJDBCDir}" includes="${jdbcJar}"/>
+                </classpath>
+                @{sql}
+                <transactions/>
+            </advanced-sql>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="runPLSQL">
+        <attribute name="jdbcUrl"/>
+        <attribute name="dbUsername" default="${dbUsername}"/>
+        <attribute name="dbPassword" default="${dbPassword}"/>
+        <attribute name="print" default="false"/>
+        <attribute name="autocommit" default="true"/>
+        <attribute name="onerror" default="${runSqlDefaultOnError}"/>
+        <attribute name="encoding" default="UTF-8"/>
+        <attribute name="failOnConnectionError" default="true"/>
+        <attribute name="connectionErrorOccurredProperty" default="connectionErrorOccurredProperty" />
+        <attribute name="errorSqlStateCodeProperty" default="errorSqlStateCodeProperty" />
+        <attribute name="errorNativeCodeProperty" default="errorNativeCodeProperty" />
+        <attribute name="errorMessageProperty" default="errorMessageProperty" />
+        <attribute name="delimiter" default="/" />
+        <attribute name="delimitertype" default="row" />
+        <text name="sql"/>
+        <element name="transactions" implicit="yes" optional="true"/>
+
+        <sequential>
+
+            <validateJdbcJar calling-target-context="runSQL" />  <!-- chk for existence of jdbc jar -->
+
+            <advanced-sql
+                    driver="${jdbcDriverClass}"
+                    url="@{jdbcUrl}"
+                    userid="@{dbUsername}"
+                    password="@{dbPassword}"
+                    print="@{print}"
+                    autocommit="@{autocommit}"
+                    onerror="@{onerror}"
+                    encoding="@{encoding}"
+                    failOnConnectionError="@{failOnConnectionError}"
+                    connectionErrorOccurredProperty="@{connectionErrorOccurredProperty}"
+                    errorSqlStateCodeProperty="@{errorSqlStateCodeProperty}"
+                    errorNativeCodeProperty="@{errorNativeCodeProperty}"
+                    errorMessageProperty="@{errorMessageProperty}"
+                    delimiter="@{delimiter}"
+                    delimitertype="@{delimitertype}"
+                    >
+                <classpath>
+                    <fileset dir="${currentDbJDBCDir}" includes="${jdbcJar}"/>
+                </classpath>
+                @{sql}
+                <transactions/>
+            </advanced-sql>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="runSelectSQL">
+        <attribute name="jdbcUrl"/>
+        <attribute name="dbUsername" default="${dbUsername}"/>
+        <attribute name="dbPassword" default="${dbPassword}"/>
+        <attribute name="print" default="false"/>
+        <attribute name="autocommit" default="true"/>
+        <attribute name="onerror" default="continue"/>
+        <attribute name="encoding" default="UTF-8"/>
+        <attribute name="failOnConnectionError" default="true"/>
+        <attribute name="connectionErrorOccurredProperty" default="connectionErrorOccurredProperty" />
+        <attribute name="errorSqlStateCodeProperty" default="errorSqlStateCodeProperty" />
+        <attribute name="errorNativeCodeProperty" default="errorNativeCodeProperty" />
+        <attribute name="errorMessageProperty" default="errorMessageProperty" />
+        <attribute name="selectRowCountProperty" default="selectRowCountProperty" />
+        <text name="sql"/>
+        <element name="transactions" implicit="yes" optional="true"/>
+
+        <sequential>
+
+            <validateJdbcJar calling-target-context="runSQL" />  <!-- chk for existence of jdbc jar -->
+
+            <select-sql
+                    driver="${jdbcDriverClass}"
+                    url="@{jdbcUrl}"
+                    userid="@{dbUsername}"
+                    password="@{dbPassword}"
+                    print="@{print}"
+                    autocommit="@{autocommit}"
+                    onerror="@{onerror}"
+                    encoding="@{encoding}"
+                    failOnConnectionError="@{failOnConnectionError}"
+                    connectionErrorOccurredProperty="@{connectionErrorOccurredProperty}"
+                    errorSqlStateCodeProperty="@{errorSqlStateCodeProperty}"
+                    errorNativeCodeProperty="@{errorNativeCodeProperty}"
+                    errorMessageProperty="@{errorMessageProperty}"
+                    selectRowCountProperty="@{selectRowCountProperty}"
+                    >
+                <classpath>
+                    <fileset dir="${currentDbJDBCDir}" includes="${jdbcJar}"/>
+                </classpath>
+                @{sql}
+                <transactions/>
+            </select-sql>
+        </sequential>
+    </macrodef>
+
+    <!-- Glassfish's command processor -->
+    <macrodef name="runasadmin">
+        <attribute name="failOnError" default="true"/>
+        <element name="args" implicit="yes"/>
+        <sequential>
+            <if>
+                <os family="windows" />
+                <then>
+                    <var name="asadminExec" value="${asadminPath}/asadmin.bat"/>
+                </then>
+                <else>
+                    <var name="asadminExec" value="${asadminPath}/asadmin"/>
+                </else>
+            </if>
+            <exec executable="${asadminExec}" failonerror="@{failOnError}">
+                <args/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <!--                                                                                   -->
+    <!-- Macro for setting/managing web app path & name                                    -->
+    <!--                                                                                   -->
+    <!-- We support setting non-standard web app names (for instance, you can have         -->
+    <!-- "jasperserver-3.7.0" or "MyCompanyServer" instead of "jasperserver")              -->
+    <!--                                                                                   -->
+    <!-- So:                                                                               -->
+    <!--   webAppNameParam    - used to set the name of webapp that you see in app server, -->
+    <!--                        sets webAppName property                                   -->
+    <!--                                                                                   -->
+    <!--   webAppNameSrcParam - used to help when doing replace operation on web.xml file  -->
+    <!--                        when copying war files to app server, sets webAppNameSrc   -->
+    <!--                                                                                   -->
+    <!--   webAppNameDelParam - used to name the CE war to delete on ce-to-pro upgrade     -->
+    <!--                        operation, sets webAppNameDel property.                    -->
+    <!--                                                                                   -->
+    <!--   Also, directory paths will be different depending on app server                 -->
+    <!--                                                                                   -->
+
+    <macrodef name="set-webapp-name">
+        <attribute name="webAppNameParam"/>
+        <attribute name="webAppNameSrcParam"/>
+        <attribute name="webAppNameDelParam"/>
+        <sequential>
+            <!-- set final property values to be used                                        -->
+            <!-- NOTE: "var name=${propertyName}" syntax overrides previous property setting -->
+
+            <var name="webAppName" value="@{webAppNameParam}"/>
+            <var name="webAppNameSrc" value="@{webAppNameSrcParam}"/>
+            <var name="webAppNameDel" value="@{webAppNameDelParam}"/>
+
+            <!-- set this uri property and use it to filter js.quartz.properties -->
+            <!-- This is the only templatized file that actually needs the webAppName plugged in -->
+            <!-- todo: this logic doesn't seem to work. Addition operation was added to webapp-deploy target -->
+            <property name="quartz.web.deployment.uri" value="http://localhost:8080/${webAppName}"/>
+            <filterCopyLoad file="${templateDir}/js.quartz.properties" toFile="${currentConf}/js.quartz.properties"/>
+            <copy toDir="${currentConf}/webapp/WEB-INF">
+                <fileset dir="${currentConf}" includes="js.quartz.properties, js.diagnostic.properties,js.config.properties, js.externalAuth.properties, js.aws.datasource.properties"/>
+            </copy>
+
+            <!-- set warTargetDir depending on app server type -->
+            <switch value="${appServerType}">
+                <case value="tomcat">
+                    <var name="warTargetDir" value="${fixedAppServerDir}/webapps/${webAppName}"/>
+                    <var name="warTargetDirDel" value="${fixedAppServerDir}/webapps/${webAppNameDel}"/>
+                </case>
+                <case value="wildfly">
+                    <var name="warTargetDir" value="${fixedAppServerDir}/${jboss7.profile}/deployments/${webAppName}.war"/>
+                    <var name="warTargetDirDel" value="${fixedAppServerDir}/${jboss7.profile}/deployments/${webAppNameDel}.war"/>
+                </case>
+                <case value="jboss-eap-6">
+                    <var name="warTargetDir" value="${fixedAppServerDir}/${jboss7.profile}/deployments/${webAppName}.war"/>
+                    <var name="warTargetDirDel" value="${fixedAppServerDir}/${jboss7.profile}/deployments/${webAppNameDel}.war"/>
+                </case>
+                <case value="jboss-eap-7">
+                    <var name="warTargetDir" value="${fixedAppServerDir}/${jboss7.profile}/deployments/${webAppName}.war"/>
+                    <var name="warTargetDirDel" value="${fixedAppServerDir}/${jboss7.profile}/deployments/${webAppNameDel}.war"/>
+                </case>
+                <case value="glassfish">
+                    <var name="warTargetDir" value="${fixedAppServerDir}/glassfish/domains/${glassfishDomain}/autodeploy/${webAppName}.war"/>
+                    <var name="warTargetDirDel" value="${fixedAppServerDir}/glassfish/domains/${glassfishDomain}/autodeploy/${webAppNameDel}.war"/>
+                </case>
+                <case value="skipAppServerCheck">
+                    <var name="warTargetDir" value="${currentConf}/${webAppName}/skipAppServerCheck"/>
+                    <var name="warTargetDirDel" value="${currentConf}/${webAppNameDel}/skipAppServerCheck"/>
+                </case>
+                <default>
+                    <fail>Unknown value of appServerType ${appServerType}</fail>
+                </default>
+            </switch>
+
+            <!-- set some other properties used only in build -->
+            <property name="warLibDir" value="${warSourceDir}/WEB-INF/lib"/>
+        </sequential>
+    </macrodef>
+
+    <!-- todo: do we need depends=init-source-paths. Might need if running build-all -->
+
+    <target name="deploy-webapp-ce-if-needed"
+            description="version of deploy-webapp-ce that executes deployment only when appServerType is not skipAppServerCheck">
+        <property name="js.deploy.target.edition" value="ce" />
+        <runtarget target="do-deploy-webapp-if-needed" />
+    </target>
+
+    <target name="deploy-webapp-pro-if-needed"
+            description="version of deploy-webapp-pro that executes deployment only when appServerType is not skipAppServerCheck">
+        <property name="js.deploy.target.edition" value="pro" />
+        <runtarget target="do-deploy-webapp-if-needed" />
+    </target>
+
+    <target name="do-deploy-webapp-if-needed"
+            description="template target for deploy-webapp-${edition}-if-needed that executes deployment only when appServerType is not skipAppServerCheck">
+        <if>
+            <equals arg1="${appServerType}" arg2="skipAppServerCheck" />
+            <then>
+                <echo>Deployment is skipped because appServerType is set to ${appServerType}</echo>
+            </then>
+            <else>
+                <runtarget target="deploy-webapp-${js.deploy.target.edition}" />
+            </else>
+        </if>
+    </target>
+
+    <target name="deploy-webapp-ce"
+            depends="init-source-paths, set-ce-webapp-name, deploy-webapp"
+            description="version of deploy-webapp for ce">
+    </target>
+
+    <target name="deploy-webapp-pro"
+            depends="init-source-paths, set-pro-webapp-name, deploy-webapp"
+            description="version of deploy-webapp for pro">
+    </target>
+
+    <!-- 2013-09-30: change target name to cp-to-pro because this is the name mentioned in the -->
+    <!--             install guide (the public name is Community Project "CP").                --> 
+    <target name="deploy-webapp-cp-to-pro"
+            depends="init-source-paths, set-ce-to-pro-webapp-name, deploy-webapp"
+            description="version of deploy-webapp for upgrade from ce to pro">
+    </target>
+
+    <!-- Developer special targets -->
+    <target name="dev-deploy-webapp-pro-ui"
+            depends="init-source-paths, set-pro-webapp-name, deploy-webapp, delete-folders-for-ui-setup"
+            description="Deploy for developer special ui setup using Tomcat 7 virtual directories">
+    </target>
+
+    <target name="delete-folders-for-ui-setup"
+            description="Tomcat 7 can setup virtual directories.
+                       delete ui folders inside of tomcat.
+                       virtual folders in src will be used instead.">
+        <delete dir="${warTargetDir}/WEB-INF/jsp"/>
+        <delete dir="${warTargetDir}/scripts"/>
+        <delete dir="${warTargetDir}/themes"/>
+        <delete dir="${warTargetDir}/WEB-INF/decorators"/>
+    </target>
+
+    <target name="set-ce-webapp-name">
+        <var name="warSourceDir" value="${warDir}/${webAppNameSrcCE}"/>
+        <var name="jsEdition" value="ce"/>
+        <set-webapp-name webAppNameParam="${webAppNameCE}"
+                         webAppNameSrcParam="${webAppNameSrcCE}"
+                         webAppNameDelParam="${webAppNameCE}"/>    <!-- call macro -->
+    </target>
+
+    <target name="set-pro-webapp-name">
+        <var name="warSourceDir" value="${warDir}/${webAppNameSrcPro}"/>
+        <var name="jsEdition" value="pro"/>
+        <set-webapp-name webAppNameParam="${webAppNamePro}"
+                         webAppNameSrcParam="${webAppNameSrcPro}"
+                         webAppNameDelParam="${webAppNamePro}"/>    <!-- call macro -->
+    </target>
+
+    <target name="set-ce-to-pro-webapp-name">
+        <var name="warSourceDir" value="${warDir}/${webAppNameSrcPro}"/>
+        <var name="jsEdition" value="pro"/>
+        <set-webapp-name webAppNameParam="${webAppNamePro}"
+                         webAppNameSrcParam="${webAppNameSrcPro}"
+                         webAppNameDelParam="${webAppNameCE}"/>    <!-- call macro -->
+    </target>
+
+    <target name="deploy-webapp-datasource-configs" depends="init-source-paths">
+        <echo> </echo>
+        <echo>Property values (in app-server.xml: deploy-webapp): </echo>
+        <echo> jsEdition = ${jsEdition}</echo>
+        <if>
+            <available file="${warFileDistSourceDir}"/> <!-- print out war src path to be used -->
+            <then>
+                <echo> warFileDistSourceDir = ${warFileDistSourceDir}</echo>
+            </then>
+            <else>
+                <echo> warSourceDir = ${warSourceDir}</echo>
+            </else>
+        </if>
+
+        <echo> warTargetDir = ${warTargetDir}</echo>
+        <echo> webAppName = ${webAppName}</echo>
+        <echo> webAppNameCE = ${webAppNameCE}</echo>
+        <echo> webAppNamePro = ${webAppNamePro}</echo>
+        <echo> webAppNameSrc = ${webAppNameSrc} </echo>
+        <echo> webAppNameDel = ${webAppNameDel}</echo>
+        <echo> warTargetDirDel = ${warTargetDirDel}</echo>
+
+        <!-- copy webapp template files produced earlier -->
+        <copy toDir="${warTargetDir}" overwrite="true">
+            <fileset dir="${currentConf}/webapp"/>
+        </copy>
+
+        <!-- Remove SugarCRM and FoodMart resource definitions from context.xml if we are doing a 'minimal' setup. -->
+        <if>
+            <and>
+                <isset property="js.minimal.mode" />
+                <equals arg1="${js.setup.mode}" arg2="install" />
+            </and>
+            <then>
+                <minimizeContextXml file="${warTargetDir}/META-INF/context.xml" />
+            </then>
+        </if>
+
+        <!-- tweak web.xml to put in the correct webAppName -->
+        <replace file="${warTargetDir}/WEB-INF/web.xml" token="${webAppNameSrc}.root" value="${webAppName}.root"/>
+        <!-- tweak log4j.properties to put in the correct webAppName -->
+        <replace file="${warTargetDir}/WEB-INF/log4j.properties" token="${webAppNameSrc}.root" value="${webAppName}.root"/>
+        <!-- todo: may be better way to handle token replace in js.quartz.properties. look at and clean up -->
+        <!-- tweak js.quartz.properties to put in the correct webAppName for uri value -->
+        <replace file="${warTargetDir}/WEB-INF/js.quartz.properties" token="${webAppNameSrcPro}" value="${webAppName}"/>
+
+
+        <!-- if this is tomcat, cleanup/delete the extra datasource definition file which
+tomcat copies to this location from the jasperserver war file META-INF/context.xml -->
+        <if>
+            <isset property="tomcatDatasourceExtraDir"/>
+            <then>
+                <if>
+                    <available file="${tomcatDatasourceExtraDir}/${webAppName}.xml" type="file" />
+                    <then>
+                        <echo>About to delete tomcat extra datasource file: ${webAppName}.xml</echo>
+                        <delete>
+                            <fileset dir="${tomcatDatasourceExtraDir}" includes="${webAppName}.xml"/>
+                        </delete>
+                    </then>
+                </if>
+            </then>
+        </if>
+
+
+    </target>
+    
+    <target name="deploy-webapp"
+            depends="deploy-jdbc-jar"
+            description="copy webapp to app server with template files">
+
+        <!-- if we are doing deploy, then skipAppServerCheck is not a valid value -->
+        <if>
+            <equals arg1="${appServerType}" arg2="skipAppServerCheck"/>
+            <then>
+                <echo> </echo>
+                <echo>Error: property appServerType has invalid value for deploying, appServerType=${appServerType}</echo>
+                <echo>Error: For deployment, appServerType should be set to a valid application server</echo>
+                <fail>Error: property appServerType has invalid value for deploying, appServerType=${appServerType}</fail>
+            </then>
+        </if>
+
+        <!-- chk for existence of jdbc jar -->
+        <validateJdbcJar calling-target-context="deploy-webapp" />
+
+        <!-- copy jdbc jar to import-export config lib folder      -->
+        <!-- todo: set a prop jdbcJarExists, only try copy if true -->
+        <copyJdbcJarForImportExport/>
+
+        <!-- if this is glassfish, add datasources and jvm options -->
+        <if>
+            <equals arg1="${appServerType}" arg2="glassfish" />
+            <then>
+                <if>
+                    <isset property="glassfishUser"/>
+                    <then>
+                        <!-- in case if glaassfish domain is not default (domain1) -->
+                        <property name="additionalParams" value="--port ${glassfishPort} --user ${glassfishUser} --passwordfile ${buildBase}/${confName}_master.properties" />
+                    </then>
+                </if>
+                <!--
+                  this is workaround to fix bug #24110 in glassfish 3.1.0
+                  it is fixed in glassfish 3.1.1
+                -->
+                <if>
+                    <isset property="glassfishPort"/>
+                    <then>
+                        <property name="additionalParams" value="--port ${glassfishPort}"/>
+                    </then>
+                    <else>
+                        <property name="additionalParams" value=""/>
+                    </else>
+                </if>
+                <runasadmin>
+                    <arg value="start-domain"/>
+                    <arg value="${glassfishDomain}"/>
+                </runasadmin>
+
+                <!-- in glassfish 3 and newer additional params should be before actual command -->
+                <if>
+                    <equals arg1="${dbType}" arg2="oracle" />
+                    <then>
+                        <runasadmin>
+                            <arg line="${additionalParams}"/>
+                            <arg value="add-resources"/>
+                            <arg value="${currentConf}/js-glassfish-oracle-ds.xml"/>
+                        </runasadmin>
+                    </then>
+                    <elseif>
+                        <equals arg1="${dbType}" arg2="db2" />
+                        <then>
+                            <runasadmin>
+                                <arg line="${additionalParams}"/>
+                                <arg value="add-resources"/>
+                                <arg value="${currentConf}/js-glassfish-db2-ds.xml"/>
+                            </runasadmin>
+                        </then>
+                    </elseif>
+                    <elseif>
+                        <equals arg1="${dbType}" arg2="mysql" />
+                        <then>
+                            <runasadmin>
+                                <arg line="${additionalParams}"/>
+                                <arg value="add-resources"/>
+                                <arg value="${currentConf}/js-glassfish-mysql-ds.xml"/>
+                            </runasadmin>
+                        </then>
+                    </elseif>
+                    <else>
+                        <runasadmin>
+                            <arg line="${additionalParams}"/>
+                            <arg value="add-resources"/>
+                            <arg value="${currentConf}/js-glassfish-ds.xml"/>
+                        </runasadmin>
+                    </else>
+                </if>
+                <runasadmin failOnError="false">
+                    <arg line="${additionalParams}"/>
+                    <arg value="delete-jvm-options"/>
+                    <arg value="${glassfishJvmOptForRemoving}"/>
+                </runasadmin>
+                <runasadmin failOnError="false">
+                    <arg line="${additionalParams}"/>
+                    <arg value="create-jvm-options"/>
+                    <arg value="${glassfishJvmOpt}"/>
+                </runasadmin>
+                <runasadmin>
+                    <arg value="stop-domain"/>
+                    <arg value="${glassfishDomain}"/>
+                </runasadmin>
+            </then>
+        </if>
+
+        <!-- clobber old webapp (or file) -->
+        <if>
+            <available file="${warTargetDirDel}"/>
+            <then>
+                <delete file="${warTargetDirDel}"/>
+            </then>
+        </if>
+        <delete dir="${warTargetDirDel}"/>
+
+
+        <!--                                                                          -->
+        <!-- Logic:                                                                   -->
+        <!--                                                                          -->
+        <!--  1) if you are a user installing from a war file distribution structure  -->
+        <!--     then the war file will be found at relative path, either:            -->
+        <!--                                                                          -->
+        <!--     a) ../jasperserver.war        or                                     -->
+        <!--     b) ../jasperserver-pro.war                                           -->
+        <!--                                                                          -->
+        <!--  2) if you are building from source, then you want to deploy the         -->
+        <!--     war file that you just built. It is found at either:                 -->
+        <!--                                                                          -->
+        <!--     a) buildomatic/install_resources/war/jasperserver     or             -->
+        <!--     b) buildomatic/install_resources/war/jasperserver-pro                -->
+        <!--                                                                          -->
+        <!--  3) if ../jasperserver(-pro).war exists then use this for deploying      -->
+        <!--                                                                          -->
+        <!--  4) else use buildomatic/install_resources/war/jasperserver(-pro)        -->
+        <!--                                                                          -->
+
+        <if>
+            <equals arg1="${jsEdition}" arg2="pro"/>
+            <then>
+                <property name="warFileDistSourceDir" value="${basedir}/../${webAppNameSrcPro}.war"/>
+            </then>
+            <elseif>
+                <equals arg1="${jsEdition}" arg2="ce"/>
+                <then>
+                    <property name="warFileDistSourceDir" value="${basedir}/../${webAppNameSrcCE}.war"/>
+                </then>
+            </elseif>
+            <else>
+                <echo>NOTE: warFileDistSourceDir has not been set</echo>
+            </else>
+        </if>
+
+
+        <!-- print out property values (before starting the files copying) -->
+        <echo> </echo>
+        <echo>Property values (in app-server.xml: deploy-webapp): </echo>
+        <echo> jsEdition = ${jsEdition}</echo>
+        <if>
+            <available file="${warFileDistSourceDir}"/> <!-- print out war src path to be used -->
+            <then>
+                <echo> warFileDistSourceDir = ${warFileDistSourceDir}</echo>
+            </then>
+            <else>
+                <echo> warSourceDir = ${warSourceDir}</echo>
+            </else>
+        </if>
+        <echo> warTargetDir = ${warTargetDir}</echo>
+        <echo> webAppName = ${webAppName}</echo>
+        <echo> webAppNameCE = ${webAppNameCE}</echo>
+        <echo> webAppNamePro = ${webAppNamePro}</echo>
+        <echo> webAppNameSrc = ${webAppNameSrc} </echo>
+        <echo> webAppNameDel = ${webAppNameDel}</echo>
+        <echo> warTargetDirDel = ${warTargetDirDel}</echo>
+        <echo> </echo>
+
+        <!-- do the war file copy/deploy -->
+        <if>
+            <available file="${warFileDistSourceDir}"/>
+            <then>
+				<!-- JRS-9267: if we have a WAR archive, unzip it (instead of using copy with zipfileset which is insanely slow) -->
+                <unzip src="${warFileDistSourceDir}" dest="${warTargetDir}"/>
+            </then>
+            <else>
+                <copy toDir="${warTargetDir}">
+                    <fileset dir="${warSourceDir}"/>
+                </copy>
+            </else>
+        </if>
+
+        <antcall target="deploy-webapp-datasource-configs"/>
+
+
+        <!--  START  JBOSS  DEPLOYMENT -->
+
+        <!-- if this is jboss, deploy the jboss datasource file                      -->
+        <!-- also, work-around jar conflicts between jasperserver and jboss:         -->
+        <!--   - delete jars from jasperserver that conflict with jboss jars         -->
+        <!--   - thus we will use the jboss jars for these classes/jars              -->
+        <!--   - 2012-02-08: bug 25413 remove slf4j-api jar for jboss 5.0 and above  -->
+        <!--                 this jar is not found in jboss 4.2                      -->
+
+        <if>
+            <or>
+                 <equals arg1="${appServerType}" arg2="wildfly"/>
+                 <equals arg1="${appServerType}" arg2="jboss-eap-6"/>
+                 <equals arg1="${appServerType}" arg2="jboss-eap-7"/>
+             </or>
+            <then>
+                <!--  Handle the different flavors of jboss-deployment-structure.xml for the different versions of JBoss
+                         https://jira.tibco.com/browse/JS-30422
+                  -->
+                 <!--   Handle DataSource config file -->
+                <if>
+                    <equals arg1="${appServerType}" arg2="wildfly"/>
+                    <then>
+                        <copy file="${currentConf}/../../install_resources/jboss7/wildfly/jboss-deployment-structure.xml" toDir="${warTargetDir}/META-INF" overwrite="true"/>
+                    </then>
+                </if>
+                <if>
+                    <equals arg1="${appServerType}" arg2="jboss-eap-6"/>
+                    <then>
+                        <copy file="${currentConf}/../../install_resources/jboss7/jboss-eap-6/jboss-deployment-structure.xml" toDir="${warTargetDir}/META-INF" overwrite="true"/>
+                    </then>
+                </if>
+                <if>
+                    <equals arg1="${appServerType}" arg2="jboss-eap-7"/>
+                    <then>
+                        <copy file="${currentConf}/../../install_resources/jboss7/jboss-eap-7/jboss-deployment-structure.xml" toDir="${warTargetDir}/META-INF" overwrite="true"/>
+                    </then>
+                 </if>
+
+                <copy file="${currentConf}/js-jboss7-ds.xml" toDir="${warTargetDir}/WEB-INF" overwrite="true"/>
+                <touch file="${jbossDeployDir}/${webAppName}.war.dodeploy"/>
+
+                <!--   START  JBoss EAP 6  or  AS 7   -->
+                <!--   2016-10-28  thorick
+                                   Q:  I do not understand why we do the following setup for WildFly ONLY
+                                   and not for EAP6 (or EAP7)
+                                   A:  In olden times we were deploying to both
+                                   modular AND non-modular JBoss.
+                                   Since we now ONLY support modular JBoss, we should perform this
+                                   module setup for ALL supported versions of JBoss.
+                -->
+                <echo message="----------------------------------- do JBoss module work"/>
+                        <copy toDir="${warTargetDir}/WEB-INF/lib" verbose="true">
+                            <fileset dir="${currentDbJDBCDir}" includes="${jdbcJar}"/>
+                        </copy>
+
+
+
+                        <!--  http://bugzilla.jaspersoft.com/show_bug.cgi?id=31907
+
+                                 install org.apache.batik module for server side svg chart exports
+                        -->
+
+                        <if>
+                            <available file="${fixedAppServerDir}/modules/jaspersoft/org/apache/batik/main" type="dir"/>
+                            <then></then>
+                            <else>
+                                <if>
+                                    <available file="${fixedAppServerDir}/modules/jaspersoft/org/apache/batik" type="dir"/>
+                                    <then>
+                                        <echo message="creating ${fixedAppServerDir}/modules/jaspersoft/org/apache/batik/main"/>
+                                        <mkdir dir="${fixedAppServerDir}/modules/jaspersoft/org/apache/batik/main"/>
+                                    </then>
+                                    <else>
+                                        <echo message="creating ${fixedAppServerDir}/modules/jaspersoft/org/apache/batik"/>
+                                        <mkdir dir="${fixedAppServerDir}/modules/jaspersoft/org/apache/batik"/>
+                                        <echo message="creating ${fixedAppServerDir}/modules/jaspersoft/org/apache/batik/main"/>
+                                        <mkdir dir="${fixedAppServerDir}/modules/jaspersoft/org/apache/batik/main"/>
+                                    </else>
+                                </if>
+                            </else>
+                        </if>
+
+                        <copy file="${currentConf}/../../install_resources/jboss7/module_descriptors/module_org_apache_batik.xml"
+                              tofile="${fixedAppServerDir}/modules/jaspersoft/org/apache/batik/main/module.xml"
+                              overwrite="true"/>
+                        <copy toDir="${fixedAppServerDir}/modules/jaspersoft/org/apache/batik/main">
+                              <fileset dir="${warTargetDir}/WEB-INF/lib" includes="batik-anim-1.9.jar, batik-awt-util-1.9.jar, batik-bridge-1.9.jar, batik-constants-1.9.jar, batik-css-1.9.jar, batik-dom-1.9.jar, batik-ext-1.9.jar, batik-gvt-1.9.jar, batik-i18n-1.9.jar, batik-parser-1.9.jar, batik-script-1.9.jar, batik-svg-dom-1.9.jar, batik-svggen-1.9.jar, batik-transcoder-1.9.jar, batik-util-1.9.jar, batik-xml-1.9.jar, xml-apis-ext-1.3.04.jar, xmlgraphics-commons-2.0.jar"/>
+                        </copy>
+
+                        <copy file="${currentConf}/../../install_resources/jboss7/module_descriptors/module_javax_validation_api.xml"
+                              tofile="${fixedAppServerDir}/modules/jaspersoft/javax/validation/api/1.1/module.xml"
+                              overwrite="true"/>
+                        <copy toDir="${fixedAppServerDir}/modules/jaspersoft/javax/validation/api/1.1">
+                            <fileset dir="${warTargetDir}/WEB-INF/lib" includes="validation-api-1.1.0.Final.jar"/>
+                        </copy>
+
+                        <!--  http://bugzilla.jaspersoft.com/show_bug.cgi?id=33391
+
+                                 install tibco driver module
+                        -->
+
+                        <if>
+                            <equals arg1="${maven.jdbc.groupId}" arg2="tibcosoftwareinc.jdbc" />
+                            <then>
+
+                                <if>
+                                    <available file="${fixedAppServerDir}/modules/jaspersoft/tibcosoftware/main" type="dir"/>
+                                    <then></then>
+                                    <else>
+                                        <if>
+                                            <available file="${fixedAppServerDir}/modules/jaspersoft/tibcosoftware" type="dir"/>
+                                            <then>
+                                                <echo message="creating ${fixedAppServerDir}/modules/jaspersoft/tibcosoftware/main"/>
+                                                <mkdir dir="${fixedAppServerDir}/modules/jaspersoft/tibcosoftware/main"/>
+                                            </then>
+                                            <else>
+                                                <echo message="creating ${fixedAppServerDir}/modules/jaspersoft/tibcosoftware"/>
+                                                <mkdir dir="${fixedAppServerDir}/modules/jaspersoft/tibcosoftware"/>
+                                                <echo message="creating ${fixedAppServerDir}/modules/jaspersoft/tibcosoftware/main"/>
+                                                <mkdir dir="${fixedAppServerDir}/modules/jaspersoft/tibcosoftware/main"/>
+                                            </else>
+                                        </if>
+                                    </else>
+                                </if>
+
+                                <copy file="${currentConf}/../../install_resources/jboss7/module_descriptors/module_tibcosoftware.xml"
+                                      tofile="${fixedAppServerDir}/modules/jaspersoft/tibcosoftware/main/module.xml"
+                                      overwrite="true"/>
+                                <copy toDir="${fixedAppServerDir}/modules/jaspersoft/tibcosoftware/main">
+                                    <fileset dir="${currentDbJDBCDir}" includes="${jdbcJar}"/>
+                                </copy>
+
+                                <move todir="${fixedAppServerDir}/modules/jaspersoft/tibcosoftware/main" includeemptydirs="false">
+                                    <fileset dir="${fixedAppServerDir}/modules/jaspersoft/tibcosoftware/main"/>
+                                    <mapper>
+                                        <mapper type="regexp" from="(.*)jasperreports-pro-(.*)" to="\1jasperreports-pro.jar" />
+                                        <mapper type="regexp" from="(.*)TI(.*)" to="\1TIdriver.jar" />
+                                    </mapper>
+                                </move>
+
+                                <!-- copy Tibco JDBC Driver -->
+
+                                <mkdir dir="${fixedAppServerDir}/${jboss7.profile}/deployments/${maven.jdbc.artifactId}-${maven.jdbc.version}.jar"/>
+
+                                <copy todir="${fixedAppServerDir}/${jboss7.profile}/deployments/${maven.jdbc.artifactId}-${maven.jdbc.version}.jar" >
+                                    <fileset dir="${currentConf}/../../install_resources/jboss7/TibcoDrivers/TibcoJDBCDriver" includes="**"/>
+                                </copy>
+
+
+                                <copy file="${currentConf}/../../install_resources/jboss7/TibcoDrivers/${dbType}_java.sql.Driver"
+                                      tofile="${fixedAppServerDir}/${jboss7.profile}/deployments/${maven.jdbc.artifactId}-${maven.jdbc.version}.jar/META-INF/services/java.sql.Driver"
+                                      overwrite="true"/>
+                                <touch file="${jbossDeployDir}/${maven.jdbc.artifactId}-${maven.jdbc.version}.jar.dodeploy"/>
+                            </then>
+                        </if>
+
+                        <!--  stax API -->
+
+                        <delete>
+                            <fileset dir="${warTargetDir}/WEB-INF/lib" includes="stax-api-1.0.1.jar"/>
+                        </delete>
+
+
+                        <!--  JRS jars that overlap JBoss Modules -->
+                        <delete>
+                            <fileset dir="${warTargetDir}/WEB-INF/lib"
+                                     includes="commons-io-1.1.jar, serializer-2.7.2.jar, xalan-2.7.2.jar, xercesImpl-2.10.0.jar, xml-apis-1.3.04.jar, narayana-jta-5.2.12.Final.jar"/>
+                        </delete>
+
+                        <!-- http://bugzilla.jaspersoft.com/show_bug.cgi?id=31907
+
+                             The extension jar 'xml-apis-ext-1.3.04.jar' contains dom SVG classes and is now
+                             referenced from the new JBoss  org.apache.batik module
+                             that we created for BUG 31907.
+                             We also delete the batik jars that are in the new batik module
+                        -->
+                        <delete>
+                             <fileset dir="${warTargetDir}/WEB-INF/lib"
+                                      includes="batik-anim-1.9.jar, batik-awt-util-1.9.jar, batik-bridge-1.9.jar, batik-constants-1.9.jar, batik-css-1.9.jar, batik-dom-1.9.jar, batik-ext-1.9.jar, batik-gvt-1.9.jar, batik-i18n-1.9.jar, batik-parser-1.9.jar, batik-script-1.9.jar, batik-svg-dom-1.9.jar, batik-svggen-1.9.jar, batik-transcoder-1.9.jar, batik-util-1.9.jar, batik-xml-1.9.jar, xml-apis-ext-1.3.04.jar, xmlgraphics-commons-2.0.jar"/>
+                        </delete>
+                        <!--   http://bugzilla.jaspersoft.com/show_bug.cgi?id=32933
+                               2013-06-24  thorick
+
+                               Add JDBC jars for UI DataSource drop down here
+                               you can only copy these jars
+                               AFTER  WEB-INF/lib is created thus we have to do it here
+                               and not where we do it for the other app servers in target 'deploy-jdbc-jar'
+                        -->
+                        <copy toDir="${warTargetDir}/WEB-INF/lib">
+                             <fileset dir="${dbDir}/app-srv-jdbc-drivers" includes="*.jar"/>
+                        </copy>
+                    </then>
+                </if>
+                <!--   END    JBoss EAP6 or AS7 ONLY   -->
+
+        <!--  END    JBOSS  DEPLOYMENT -->
+
+
+        <!-- clobber work dir (if it's set) -->
+        <if>
+            <isset property="appServerWorkDir"/>
+            <then>
+                <delete dir="${appServerWorkDir}/${webAppName}"/>
+            </then>
+        </if>
+
+        <!-- if this is glassfish, copy serializer library to target dir
+     and remove weblogic.xml -->
+        <if>
+            <equals arg1="${appServerType}" arg2="glassfish" />
+            <then>
+                <copy file="${installResourceDir}/extra-jars/serializer-2.7.2.jar" toDir="${warTargetDir}/WEB-INF/lib" overwrite="true"/>
+                <replace file="${currentConf}/glassfish-web.xml" token="@webAppName@" value="${webAppName}"/>
+                <copy file="${currentConf}/glassfish-web.xml" toDir="${warTargetDir}/WEB-INF" overwrite="true"/>
+                <delete>
+                    <fileset dir="${warTargetDir}/WEB-INF" includes="weblogic.xml"/>
+                    <fileset dir="${warTargetDir}/WEB-INF/lib" includes="hk2-api-*.jar"/>
+                    <fileset dir="${warTargetDir}/WEB-INF/lib" includes="javax.ws.rs-api-*.jar"/>
+                    <fileset dir="${warTargetDir}/WEB-INF/lib" includes="jersey-common-*.jar"/>
+                    <fileset dir="${warTargetDir}/WEB-INF/lib" includes="jersey-container-servlet-core-*.jar"/>
+                    <fileset dir="${warTargetDir}/WEB-INF/lib" includes="jersey-server-*.jar"/>
+                </delete>
+            </then>
+        </if>
+
+    </target>
+
+    <if>
+        <isset property="ieLib" />
+        <then>
+            <taskdef name="groovy" classname="org.codehaus.groovy.ant.Groovy">
+                <classpath>
+                    <fileset dir="${ieLib}" includes="groovy-all-*.jar" />
+                </classpath>
+            </taskdef>
+        </then>
+    </if>
+
+    <macrodef name="minimizeContextXml">
+        <attribute name="file" />
+        <sequential>
+            <if>
+                <available file="@{file}" type="file" />
+                <then>
+                    <groovy>
+                        <arg value="@{file}"/>
+
+                        import groovy.xml.DOMBuilder
+
+                        def document = DOMBuilder.parse(new FileReader(args[0]))
+                        def context = document.documentElement
+
+                        def jsDbResourceFound = false
+
+                        context.childNodes.each { node ->
+                        if (node.nodeType == org.w3c.dom.Node.ELEMENT_NODE &amp;&amp; node.nodeName == "Resource") {
+                        if (jsDbResourceFound) {
+                        context.removeChild(node)
+                        }
+                        else {
+                        jsDbResourceFound = true
+                        }
+                        }
+                        }
+
+                        new File(args[0]).withWriter {
+                        it &lt;&lt; context
+                        }
+                    </groovy>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <!-- copy jdbc jar for import-export config to ${ieLib}               -->
+    <!-- this will allow the scripts js-import.bat/sh js-export.bat/sh to -->
+    <!-- work when non-default dbType. workaround for bug 23764.          -->
+    <!--                                                                  -->
+    <!-- if jdbc driver does not exist, then nothing will be copied       -->
+    <macrodef name="copyJdbcJarForImportExport">
+        <sequential>
+            <echo>About to copy JDBC driver for import-export config (if it exists):</echo>
+            <!-- <echo>  Copy from: ${currentDbJDBCDir}/${jdbcJar}</echo> -->
+            <!-- <echo>  Copy to:   ${ieLib}</echo>                        -->
+
+            <if>
+                <isset property="ieLib" />
+                <then>
+                    <copy toDir="${ieLib}" verbose="true">
+                        <fileset dir="${currentDbJDBCDir}" includes="${jdbcJar}"/>
+                    </copy>
+                </then>
+                <else>
+                    <echo>INFO: property ieLib is not set. No copy of JDBC jar to import-export config location</echo>
+                    <echo>INFO: ieLib=${ieLib}, importExportConfig=${importExportConfig}</echo>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <target name="deploy-jdbc-jar"
+            description="copy jdbc jar to app server dir">
+        <sequential>
+            <echo>Copy JDBC drivers to the app-server</echo>
+            <echo>First copy jars</echo>
+            <echo>FROM the conf_source/db/app-srv-jdbc-drivers folder</echo>
+            <echo>TO   the folder ${appServerJdbcDir}</echo>
+
+            <!-- copy jdbc drivers to the app server in support of the       -->
+            <!-- datasource creation UI workflow improvement feature for 5.1 -->
+            <!-- 1) copy jars found in conf_source/db/app-srv-jdbc-drivers   -->
+
+            <!-- http://bugzilla.jaspersoft.com/show_bug.cgi?id=32933
+                 2013-06-24  thorick
+                             For JBoss7 you can't just put the drivers the deploy dir.
+                             Instead put them in WEB-INF/lib and set the JBoss
+                             module deployer to load the classes from there.
+                             For JBoss7 this has to be done in the
+                             'deploy-web-app' target because WEB-INF/lib doesn't
+                             exist yet when we're here
+            -->
+            <!--  http://bugzilla.jaspersoft.com/show_bug.cgi?id=33391
+
+                                 install tibco driver module as a directory which can contain multiple jar files.
+                                 instead of copying jar file to deployment folder
+            -->
+            <if>
+                <equals arg1="${maven.jdbc.groupId}" arg2="tibcosoftwareinc.jdbc" />
+                <then>
+                    <if>
+                        <or>
+                            <equals arg1="${appServerType}" arg2="wildfly"/>
+                            <equals arg1="${appServerType}" arg2="jboss-eap-6"/>
+                            <equals arg1="${appServerType}" arg2="jboss-eap-7"/>
+                        </or>
+                        <then>
+                            <var name="deployJDBCDriver" value="false"/>
+                        </then>
+                    </if>
+                </then>
+            </if>
+
+
+            <if>
+                <equals arg1="${deployJDBCDriver}" arg2="true"/>
+                <then>
+                    <if>
+                        <or>
+                            <equals arg1="${appServerType}" arg2="wildfly"/>
+                            <equals arg1="${appServerType}" arg2="jboss-eap-6"/>
+                            <equals arg1="${appServerType}" arg2="jboss-eap-7"/>
+                        </or>
+                    <then>
+                        <echo message="JBoss7 JDBC Drivers for the Create DataSource UI are installed during the deploy-webapp phase."/>
+                    </then>
+                    <else>
+                        <copy toDir="${appServerJdbcDir}">
+                            <fileset dir="${dbDir}/app-srv-jdbc-drivers" includes="*.jar"/>
+                        </copy>
+                        <delete>
+                            <fileset dir="${appServerJdbcDir}" includes="ji-*-driver-*.jar"/>
+                        </delete>
+                    </else>
+                    </if>
+                </then>
+            </if>
+
+            <!-- 2) delete the jar that is the dbType for this deployment                 -->
+            <!--    In step #3 we will copy the jar used for the repository db connection --> 
+            <!--    This could be a different jar than our default (ie user specifies a   -->
+            <!--    different version or custom jar)                                      --> 
+            <!--    Only need to do this for dbTypes that can be used as a js repository  -->
+
+            <if>
+                <equals arg1="${dbType}" arg2="postgresql" />
+                <then>
+                    <delete>
+                        <fileset dir="${appServerJdbcDir}" includes="postgresql-*.jar"/>
+                    </delete>
+                </then>
+                <elseif>
+                    <equals arg1="${dbType}" arg2="db2" />
+                    <then>
+                        <delete>
+                            <fileset dir="${appServerJdbcDir}" includes="db2*.jar"/>
+                        </delete>
+                    </then>
+                </elseif>
+                <elseif>
+                    <equals arg1="${dbType}" arg2="ingres" />
+                    <then>
+                        <delete>
+                            <fileset dir="${appServerJdbcDir}" includes="ingres-*.jar"/>
+                        </delete>
+                    </then>
+                </elseif>
+                <elseif>
+                    <equals arg1="${dbType}" arg2="oracle" />
+                    <then>
+                        <delete>
+                            <fileset dir="${appServerJdbcDir}" includes="ojdbc*.jar"/>
+                        </delete>
+                    </then>
+                </elseif>
+                <elseif>
+                    <equals arg1="${dbType}" arg2="sqlserver" />
+                    <then>
+                        <delete>
+                            <fileset dir="${appServerJdbcDir}" includes="sqljdbc-*.jar"/>
+                        </delete>
+                    </then>
+                </elseif>
+                <else>
+                    <echo>Did not need to delete an extra jdbc driver</echo>
+                </else>
+            </if>
+
+            <!-- 3) copy the jdbc driver used for repository database connection --> 
+
+            <echo>About to copy JS repository JDBC driver (if it exists):</echo>
+            <if>
+                <equals arg1="${deployJDBCDriver}" arg2="true"/>
+                <then>
+                    <echo>  Copy jdbc driver from: ${currentDbJDBCDir}/${jdbcJar}</echo>
+                    <echo>  Copy jdbc driver to:   ${appServerJdbcDir}</echo>
+
+                    <copy toDir="${appServerJdbcDir}" verbose="true">
+                        <fileset dir="${currentDbJDBCDir}" includes="${jdbcJar}"/>
+                    </copy>
+                </then>
+                <else>
+                    <echo>INFO: property deployJDBCDriver is set to false. No copy of JDBC jar to ${appServerJdbcDir}</echo>
+                </else>
+            </if>
+        </sequential>
+    </target>
+    <target name="enable-gzip-glassfish">
+        <runasadmin>
+            <arg value="set"/>
+            <arg value="configs.config.server-config.network-config.protocols.protocol.http-listener-1.http.compression=on"/>
+        </runasadmin>
+        <runasadmin>
+            <arg value="set"/>
+            <arg value="configs.config.server-config.network-config.protocols.protocol.http-listener-1.http.compression-min-size-bytes=4096"/>
+        </runasadmin>
+        <runasadmin>
+            <arg value="set"/>
+            <arg value="configs.config.server-config.network-config.protocols.protocol.http-listener-1.http.compressable-mime-type=text/html,text/css,text/xml,text/plain,text/javascript,application/javascript,application/json"/>
+        </runasadmin>
+    </target>
+</project>

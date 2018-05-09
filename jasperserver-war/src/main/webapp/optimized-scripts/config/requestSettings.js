@@ -1,0 +1,1 @@
+define(["require","common/config/requestSettings","jrs.configs"],function(e){var n=e("common/config/requestSettings"),r=e("jrs.configs"),c=r.userLocale.replace(/_/g,"-");return n.headers["Accept-Language"]=c,n});

@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+       http://www.springframework.org/schema/security
+       http://www.springframework.org/schema/security/spring-security-3.2.xsd
+       http://www.springframework.org/schema/util
+       http://www.springframework.org/schema/util/spring-util-3.2.xsd">
+
+
+<!-- 2010-05-07: SPRING REFACTOR PROJECT: LIST OF CHANGES                  -->
+<!--             - added alias for service                                 -->
+<!--                                                                       -->
+<!-- TODO:                                                                 -->
+<!--       - shouldn't need this alias can change export unit test that    -->
+<!--         makes this reference                                          -->
+<!--       - reportSchedulingInternalService                               -->
+<!--                                                                       -->
+
+
+
+    <bean id="reportJobsPersistenceHibernateService" class="com.jaspersoft.jasperserver.api.engine.scheduling.hibernate.HibernateReportJobsPersistenceService">
+        <property name="sessionFactory" ref="sessionFactory"/>
+        <property name="userHandler"><ref bean="${bean.standardUserPersistenceHandler}"/></property>
+        <property name="profileAttributeService" ref="profileAttributeServiceTarget"/>
+        <!-- defer getting the repo service ref (ugly, but don't want to add to existing circular deps) -->
+        <property name="referenceResolverBean" value="${bean.internalRepositoryService}"/>
+    </bean>
+
+    <!-- reportJobsPersistenceService bean: this bean was moved into sub-folder specific locations. -->
+    <!-- this is because import-export needs a different definition than js-war and unit-test       -->
+
+    <bean id="reportSchedulerMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="host" value="${report.scheduler.mail.sender.host}"/>
+        <property name="username" value="${report.scheduler.mail.sender.username}"/>
+        <property name="password" value="${report.scheduler.mail.sender.password}"/>
+        <property name="protocol" value="${report.scheduler.mail.sender.protocol}"/>
+        <property name="port" value="${report.scheduler.mail.sender.port}"/>
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.smtp.sendpartial">true</prop>
+                <prop key="mail.smtp.auth">false</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="ftpService" class="com.jaspersoft.jasperserver.api.engine.common.util.impl.FTPUtil"/>
+    <bean id="reportExecutionJobAlert" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.ReportExecutionJobAlertImpl"/>
+    <bean id="reportExecutionJobMailNotification" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.ReportExecutionJobMailNotificationImpl"/>
+    <bean id="reportExecutionJobInit" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.ReportExecutionJobInitImpl"/>
+    <bean id="reportExecutionJobFileSaving" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.ReportExecutionJobFileSavingImpl">
+        <property name="ftpService" ref="ftpService"/>
+        <property name="enableSaveToHostFS" value="#{configurationBean.enableSaveToHostFS}"/>
+    </bean>
+
+    <bean id="quartzScheduler" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.JSSchedulerFactoryBean" lazy-init="false" destroy-method="destroy">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="configLocation" value="${resource.root}/js.quartz.base.properties"/>
+        <property name="quartzProperties">
+            <value>
+                org.quartz.jobStore.driverDelegateClass = ${quartz.delegateClass}
+                org.quartz.jobStore.tablePrefix = ${quartz.tablePrefix}
+                ${quartz.extraSettings}
+            </value>
+        </property>
+        <property name="waitForJobsToCompleteOnShutdown" value="false"/>
+        <property name="autoStartup" value="false"/>
+        <property name="applicationContextSchedulerContextKey" value="applicationContext"/>
+        <property name="schedulerContextAsMap">
+            <map>
+                <entry key="jobPersistenceService" value-ref="${bean.reportJobsPersistenceService}"/>
+                <entry key="reportSchedulingService" value-ref="reportSchedulingService"/>
+                <entry key="engineService" value-ref="engineService"/>
+                <entry key="virtualizerFactory" value-ref="fileVirtualizerFactory"/>
+                <entry key="repositoryService" value-ref="${bean.repositoryService}"/>
+                <entry key="exportDashboardService" value="singletonExportDashboardService"/>
+                <entry key="configurationBeanName" value="configurationBean"/>
+                <entry key="mailSender" value-ref="reportSchedulerMailSender"/>
+                <entry key="mailFromAddress" value="${report.scheduler.mail.sender.from}"/>
+                <entry key="loggingService" value-ref="loggingService"/>
+                <entry key="securityContextProvider" value-ref="${bean.securityContextProvider}"/>
+                <entry key="hyperlinkProducerFactory">
+                    <bean class="net.sf.jasperreports.engine.export.JRHyperlinkProducerMapFactory">
+                        <property name="producersMap">
+                            <map>
+                                <entry key="ReportExecution" value-ref="schedulerReportExecutionHyperlinkProducer"/>
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
+                <entry key="encodingProvider" value-ref="encodingProvider"/>
+                <entry key="exportParametersMap" value-ref="jobExportParametersMap"/>
+                <entry key="dataContainerFactory">
+                    <bean class="com.jaspersoft.jasperserver.api.metadata.common.domain.FileBufferedDataContainerFactory"/>
+                </entry>
+                <entry key="contentResourceURIResolver"><ref bean="contentResourceURIResolver"/></entry>
+                <entry key="lockManager">
+                    <bean class="com.jaspersoft.jasperserver.api.metadata.common.util.LocalLockManager"/>
+                </entry>
+                <entry key="reportOptionsServiceName" value="${bean.reportOptionsService}"/>
+                <entry key="dataSnapshotServiceName" value="dataSnapshotService"/>
+                <entry key="dataCacheProviderName" value="engineServiceDataCacheProvider"/>
+                <entry key="outputFormatMap" value-ref="outputFormatMap"/>
+                <entry key="outputKeyMapping" value-ref="outputKeyMapping"/>
+                <entry key="administratorRole" value="ROLE_ADMINISTRATOR"/>
+                <entry key="reportExecutionJobInit" value-ref="reportExecutionJobInit"/>
+                <entry key="reportExecutionJobAlert" value-ref="reportExecutionJobAlert"/>
+                <entry key="reportExecutionJobMailNotification" value-ref="reportExecutionJobMailNotification"/>
+                <entry key="reportExecutionJobFileSaving" value-ref="reportExecutionJobFileSaving"/>
+                <entry key="autoDeleteBrokenUriReportJob" value="false"/>
+                <entry key="jasperReportsContextName" value="${bean.schedulerJasperReportsContext}"/>
+                <entry key="disableSendingAlertToAdmin" value="false"/>
+                <entry key="disableSendingAlertToOwner" value="false"/>
+            </map>
+        </property>
+        <property name="taskExecutor" ref="${bean.report.scheduler.taskExecutor}"/>
+        <property name="threadExecutor" ref="${bean.report.scheduler.threadExecutor}"/>
+        <!--
+        <property name="threadRunner" ref="${bean.report.scheduler.threadRunner}"/>
+        -->
+    </bean>
+
+    <bean id="nullTaskExecutor" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.NullTaskExecutor"/>
+
+    <bean id="nullThreadExecutor" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.NullThreadExecutor"/>
+    <!--
+    <bean id="nullThreadRunner" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.NullThreadRunner"/>
+    -->
+    <bean id="schedulerReportExecutionHyperlinkProducer" class="com.jaspersoft.jasperserver.api.engine.scheduling.ReportExecutionHyperlinkProducerFactory"
+        parent="baseReportExecutionHyperlinkProducer">
+        <property name="deploymentInformation"><ref bean="defaultWebDeploymentInformation"/></property>
+    </bean>
+
+    <bean id="reportScheduler" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.ReportJobsQuartzScheduler">
+        <property name="scheduler" ref="quartzScheduler"/>
+        <property name="singleSimpleJobMisfirePolicy" value="${report.quartz.misfirepolicy.singlesimplejob}"/>
+        <property name="repeatingSimpleJobMisfirePolicy" value="${report.quartz.misfirepolicy.repeatingsimplejob}"/>
+        <property name="calendarJobMisfirePolicy" value="${report.quartz.misfirepolicy.calendarjob}"/>
+        <property name="persistenceService" ref="${bean.reportJobsPersistenceService}"/>
+        <property name="reportExecutionJobClass">
+              <value>${property.reportQuartzScheduler.reportExecutionJobClass}</value>
+        </property>
+    </bean>
+
+    <bean id="defaultReportJobValidator" class="com.jaspersoft.jasperserver.api.engine.scheduling.DefaultReportJobValidator">
+        <property name="repository" ref="${bean.unsecureRepositoryService}"/>
+        <property name="engineServiceBeanName" value="${bean.engineService}"/>
+        <property name="repositoryServiceSecurityChecker" ref="${bean.repositoryServiceSecurityChecker}"/>
+    </bean>
+
+    <bean id="reportSchedulingService" class="com.jaspersoft.jasperserver.api.engine.scheduling.ReportSchedulingFacade">
+        <property name="persistenceService" ref="${bean.reportJobsPersistenceService}"/>
+        <property name="jobsInternalService" ref="reportJobsPersistenceHibernateService"/>
+        <property name="scheduler" ref="reportScheduler"/>
+        <property name="validator" ref="defaultReportJobValidator"/>
+        <property name="auditContext" ref="${bean.auditContext}"/>
+        <property name="outputKeyMapping" ref="outputKeyMapping"/>
+        <property name="externalUserService">
+            <ref bean="${bean.internalUserAuthorityService}"/>
+        </property>
+
+        <property name="enableSaveToHostFS" value="#{configurationBean.enableSaveToHostFS}"/>
+        <!--    2012-03-10 thorick:  comment out as this feature currently has runtime permission problems to be resolved
+        <property name="autoScheduleFailedJobsOnStartup" value="false"/>
+        -->
+    </bean>
+
+    <alias name="reportSchedulingService" alias="reportSchedulingInternalService"/>
+
+
+    <bean id="schedulingReportDeleteListener" class="com.jaspersoft.jasperserver.api.engine.scheduling.SchedulingReportDeleteListener">
+        <property name="schedulingService" ref="reportSchedulingService"/>
+    </bean>
+
+    <bean id="schedulingReportDeleteListenerRegisterer" class="com.jaspersoft.jasperserver.api.metadata.common.service.ResourceEventListenerProcessor" lazy-init="false">
+        <property name="registry" ref="metadataRepositoryDeleteListener"/>
+        <property name="listenerBeanName" value="${property.schedulingReportDeleteListenerRegisterer.listenerBeanName}"/>
+    </bean>
+
+    <bean id="quartzSchedulerControl" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.QuartzSchedulerControl"
+        depends-on="reportSchedulingService" init-method="start">
+        <property name="scheduler" ref="quartzScheduler"/>
+    </bean>
+
+    <!-- Security -->
+    <bean id="reportJobVirtualAclService" class="com.jaspersoft.jasperserver.api.engine.scheduling.security.ReportJobVirtualAclServiceImpl">
+        <property name="permissionGrantingStrategy" ref="reportJobVirtualPermissionGrantingStrategy"/>
+        <property name="reportJobsInternalService" ref="reportJobsPersistenceHibernateService"/>
+        <property name="sidRetrievalStrategy" ref="sidRetrievalStrategy"/>
+        <property name="administratorRole" value="ROLE_ADMINISTRATOR"/>
+    </bean>
+
+    <bean id="reportJobVirtualPermissionGrantingStrategy" class="com.jaspersoft.jasperserver.api.metadata.security.ReportJobPermissionGrantingStrategy"/>
+
+    <alias name="${bean.reportJobVirtualAclService}" alias="reportJobAclService"/>
+    <alias name="jobIdRetrievalStrategy" alias="jobRetrievalStrategy"/>
+
+    <!--<alias name="internalAclService" alias="reportJobAclService"/>-->
+    <!--<alias name="jobResourceRetrievalStrategy" alias="jobRetrievalStrategy"/>-->
+
+    <bean id="jobIdRetrievalStrategy" class="com.jaspersoft.jasperserver.api.engine.scheduling.security.ReportJobObjectIdentityRetrievalStrategyImpl">
+        <property name="ReportJobsInternalService" ref="reportJobsPersistenceHibernateService"/>
+    </bean>
+
+    <bean id="jobResourceRetrievalStrategy" class="com.jaspersoft.jasperserver.api.engine.scheduling.security.ReportJobResourceObjectIdentityRetrievalStrategy">
+        <property name="reportJobsInternalService" ref="reportJobsPersistenceHibernateService"/>
+    </bean>
+
+    <bean id="reportJobUpdateVoter" class="org.springframework.security.acls.AclEntryVoter">
+        <constructor-arg name="aclService" ref="reportJobAclService"/>
+        <constructor-arg name="processConfigAttribute" type="java.lang.String" value="ACL_REPORT_JOB_UPDATE"/>
+        <constructor-arg name="requirePermission">
+            <list>
+                <ref bean="JasperServerPermission.READ_WRITE"/>
+                <ref bean="JasperServerPermission.ADMINISTRATION"/>
+            </list>
+        </constructor-arg>
+        <property name="processDomainObjectClass"><value>com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJob</value></property>
+        <property name="objectIdentityRetrievalStrategy" ref="jobRetrievalStrategy"/>
+        <property name="sidRetrievalStrategy" ref="sidRetrievalStrategy"/>
+    </bean>
+
+    <bean id="reportJobDeletionVoter" class="org.springframework.security.acls.AclEntryVoter">
+        <constructor-arg name="aclService" ref="reportJobAclService"/>
+        <constructor-arg name="processConfigAttribute" type="java.lang.String" value="ACL_REPORT_JOB_DELETE"/>
+        <constructor-arg name="requirePermission">
+            <list>
+                <ref bean="JasperServerPermission.DELETE"/>
+                <ref bean="JasperServerPermission.ADMINISTRATION"/>
+            </list>
+        </constructor-arg>
+        <property name="processDomainObjectClass"><value>com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJobIdHolder</value></property>
+        <property name="objectIdentityRetrievalStrategy" ref="jobRetrievalStrategy"/>
+        <property name="sidRetrievalStrategy" ref="sidRetrievalStrategy"/>
+    </bean>
+
+    <bean id="reportJobLoadVoter" class="org.springframework.security.acls.AclEntryVoter">
+        <constructor-arg name="aclService" ref="reportJobAclService"/>
+        <constructor-arg name="processConfigAttribute" type="java.lang.String" value="ACL_REPORT_JOB_READ"/>
+        <constructor-arg name="requirePermission">
+            <list>
+                <ref bean="JasperServerPermission.READ"/>
+                <ref bean="JasperServerPermission.ADMINISTRATION"/>
+            </list>
+        </constructor-arg>
+        <property name="processDomainObjectClass"><value>com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJobIdHolder</value></property>
+        <property name="objectIdentityRetrievalStrategy" ref="jobRetrievalStrategy"/>
+        <property name="sidRetrievalStrategy" ref="sidRetrievalStrategy"/>
+    </bean>
+
+    <bean id="reportJobAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+        <property name="allowIfAllAbstainDecisions"><value>true</value></property>
+        <property name="decisionVoters">
+            <list>
+                <ref bean="reportJobUpdateVoter"/>
+                <ref bean="reportJobDeletionVoter"/>
+                <ref bean="reportJobLoadVoter"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="reportJobAfterList" class="org.springframework.security.acls.afterinvocation.AclEntryAfterInvocationCollectionFilteringProvider">
+        <constructor-arg name="aclService" ref="reportJobAclService"/>
+        <constructor-arg name="requirePermission">
+            <list>
+                <ref bean="JasperServerPermission.READ"/>
+                <ref bean="JasperServerPermission.ADMINISTRATION"/>
+            </list>
+        </constructor-arg>
+        <property name="processDomainObjectClass" value="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJobSummary"/>
+        <property name="sidRetrievalStrategy" ref="sidRetrievalStrategy"/>
+        <property name="objectIdentityRetrievalStrategy" ref="jobRetrievalStrategy"/>
+    </bean>
+
+    <bean id="reportJobAccessDenySubstitutor" class="com.jaspersoft.jasperserver.api.metadata.security.DefaultValueAfterInvocationFilteringProvider">
+        <constructor-arg name="aclService" ref="reportJobAclService"/>
+        <constructor-arg name="processConfigAttribute" value="ACL_REPORT_JOB_DELETE" type="java.lang.String"/>
+        <constructor-arg name="requirePermission">
+            <list>
+                <ref bean="JasperServerPermission.READ"/>
+                <ref bean="JasperServerPermission.ADMINISTRATION"/>
+            </list>
+        </constructor-arg>
+        <property name="processDomainObjectClass" value="com.jaspersoft.jasperserver.api.engine.scheduling.domain.ReportJobSummary"/>
+        <property name="sidRetrievalStrategy" ref="sidRetrievalStrategy"/>
+        <property name="objectIdentityRetrievalStrategy" ref="jobRetrievalStrategy"/>
+    </bean>
+
+    <bean id="reportJobAfterInvocationManager" class="org.springframework.security.access.intercept.AfterInvocationProviderManager">
+        <property name="providers">
+            <list>
+                <ref bean="reportJobAfterList"/>
+                <!--<ref bean="reportJobAccessDenySubstitutor"/>-->
+            </list>
+        </property>
+    </bean>
+
+    <bean id="securedReportJobsPersistenceService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="interceptorNames">
+            <list>
+                <idref bean="reportJobSecurity"/>
+                <idref bean="reportJobsPersistenceHibernateService"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="reportJobSecurity" class="org.springframework.security.access.intercept.aopalliance.MethodSecurityInterceptor">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="accessDecisionManager" ref="reportJobAccessDecisionManager"/>
+        <property name="afterInvocationManager" ref="reportJobAfterInvocationManager"/>
+        <property name="securityMetadataSource">
+            <security:method-security-metadata-source>
+                <security:protect method="com.jaspersoft.jasperserver.api.engine.scheduling.service.ReportJobsPersistenceService.listJobs" access="AFTER_ACL_COLLECTION_READ"/>
+                <security:protect method="com.jaspersoft.jasperserver.api.engine.scheduling.service.ReportJobsPersistenceService.loadJob" access="ACL_REPORT_JOB_READ"/>
+                <security:protect method="com.jaspersoft.jasperserver.api.engine.scheduling.service.ReportJobsPersistenceService.updateJob" access="ACL_REPORT_JOB_UPDATE"/>
+                <security:protect method="com.jaspersoft.jasperserver.api.engine.scheduling.service.ReportJobsPersistenceService.deleteJob" access="ACL_REPORT_JOB_DELETE"/>
+            </security:method-security-metadata-source>
+        </property>
+    </bean>
+
+
+    <!-- export parameters for report job scheduling -->
+
+    <bean id="jobXlsExportParameters" parent="xlsExportParameters">
+        <!--
+        <property name="detectCellType" value="false"/>
+        <property name="onePagePerSheet" value="false"/>
+        <property name="removeEmptySpaceBetweenRows" value="false"/>
+        <property name="removeEmptySpaceBetweenColumns" value="false"/>
+        <property name="whitePageBackground" value="false"/>
+        <property name="ignoreGraphics" value="false"/>
+        <property name="collapseRowSpan" value="false"/>
+        <property name="ignoreCellBorder" value="false"/>
+        <property name="fontSizeFixEnabled" value="false"/>
+        <property name="maximumRowsPerSheet" value="0"/>
+        <property name="xlsFormatPatternsMap" ref="formatPatternsMap"/>
+        -->
+    </bean>
+
+    <bean id="jobOdsExportParameters" parent="odsExportParameters">
+        <!--
+        <property name="detectCellType" value="false"/>
+        <property name="onePagePerSheet" value="false"/>
+        <property name="removeEmptySpaceBetweenRows" value="false"/>
+        <property name="removeEmptySpaceBetweenColumns" value="false"/>
+        <property name="whitePageBackground" value="false"/>
+        <property name="ignoreGraphics" value="false"/>
+        <property name="collapseRowSpan" value="false"/>
+        <property name="ignoreCellBorder" value="false"/>
+        <property name="fontSizeFixEnabled" value="false"/>
+        <property name="maximumRowsPerSheet" value="0"/>
+        <property name="xlsFormatPatternsMap" ref="formatPatternsMap"/>
+        -->
+    </bean>
+
+    <bean id="jobCsvExportParameters" parent="csvExportParameters">
+        <!-- property name="fieldDelimiter" value=","/-->
+    </bean>
+
+    <bean id="jobTxtExportParameters" parent="txtExportParameters">
+    <!--
+        <property name="characterWidth" value="10"/>
+        <property name="characterHeight" value="10"/>
+        <property name="pageHeight" value="100"/>
+        <property name="pageWidth" value="80"/>
+    -->
+    </bean>
+
+    <bean id="jobPdfExportParameters" parent="pdfExportParameters">
+    </bean>
+
+    <bean id="jobPptxExportParameters" parent="pptxExportParameters">
+    <!--
+        <property name="ignoreHyperlink" value="false"/>
+    -->
+    </bean>
+
+    <util:map id="jobExportParametersMap" key-type="java.lang.String">
+        <entry key="pdf" value-ref="jobPdfExportParameters"/>
+        <entry key="xls" value-ref="jobXlsExportParameters"/>
+        <entry key="csv" value-ref="jobCsvExportParameters"/>
+        <entry key="txt" value-ref="jobTxtExportParameters"/>
+        <entry key="ods" value-ref="jobOdsExportParameters"/>
+        <entry key="xlsx" value-ref="jobXlsExportParameters"/>
+        <entry key="pptx" value-ref="jobPptxExportParameters"/>
+    </util:map>
+
+    <!-- end export parameters for report job scheduling -->
+
+    <util:map id="outputKeyMapping">
+        <entry key="1" value="pdf"/>
+        <entry key="2" value="html"/>
+        <entry key="3" value="xls"/>
+        <entry key="4" value="rtf"/>
+        <entry key="5" value="csv"/>
+        <entry key="6" value="odt"/>
+        <entry key="7" value="txt"/>
+        <entry key="8" value="docx"/>
+        <entry key="9" value="ods"/>
+        <entry key="10" value="xlsx"/>
+        <entry key="11" value="xlsNoPag"/>
+        <entry key="12" value="xlsxNoPag"/>
+        <entry key="14" value="pptx"/>
+        <entry key="15" value="json"/>
+        <entry key="16" value="png"/>
+    </util:map>
+
+
+    <!-- Comment/uncomment any of the entries below if you want related exporters
+         to be excluded/included in the scheduler's output formats list -->
+    <!-- * Report output formats: -->
+    <util:list id="availableReportJobOutputFormats" value-type="java.lang.String">
+        <value>CSV</value>
+        <value>HTML</value>
+        <value>RTF</value>
+        <value>DOCX</value>
+        <value>ODS</value>
+        <value>XLSX_NOPAG</value>
+        <value>XLS</value>
+        <value>ODT</value>
+        <value>XLSX</value>
+        <value>XLS_NOPAG</value>
+        <value>PDF</value>
+        <value>PPTX</value>
+        <!--<value>TXT</value>-->
+        <value>DATA_SNAPSHOT</value> <!-- This one will not appear if data snapshot persistence is turned off  -->
+    </util:list>
+
+    <!-- * Dashboard output formats: -->
+    <util:list id="availableDashboardJobOutputFormats" value-type="java.lang.String">
+        <value>DOCX</value>
+        <value>PNG</value>
+        <value>ODT</value>
+        <value>PPTX</value>
+        <value>PDF</value>
+    </util:list>
+
+
+    <!-- Job Editor default values. May be overridden with profile attributes -->
+    <util:map id="reportJobDefaults">
+        <!-- Uncomment next entry and set the required default output folder URI value -->
+        <!-- <entry key="scheduler.job.repositoryDestination.folderURI" value="/job_output" /> -->
+    </util:map>
+
+	<bean id="baseReportJobExportOutput" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.AbstractReportOutput" 
+			abstract="true">
+		<property name="jasperReportsContext" ref="${bean.schedulerJasperReportsContext}"/>
+	</bean>
+
+    <bean id="pdfOutput" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.PdfReportOutput" parent="baseReportJobExportOutput">
+        <property name="exportParams" ref="jobPdfExportParameters"/>
+    </bean>
+    <bean id="htmlOutput" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.HtmlReportOutput" parent="baseReportJobExportOutput">
+    	<property name="compress" value="true"/>
+        <property name="deploymentInformation"><ref bean="defaultWebDeploymentInformation"/></property>
+    </bean>
+    <bean id="xlsOutput" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.XlsReportOutput" parent="baseReportJobExportOutput">
+        <property name="exportParams" ref="jobXlsExportParameters"/>
+    	<property name="compress" value="true"/>
+    </bean>
+    <bean id="xlsNoPagOutput" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.XlsReportOutput" parent="baseReportJobExportOutput">
+        <property name="exportParams" ref="jobXlsExportParameters"/>
+        <property name="ignorePagination" value="true"/>
+    	<property name="compress" value="true"/>
+    </bean>
+    <bean id="csvOutput" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.CsvReportOutput" parent="baseReportJobExportOutput">
+        <property name="exportParams" ref="jobCsvExportParameters"/>
+    </bean>
+    <bean id="docxOutput" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.DocxReportOutput" parent="baseReportJobExportOutput"/>
+    <bean id="rtfOutput" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.RtfReportOutput" parent="baseReportJobExportOutput">
+    	<property name="compress" value="true"/>
+    </bean>
+    <bean id="odtOutput" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.OdtReportOutput" parent="baseReportJobExportOutput"/>
+    <bean id="odsOutput" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.OdsReportOutput" parent="baseReportJobExportOutput">
+        <property name="exportParams" ref="jobOdsExportParameters"/>
+    </bean>
+    <bean id="xlsxOutput" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.XlsxReportOutput" parent="baseReportJobExportOutput">
+        <property name="exportParams" ref="jobXlsExportParameters"/>
+    </bean>
+    <bean id="xlsxNoPagOutput" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.XlsxReportOutput" parent="baseReportJobExportOutput">
+        <property name="exportParams" ref="jobXlsExportParameters"/>
+        <property name="ignorePagination" value="true"/>
+    </bean>
+    <bean id="txtOutput" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.TxtReportOutput" parent="baseReportJobExportOutput">
+        <property name="exportParams" ref="jobTxtExportParameters"/>
+    </bean>
+    <bean id="pptxOutput" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.PptxReportOutput" parent="baseReportJobExportOutput">
+        <property name="exportParams" ref="jobPptxExportParameters"/>
+    </bean>
+    <bean id="jsonOutput" class="com.jaspersoft.jasperserver.api.engine.scheduling.quartz.JsonReportOutput" parent="baseReportJobExportOutput">
+    </bean>
+
+    <util:map id="outputFormatMap">
+        <entry key="pdf" value-ref="pdfOutput"/>
+        <entry key="html" value-ref="htmlOutput"/>
+        <entry key="xls" value-ref="xlsOutput"/>
+        <entry key="xlsNoPag" value-ref="xlsNoPagOutput"/>
+        <entry key="rtf" value-ref="rtfOutput"/>
+        <entry key="csv" value-ref="csvOutput"/>
+        <entry key="odt" value-ref="odtOutput"/>
+        <entry key="txt" value-ref="txtOutput"/>
+        <entry key="docx" value-ref="docxOutput"/>
+        <entry key="ods" value-ref="odsOutput"/>
+        <entry key="xlsx" value-ref="xlsxOutput"/>
+        <entry key="xlsxNoPag" value-ref="xlsxNoPagOutput"/>
+        <entry key="pptx" value-ref="pptxOutput"/>
+        <entry key="json" value-ref="jsonOutput"/>
+    </util:map>
+
+    <bean id="contentResourceURIResolver" class="com.jaspersoft.jasperserver.api.engine.common.service.impl.DefaultContentResourceURIResolver">
+        <property name="deploymentInformation"><ref bean="defaultWebDeploymentInformation"/></property>
+        <property name="contentControllerPath"><value>/fileview/fileview</value></property>
+    </bean>
+
+    <bean id="defaultWebDeploymentInformation" class="com.jaspersoft.jasperserver.api.engine.common.service.impl.SimpleWebDeploymentInformation">
+        <property name="deploymentURI"><value>${report.scheduler.web.deployment.uri}</value></property>
+    </bean>
+
+    <bean id="hibernateReportJobsUserDeleteListener"
+        class="com.jaspersoft.jasperserver.api.engine.scheduling.hibernate.HibernateReportJobsUserDeleteListener"/>
+
+</beans>

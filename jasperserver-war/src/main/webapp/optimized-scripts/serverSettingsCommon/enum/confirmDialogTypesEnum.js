@@ -1,0 +1,1 @@
+define([],function(){return{CANCEL_CONFIRM:"cancelConfirm",DELETE_CONFIRM:"deleteConfirm",PERMISSION_CONFIRM:"permissionConfirm",NAME_CONFIRM:"nameConfirm",EDIT_CONFIRM:"editConfirm"}});

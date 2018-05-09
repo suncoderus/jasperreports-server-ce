@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright (C) 2005 - 2018 TIBCO Software Inc. All rights reserved.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ Unless you have purchased  a commercial license agreement from Jaspersoft,
+  ~ the following license terms  apply:
+  ~
+  ~ This program is free software: you can redistribute it and/or  modify
+  ~ it under the terms of the GNU Affero General Public License  as
+  ~ published by the Free Software Foundation, either version 3 of  the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero  General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public  License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+       xmlns:util="http://www.springframework.org/schema/util"
+       default-lazy-init="true">
+
+    <bean id="propertyConfigurer" class="com.jaspersoft.jasperserver.api.common.properties.DecryptingPropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>js.spring.export.properties</value>
+            </list>
+        </property>
+        <property name="properties">
+            <props>
+                <prop key="resource.root">classpath:</prop>
+                <prop key="bean.olapCacheManager">cacheManager</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- i18n -->
+    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="useCodeAsDefaultMessage" value="true"/>
+        <property name="fallbackToSystemLocale" value="false"/>
+        <property name="basenames" ref="bundlePathsListImpExp"/>
+    </bean>
+
+
+    <bean id="bundlePathsListImpExp" class="com.jaspersoft.jasperserver.api.common.util.spring.ArrayFactoryBean">
+        <property name="sourceList">
+            <list>
+                <value>bundles/jsexceptions_messages</value>
+         </list>
+        </property>
+    </bean>
+
+
+    <!-- beans from different contexts -->
+
+    <bean id="mappingResourceFactory" class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.ResourceFactoryImpl">
+        <property name="objectFactory" ref="objectFactory"/>
+        <property name="implementationClassMappings">
+            <map>
+                <entry key="com.jaspersoft.jasperserver.api.common.domain.LogEvent"
+                       value="com.jaspersoft.jasperserver.api.common.domain.client.LogEventImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource"
+                       value="com.jaspersoft.jasperserver.api.metadata.common.domain.client.FileResourceImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.ContentResource"
+                       value="com.jaspersoft.jasperserver.api.metadata.common.domain.client.ContentResourceImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JdbcReportDataSource"
+                       value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.JdbcReportDataSourceImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JndiJdbcReportDataSource"
+                       value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.JndiJdbcReportDataSourceImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.BeanReportDataSource"
+                       value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.BeanReportDataSourceImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.CustomReportDataSource"
+                       value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.CustomReportDataSourceImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.ReportUnit"
+                       value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.ReportUnitImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.Query"
+                       value="com.jaspersoft.jasperserver.api.metadata.common.domain.client.QueryImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl"
+                       value="com.jaspersoft.jasperserver.api.metadata.common.domain.client.InputControlImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.ListOfValues"
+                       value="com.jaspersoft.jasperserver.api.metadata.common.domain.client.ListOfValuesImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.DataType"
+                       value="com.jaspersoft.jasperserver.api.metadata.common.domain.client.DataTypeImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.Folder"
+                       value="com.jaspersoft.jasperserver.api.metadata.common.domain.client.FolderImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.user.domain.User"
+                       value="com.jaspersoft.jasperserver.api.metadata.user.domain.client.UserImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.user.domain.Role"
+                       value="com.jaspersoft.jasperserver.api.metadata.user.domain.client.RoleImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.user.domain.Tenant"
+                       value="com.jaspersoft.jasperserver.api.metadata.user.domain.client.TenantImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.user.domain.ObjectPermission"
+                       value="com.jaspersoft.jasperserver.api.metadata.user.domain.client.ObjectPermissionImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.user.domain.ProfileAttribute"
+                       value="com.jaspersoft.jasperserver.api.metadata.user.domain.client.ProfileAttributeImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.olap.domain.MondrianXMLADefinition"
+                       value="com.jaspersoft.jasperserver.api.metadata.olap.domain.client.MondrianXMLADefinitionImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.olap.domain.OlapUnit"
+                       value="com.jaspersoft.jasperserver.api.metadata.olap.domain.client.OlapUnitImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.olap.domain.OlapClientConnection"
+                       value="com.jaspersoft.jasperserver.api.metadata.olap.domain.client.OlapClientConnectionImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.olap.domain.XMLAConnection"
+                       value="com.jaspersoft.jasperserver.api.metadata.olap.domain.client.XMLAConnectionImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.olap.domain.JdbcOlapDataSource"
+                       value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.JdbcReportDataSourceImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.olap.domain.JndiJdbcOlapDataSource"
+                       value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.JndiJdbcReportDataSourceImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.metadata.olap.domain.MondrianConnection"
+                       value="com.jaspersoft.jasperserver.api.metadata.olap.domain.client.MondrianConnectionImpl"/>
+                <entry key="com.jaspersoft.jasperserver.api.logging.access.domain.AccessEvent"
+                       value="com.jaspersoft.jasperserver.api.logging.access.domain.AccessEventImpl"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="objectFactory" class="com.jaspersoft.jasperserver.api.common.service.impl.ObjectFactoryImpl"/>
+
+    <bean id="configurationBean" class="com.jaspersoft.jasperserver.export.ConfigutrationBeanMock">
+        <property name="themeDefaultName" value="default" />
+    </bean>
+
+    <bean id="reportLoadingService" class="com.jaspersoft.jasperserver.api.engine.jasperreports.service.impl.ReportLoadingService">
+    </bean>
+
+    <!-- Test mocks -->
+
+
+    <bean id="profileAttributeService" class="com.jaspersoft.jasperserver.export.ProfileAttributeServiceMock">
+        <property name="userAuthorityService" ref="userAuthorityService"/>
+    </bean>
+
+    <bean id="userAuthorityService" class="com.jaspersoft.jasperserver.export.UserAuthorityServiceMock">
+        <property name="rolesMap">
+            <map>
+                <entry key="ROLE_SUPERUSER" value-ref="ROLE_SUPERUSER"/>
+                <entry key="ROLE_USER" value-ref="ROLE_USER"/>
+                <entry key="ROLE_DEMO" value-ref="ROLE_DEMO"/>
+                <entry key="ROLE_ADMINISTRATOR" value-ref="ROLE_ADMINISTRATOR"/>
+            </map>
+        </property>
+        <property name="usersMap">
+            <map>
+                <entry key="demo" value-ref="demoUser"/>
+            </map>
+        </property>
+        <property name="usersWithRolesMap">
+            <map>
+                <entry key="ROLE_DEMO" value-ref="demoUser"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="repositoryService" class="com.jaspersoft.jasperserver.export.HibernateRepositoryServiceMock">
+
+    </bean>
+
+    <bean id="reportSchedulingService" class="com.jaspersoft.jasperserver.export.ReportSchedulingServiceMock">
+
+    </bean>
+
+    <bean id="accessService" class="com.jaspersoft.jasperserver.export.AccessServiceMock">
+
+    </bean>
+
+    <bean id="tenantService" class="com.jaspersoft.jasperserver.export.TenantServiceMock">
+
+    </bean>
+
+    <bean id="objectPermissionService" class="com.jaspersoft.jasperserver.export.ObjectPermissionServiceMock">
+
+    </bean>
+
+    <bean id="objectPermissionServiceUnsecure" class="com.jaspersoft.jasperserver.export.ObjectPermissionServiceMock">
+
+    </bean>
+
+    <bean id="reportSchedulingInternalService" class="com.jaspersoft.jasperserver.export.ReportSchedulingInternalServiceMock">
+
+    </bean>
+
+    <bean id="ROLE_SUPERUSER" class="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoRole">
+         <property name="roleName" value="ROLE_SUPERUSER"/>
+    </bean>
+    <bean id="ROLE_USER" class="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoRole">
+         <property name="roleName" value="ROLE_USER"/>
+    </bean>
+    <bean id="ROLE_DEMO" class="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoRole">
+         <property name="roleName" value="ROLE_DEMO"/>
+    </bean>
+    <bean id="ROLE_ADMINISTRATOR" class="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoRole">
+         <property name="roleName" value="ROLE_ADMINISTRATOR"/>
+    </bean>
+
+    <bean id="demoUser" class="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoUser">
+         <property name="username" value="demo"/>
+         <property name="fullName" value="demo"/>
+    </bean>
+
+    <bean id="rootTenantId" class="java.lang.String">
+        <constructor-arg type="java.lang.String">
+            <value>organizations</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="applicationContextProvider" class="com.jaspersoft.jasperserver.api.common.util.spring.ApplicationContextProvider"/>
+
+    <!-- NOTE: Only AES-128 (key size 128 bits) would be available in the default java installation: key in this bean
+        should be 16 bytes.  In order to achieve AES-256, you will need to install
+        “Unlimited Strength Jurisdiction Policy Files” off the oracle site for your Java version.  To install the files:
+        AFTER backing up the old files, extract US_export_policy.jar and local_policy.jar into %JAVA_HOME%\\jre\lib\security
+        directory.
+
+        Alternatively, you may download one of the reputable providers such as Bouncy Castle (ships in JRS).
+        You would need to add the Bouncy Castle provider to %JAVA_HOME%\jre\lib\security\java.security file
+        as a line security.provider.<seq number>=org.bouncycastle.jce.provider.BouncyCastleProvider
+
+        NOTE.1: plain text key functionality was removed as insecure via dictionary attacks.
+         -->
+    <bean id="importExportCipher" class="com.jaspersoft.jasperserver.api.common.crypto.Cipherer">
+        <property name="keyBytes"><value>0x1b 0xd4 0xa6 0x10 0x44 0x42 0x6f 0xb5 0x15 0xda 0xd3 0xf2 0x1f 0x18 0xaa 0x57</value></property>
+        <property name="keyAlgorithm"><value>AES</value></property>
+        <property name="cipherTransformation"><value>AES/CBC/PKCS5Padding</value></property>
+    </bean>
+
+    <bean id="globalPropertiesListUpgradeExecutor" class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.GlobalPropertiesListUpgradeExecutor">
+        <property name="repositoryService" ref="repositoryService"/>
+        <property name="profileAttributeService" ref="profileAttributeService"/>
+        <property name="resourceFactory" ref="mappingResourceFactory"/>
+        <property name="userAuthorityPersistenceService" ref="userAuthorityService"/>
+    </bean>
+
+    <bean id="roleAdministrator" class="java.lang.String">
+        <constructor-arg type="java.lang.String">
+            <value>ROLE_ADMINISTRATOR</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="importExportPrivilegeRoles" class="java.util.HashSet">
+        <constructor-arg  index="0" type="java.util.Collection">
+            <list merge="true" value-type="java.lang.String">
+                <ref bean="roleAdministrator"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="clientResourceResolver" class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.ClientResourceResolver">
+        <property name="clientResourceTypeToServerResourceTypes" ref="${bean.clientResourceTypeToServerResourceTypes}"/>
+    </bean>
+
+    <bean id="clientResourceTypeToServerResourceTypes" class="java.util.HashMap">
+        <constructor-arg index="0" type="java.util.Map">
+            <map>
+                <entry key="awsDataSource">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.AwsReportDataSource</value>
+                    </set>
+                </entry>
+                <entry key="beanDataSource">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.BeanReportDataSource</value>
+                    </set>
+                </entry>
+                <entry key="customDataSource">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.CustomReportDataSource</value>
+                    </set>
+                </entry>
+                <entry key="dataType">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.DataType</value>
+                    </set>
+                </entry>
+                <entry key="file">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.ContentResource</value>
+                        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource</value>
+                    </set>
+                </entry>
+                <entry key="folder">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.Folder</value>
+                    </set>
+                </entry>
+                <entry key="inputControl">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl</value>
+                    </set>
+                </entry>
+                <entry key="jdbcDataSource">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JdbcReportDataSource</value>
+                    </set>
+                </entry>
+                <entry key="jndiJdbcDataSource">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JndiJdbcReportDataSource</value>
+                    </set>
+                </entry>
+                <entry key="listOfValues">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.ListOfValues</value>
+                    </set>
+                </entry>
+                <entry key="mondrianConnection">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.MondrianConnection</value>
+                    </set>
+                </entry>
+                <entry key="mondrianXmlaDefinition">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.MondrianXMLADefinition</value>
+                    </set>
+                </entry>
+                <entry key="olapUnit">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.OlapUnit</value>
+                    </set>
+                </entry>
+                <entry key="query">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.Query</value>
+                    </set>
+                </entry>
+                <entry key="reportUnit">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.ReportUnit</value>
+                    </set>
+                </entry>
+                <entry key="resourceLookup">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.common.domain.ResourceLookup</value>
+                    </set>
+                </entry>
+                <entry key="virtualDataSource">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.VirtualReportDataSource</value>
+                    </set>
+                </entry>
+                <entry key="xmlaConnection">
+                    <set value-type="java.lang.Class">
+                        <value>com.jaspersoft.jasperserver.api.metadata.olap.domain.XMLAConnection</value>
+                    </set>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+</beans>

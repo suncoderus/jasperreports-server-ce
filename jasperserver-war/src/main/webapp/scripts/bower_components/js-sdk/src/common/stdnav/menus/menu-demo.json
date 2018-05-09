@@ -1,0 +1,89 @@
+{
+	"id"				: "main",
+	"label"			: "Main Menu",
+	"contents"		: [
+		{
+			"type"	: "item",
+			"id"		: "home",
+			"label"	: "Home"
+		},
+		{
+			"type"	: "submenu",
+			"id"		: "file",
+			"label"	: "File",
+			"contents": [
+				{
+					"type"	: "item",
+					"id"		: "new",
+					"label"	: "New"
+				},
+				{
+					"type"	: "item",
+					"id"		: "save",
+					"label"	: "Save"
+				},
+				{
+					"type"	: "item",
+					"id"		: "load",
+					"label"	: "Load"
+				}
+			]
+		},
+		{
+			"type"	: "submenu",
+			"id"		: "edit",
+			"label"	: "Edit",
+			"contents": [
+				{
+					"type"	: "item",
+					"id"		: "cut",
+					"label"	: "Cut"
+				},
+				{
+					"type"	: "item",
+					"id"		: "copy",
+					"label"	: "Copy"
+				},
+				{
+					"type"	: "item",
+					"id"		: "paste",
+					"label"	: "Paste"
+				}
+			]
+		},
+		{
+			"type"	: "submenu",
+			"id"		: "view",
+			"label"	: "View",
+			"contents": [
+				{
+               "type"   : "submenu",
+               "id"     : "view_as",
+               "label"  : "View as...",
+               "contents": [
+                  {
+                     "type"   : "item",
+                     "id"     : "english",
+                     "label"  : "English"
+                  },
+                  {
+                     "type"   : "item",
+                     "id"     : "ukrainian",
+                     "label"  : "Ukrainian"
+                  }
+               ]
+            },
+            {
+					"type"	: "item",
+					"id"		: "reset_view",
+					"label"	: "Reset"
+				}
+			]
+		},
+		{
+			"type"	: "item",
+			"id"		: "id",
+			"label"	: "Help"
+		}
+	]
+}

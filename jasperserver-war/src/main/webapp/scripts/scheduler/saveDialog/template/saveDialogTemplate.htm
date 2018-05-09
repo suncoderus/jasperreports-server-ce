@@ -1,0 +1,11 @@
+<label title="{{- i18n['report.scheduling.saveDialog.jobNameTitle']}}" class="control input text ">
+	<span class="wrap">{{- i18n['report.scheduling.saveDialog.jobName']}} ({{- i18n['required.field']}}):</span>
+	<input type="text" value="{{- model.label }}" name="label">
+	<span class="message warning"></span>
+</label>
+
+<label title="{{- i18n['report.scheduling.saveDialog.descriptionTitle']}}" class="control textArea">
+	<span class="wrap">{{- i18n['report.scheduling.saveDialog.description']}}</span>
+	<textarea type="text" name="description">{{- model.description }}</textarea>
+	<span class="message warning"></span>
+</label>

@@ -1,0 +1,152 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<resourceDescriptor name="Simple_Domain_Topic"
+	wsType="domainTopic" uriString="/JUNIT_NEW_FOLDER/Simple_Domain_Topic"
+	isNew="false">
+	<label>Simple Domain Topic</label>
+	<description>Simple example of Domain saved as Topic</description>
+	<creationDate>1318380303790</creationDate>
+	<resourceProperty name="PROP_RESOURCE_TYPE">
+		<value>com.jaspersoft.commons.semantic.DataDefinerUnit</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_PARENT_FOLDER">
+		<value>/adhoc/topics</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_VERSION">
+		<value>1</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_DATASOURCE_CUSTOM_PROPERTY_MAP">
+	</resourceProperty>
+	<resourceProperty name="PROP_HAS_DATA">
+		<value>false</value>
+	</resourceProperty>
+	<resourceProperty name="PROP_IS_REFERENCE">
+		<value>false</value>
+	</resourceProperty>
+	<resourceDescriptor name="" wsType="datasource"
+		uriString="" isNew="false">
+		<label>null</label>
+		<resourceProperty name="PROP_REFERENCE_URI">
+			<value>/Domains/Simple_Domain</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_IS_REFERENCE">
+			<value>true</value>
+		</resourceProperty>
+	</resourceDescriptor>
+	<resourceDescriptor name="Top5CustomersReport"
+		wsType="jrxml" uriString="/supermart/details/Top5CustomersReport"
+		isNew="false">
+		<label>Top5CustomersReport</label>
+		<description>Subreport for Top Fives Report. Parameterized on month.
+			Links to details.</description>
+		<creationDate>1318380315856</creationDate>
+		<resourceProperty name="PROP_RESOURCE_TYPE">
+			<value>com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_PARENT_FOLDER">
+			<value>/supermart/details</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_VERSION">
+			<value>0</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_HAS_DATA">
+			<value>true</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_ATTACHMENT_ID">
+			<value>attachment</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_REFERENCE_URI">
+			<value>/supermart/details/Top5CustomersReport</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_IS_REFERENCE">
+			<value>true</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_RU_IS_MAIN_REPORT">
+			<value>true</value>
+		</resourceProperty>
+	</resourceDescriptor>
+	<resourceDescriptor name="monthNumber" wsType="inputControl"
+		uriString="/supermart/Common/monthNumber" isNew="false">
+		<label>Month Number Input Control</label>
+		<description>Uses MonthNamesList (in root\input data types). Maps to
+			monthNumber parameter.</description>
+		<creationDate>1318380318594</creationDate>
+		<resourceProperty name="PROP_RESOURCE_TYPE">
+			<value>com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_PARENT_FOLDER">
+			<value>/supermart/Common</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_VERSION">
+			<value>0</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_HAS_DATA">
+			<value>false</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_IS_REFERENCE">
+			<value>false</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_INPUTCONTROL_IS_MANDATORY">
+			<value>true</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_INPUTCONTROL_IS_READONLY">
+			<value>false</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_INPUTCONTROL_IS_VISIBLE">
+			<value>true</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_INPUTCONTROL_TYPE">
+			<value>3</value>
+		</resourceProperty>
+		<resourceDescriptor name="" wsType="reference"
+			uriString="" isNew="false">
+			<label>null</label>
+			<resourceProperty name="PROP_REFERENCE_URI">
+				<value>/datatypes/MonthNamesList</value>
+			</resourceProperty>
+		</resourceDescriptor>
+	</resourceDescriptor>
+	<resourceDescriptor name="css_test" wsType="reference"
+		uriString="/JUNIT_NEW_FOLDER/Simple_Domain_Topic_files/css_test" isNew="false">
+		<label>css test</label>
+		<description>this is a test</description>
+		<creationDate>1318632754159</creationDate>
+		<resourceProperty name="PROP_RESOURCE_TYPE">
+			<value>com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_PARENT_FOLDER">
+			<value>/JUNIT_NEW_FOLDER/Simple_Domain_Topic_files</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_VERSION">
+			<value>0</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_IS_REFERENCE">
+			<value>true</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_REFERENCE_URI">
+			<value>/themes/default/containers.css</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_HAS_DATA">
+			<value>true</value>
+		</resourceProperty>
+		<resourceProperty name="PROP_ATTACHMENT_ID">
+			<value>attachment</value>
+		</resourceProperty>
+	</resourceDescriptor>
+</resourceDescriptor>

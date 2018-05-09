@@ -1,0 +1,1 @@
+define("system/systemErrorMain",["require","commons.main","utils.common","!domReady","jquery","core.layout"],function(o){"use strict";o("commons.main"),o("utils.common");var e=o("!domReady"),m=o("jquery"),n=o("core.layout");e(function(){var o=m("#nothingToDisplay");o.removeClass(n.HIDDEN_CLASS),centerElement(o,{horz:!0,vert:!0})})});

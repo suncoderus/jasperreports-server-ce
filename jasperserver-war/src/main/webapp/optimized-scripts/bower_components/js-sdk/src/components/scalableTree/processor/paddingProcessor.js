@@ -1,0 +1,1 @@
+define([],function(){return{processItem:function(n,e,i){return i.padding=n(i.id)*e,i}}});

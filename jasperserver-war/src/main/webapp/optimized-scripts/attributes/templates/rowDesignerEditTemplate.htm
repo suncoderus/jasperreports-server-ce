@@ -1,0 +1,43 @@
+<div class="editMode">
+    <span class="control firstInputGroup">
+        <span class="name editMode control" data-bind="validationErrorClass:name">
+            <div class="wrap">{{- i18n["attributes.name"]}}:</div>
+            <input type="text" data-bind="value:name, events:['keyup'], disabled:inherited" />
+            <span class="message warning" data-bind="validationErrorText:name" ></span>
+        </span>
+        <span class="value editMode control" data-bind="validationErrorClass:value">
+            <div class="wrap">{{- i18n["attributes.value"]}}:</div>
+            <input type="password" data-bind="toggle:secure, value:encrypt, events:['keyup']" />
+            <input type="text" data-bind="toggle:not(secure), value:value, events:['keyup']" />
+            <span class="message warning" data-bind="validationErrorText:value"></span>
+        </span>
+    </span>
+    <label class="descriptionArea editMode control" data-bind="validationErrorClass:description">
+        <div class="wrap">{{- i18n["attributes.description"]}}:</div>
+        <input type="text" data-bind="value:description, events:['keyup']" />
+        <span class="message warning" data-bind="validationErrorText:description"></span>
+    </label>
+    {{ if (type !== types.USER) { }}
+    <span class="permission editMode control">
+        <div class="wrap">{{- i18n["attributes.permission"]}}:</div>
+        <select data-bind="value:integer(permissionEmbedded)">
+            <option value="1">{{- i18n["attributes.attribute.permissionMask.1"]}}</option>
+            <option value="2">{{- i18n["attributes.attribute.permissionMask.2"]}}</option>
+            <option value="32">{{- i18n["attributes.attribute.permissionMask.32"]}}</option>
+            <option value="0">{{- i18n["attributes.attribute.permissionMask.0"]}}</option>
+        </select>
+    </span>
+    {{ } }}
+    <div class="secure editMode control">
+        <input name="secure" data-bind="checked:secure" type="checkbox"/>
+        <span class="wrap">{{- i18n["attributes.encrypt"]}}</span>
+    </div>
+    <div class="actions control">
+        <button class="button action up primary ok editMode">
+            <span class="wrap">{{- i18n2["button.ok"] }}</span>
+        </button>
+        <button class="button action up cancel editMode">
+            <span class="wrap">{{- i18n2["button.cancel"] }}</span>
+        </button>
+    </div>
+</div>

@@ -1,0 +1,11 @@
+<div class="jr-mVisualization jr">
+    <div class="jr-mVisualization-title {{ !props.title ? print('jr-isHidden') : print('') }} jr">
+        <h2  class="jr-mVisualization-title-text jr">{{- props.title  }}</h2>
+    </div>
+    <div class="jr-mVisualization-switcher {{ !props.title ? print('jr-isMinimized') : print('') }} jr">
+        <button class="jr-mButton jr-mButtonAction jr-mButtonOutline jr-isHovered jr" aria-label="chart options">
+            <span class="jr-mButton-icon jr-mIcon {{ !props.title ? print('jr-meatball') : print('jr-chartColumn') }}  jr"></span>
+        </button>
+    </div>
+    <div class="jr-mVisualization-canvas jr"></div>
+</div>

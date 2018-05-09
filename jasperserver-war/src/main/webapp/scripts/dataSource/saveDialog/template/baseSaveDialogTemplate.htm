@@ -1,0 +1,35 @@
+<label title="{{- i18n['resource.datasource.saveDialog.dataSourceNameTitle']}}" class="control input text ">
+	<span class="wrap">{{- i18n['resource.datasource.saveDialog.dataSourceName']}} ({{- i18n['required.field']}}):</span>
+	<input type="text" value="{{- model.label }}" name="label">
+	<span class="message warning"></span>
+</label>
+
+
+<label title="{{- i18n['resource.datasource.saveDialog.resourceIDTitle']}}" class="control input text ">
+	<span class="wrap">{{- i18n['resource.datasource.saveDialog.resourceID']}} ({{- i18n['required.field']}}):</span>
+	<input type="text" {{ if (isEditMode) { }}readonly="readonly"{{ } }} value="{{- model.name }}" name="name">
+	<span class="message warning"></span>
+</label>
+
+
+<label title="{{- i18n['resource.datasource.saveDialog.descriptionTitle']}}" class="control textArea">
+	<span class="wrap">{{- i18n['resource.datasource.saveDialog.description']}}</span>
+	<textarea type="text" name="description">{{- model.description }}</textarea>
+	<span class="message warning"></span>
+</label>
+
+{{ if (skipLocation === false) { }}
+<div class="control groupBox treeBox">
+	<div class="content">
+		<div class="header ">
+			<div class="title"></div>
+		</div>
+        <ul class="list collapsible folders"></ul>
+	</div>
+</div>
+
+<label class="control textArea">
+	<textarea type="text" class="hidden" name="parentFolderUri"></textarea>
+	<span class="message warning"></span>
+</label>
+{{ } }}

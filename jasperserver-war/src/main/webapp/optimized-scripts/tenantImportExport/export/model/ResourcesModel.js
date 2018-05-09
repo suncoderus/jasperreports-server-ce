@@ -1,0 +1,1 @@
+define(["require","backbone","request"],function(e){var r=e("backbone"),t=e("request");return r.Model.extend({url:"rest_v2/settings/exportResourceOptions",fetch:function(){return t({url:this.url,type:"GET"})}})});

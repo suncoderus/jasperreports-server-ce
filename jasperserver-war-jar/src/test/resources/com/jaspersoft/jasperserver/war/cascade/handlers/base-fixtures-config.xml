@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:util="http://www.springframework.org/schema/util"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+    <!-- constants for test cases map keys -->
+    <util:constant id="CONTROLS" static-field="com.jaspersoft.jasperserver.war.cascade.utils.CascadeTestHelper.CONTROLS_KEY_NAME"/>
+    <util:constant id="PARAMETER_TYPES" static-field="com.jaspersoft.jasperserver.war.cascade.utils.CascadeTestHelper.PARAMETER_TYPES"/>
+    <util:constant id="QUERY_EXECUTOR" static-field="com.jaspersoft.jasperserver.war.cascade.utils.CascadeTestHelper.QUERY_EXECUTOR_KEY_NAME"/>
+    <util:constant id="QUERY_EXECUTOR_KEY_GENERATOR" static-field="com.jaspersoft.jasperserver.war.cascade.utils.CascadeTestHelper.QUERY_EXECUTOR_KEY_GENERATOR_KEY_NAME"/>
+    <util:constant id="INPUT_CONTROL" static-field="com.jaspersoft.jasperserver.war.cascade.utils.CascadeTestHelper.INPUT_CONTROL_KEY_NAME"/>
+    <util:constant id="CONTROL_INFO" static-field="com.jaspersoft.jasperserver.war.cascade.utils.CascadeTestHelper.REPORT_INPUT_CONTROL_INFORMATION_KEY_NAME"/>
+    <util:constant id="TYPED_PARAMS_MAP" static-field="com.jaspersoft.jasperserver.war.cascade.utils.CascadeTestHelper.TYPED_PARAMS_MAP_KEY_NAME"/>
+    <util:constant id="RAW_PARAMS_ARRAY" static-field="com.jaspersoft.jasperserver.war.cascade.utils.CascadeTestHelper.PAW_PARAMS_ARRAY_KEY_NAME"/>
+    <util:constant id="EXPECTED_RESULT" static-field="com.jaspersoft.jasperserver.war.cascade.utils.CascadeTestHelper.EXPECTED_RESULT_KEY_NAME"/>
+
+    <!-- control types constants -->
+    <util:constant id="TYPE_BOOLEAN" static-field="com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl.TYPE_BOOLEAN"/>
+    <util:constant id="TYPE_SINGLE_VALUE" static-field="com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl.TYPE_SINGLE_VALUE"/>
+    <util:constant id="TYPE_SINGLE_SELECT_LIST_OF_VALUES" static-field="com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl.TYPE_SINGLE_SELECT_LIST_OF_VALUES"/>
+    <util:constant id="TYPE_SINGLE_SELECT_QUERY" static-field="com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl.TYPE_SINGLE_SELECT_QUERY"/>
+    <util:constant id="TYPE_MULTI_VALUE" static-field="com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl.TYPE_MULTI_VALUE"/>
+    <util:constant id="TYPE_MULTI_SELECT_LIST_OF_VALUES" static-field="com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl.TYPE_MULTI_SELECT_LIST_OF_VALUES"/>
+    <util:constant id="TYPE_MULTI_SELECT_QUERY" static-field="com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl.TYPE_MULTI_SELECT_QUERY"/>
+    <util:constant id="TYPE_SINGLE_SELECT_LIST_OF_VALUES_RADIO" static-field="com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl.TYPE_SINGLE_SELECT_LIST_OF_VALUES_RADIO"/>
+    <util:constant id="TYPE_SINGLE_SELECT_QUERY_RADIO" static-field="com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl.TYPE_SINGLE_SELECT_QUERY_RADIO"/>
+    <util:constant id="TYPE_MULTI_SELECT_LIST_OF_VALUES_CHECKBOX" static-field="com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl.TYPE_MULTI_SELECT_LIST_OF_VALUES_CHECKBOX"/>
+    <util:constant id="TYPE_MULTI_SELECT_QUERY_CHECKBOX" static-field="com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl.TYPE_MULTI_SELECT_QUERY_CHECKBOX"/>
+
+    <bean id="baseTestCaseMap" class="java.util.HashMap">
+        <constructor-arg  index="0">
+            <map key-type="java.lang.String" value-type="java.lang.Object">
+                <entry key-ref="CONTROLS"><map/></entry> <!-- Controls related data -->
+                <entry key-ref="QUERY_EXECUTOR"><map/></entry> <!-- Query Executor related data -->
+                <entry key-ref="QUERY_EXECUTOR_KEY_GENERATOR" value-ref="jsonQueryExecutorKeyGenerator"/> <!-- default query executor -->
+                <entry key-ref="TYPED_PARAMS_MAP"><map/></entry>
+                <entry key-ref="EXPECTED_RESULT"><null/></entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <!-- default key generator -->
+    <bean id="jsonQueryExecutorKeyGenerator" class="com.jaspersoft.jasperserver.war.cascade.utils.JSONQueryExecutorKeyGenerator">
+        <property name="quoteFieldNames" value="false"/>
+        <property name="replacementForDoubleQuotes" value="'"/>
+    </bean>
+
+    <util:constant id="NULL_SUBSTITUTION_VALUE" static-field="com.jaspersoft.jasperserver.war.cascade.handlers.InputControlHandler.NULL_SUBSTITUTION_VALUE"/>
+    <util:constant id="NULL_SUBSTITUTION_LABEL" static-field="com.jaspersoft.jasperserver.war.cascade.handlers.InputControlHandler.NULL_SUBSTITUTION_LABEL"/>
+
+</beans>
+
+
+
+
+

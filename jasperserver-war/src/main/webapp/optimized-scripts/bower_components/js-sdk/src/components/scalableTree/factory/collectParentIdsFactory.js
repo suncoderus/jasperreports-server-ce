@@ -1,0 +1,1 @@
+define(["require","underscore","./getParentIdFactory"],function(r){var e=r("underscore"),t=r("./getParentIdFactory"),a=function(r,e,t){if(t=t||[],"/"===e)return t;var n=r.getParentId(e);return t.push(n),a(r,n,t),t};return{create:function(r,n){var c=t.create(r,n);return e.partial(a,{escapeCharacter:r,separator:n,getParentId:c})}}});

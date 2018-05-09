@@ -1,0 +1,1 @@
+define([],function(){return function(n){var e="^"+n;return"/"!==n&&(e+="/"),new RegExp(e)}});

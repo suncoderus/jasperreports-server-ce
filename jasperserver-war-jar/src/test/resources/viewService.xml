@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+  <bean id="repoTxManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+    <property name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <bean id="mappingResourceFactory" class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.ResourceFactoryImpl">
+    <property name="objectFactory" ref="objectFactory"/>
+    <property name="implementationClassMappings">
+      <map>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource"
+	       value="com.jaspersoft.jasperserver.api.metadata.common.domain.client.FileResourceImpl"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.ContentResource"
+	       value="com.jaspersoft.jasperserver.api.metadata.common.domain.client.ContentResourceImpl"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JdbcReportDataSource"
+	       value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.JdbcReportDataSourceImpl"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.BeanReportDataSource"
+	       value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.BeanReportDataSourceImpl"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JndiJdbcReportDataSource"
+	       value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.JndiJdbcReportDataSourceImpl"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.ReportUnit"
+	       value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.client.ReportUnitImpl"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.Query"
+	       value="com.jaspersoft.jasperserver.api.metadata.common.domain.client.QueryImpl"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl"
+	       value="com.jaspersoft.jasperserver.api.metadata.common.domain.client.InputControlImpl"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.ListOfValues"
+	       value="com.jaspersoft.jasperserver.api.metadata.common.domain.client.ListOfValuesImpl"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.DataType"
+	       value="com.jaspersoft.jasperserver.api.metadata.common.domain.client.DataTypeImpl"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.user.domain.User"
+	       value="com.jaspersoft.jasperserver.api.metadata.user.domain.client.UserImpl"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.user.domain.Role"
+	       value="com.jaspersoft.jasperserver.api.metadata.user.domain.client.RoleImpl"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.user.domain.Tenant"
+		   value="com.jaspersoft.jasperserver.api.metadata.user.domain.client.TenantImpl"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.user.domain.ObjectPermission"
+	       value="com.jaspersoft.jasperserver.api.metadata.user.domain.client.ObjectPermissionImpl"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.user.domain.ProfileAttribute"
+	       value="com.jaspersoft.jasperserver.api.metadata.user.domain.client.ProfileAttributeImpl"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.olap.domain.MondrianConnection"
+               value="com.jaspersoft.ji.ja.security.domain.SecureMondrianConnectionImpl"/>
+	<entry key="com.jaspersoft.ji.ja.security.domain.SecureMondrianConnection"
+               value="com.jaspersoft.ji.ja.security.domain.SecureMondrianConnectionImpl"/>
+	<!--
+	    <entry key="com.jaspersoft.jasperserver.api.metadata.olap.domain.MondrianConnection"
+		   value="com.jaspersoft.jasperserver.api.metadata.olap.domain.client.MondrianConnectionImpl"/>
+	    -->
+	<entry key="com.jaspersoft.jasperserver.api.metadata.olap.domain.MondrianXMLADefinition"
+	       value="com.jaspersoft.jasperserver.api.metadata.olap.domain.client.MondrianXMLADefinitionImpl"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.olap.domain.OlapUnit"
+	       value="com.jaspersoft.jasperserver.api.metadata.olap.domain.client.OlapUnitImpl"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.olap.domain.OlapClientConnection"
+	       value="com.jaspersoft.jasperserver.api.metadata.olap.domain.client.OlapClientConnectionImpl"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.olap.domain.XMLAConnection"
+	       value="com.jaspersoft.jasperserver.api.metadata.olap.domain.client.XMLAConnectionImpl"/>
+	<entry key="com.jaspersoft.ji.adhoc.AdhocReportUnit"
+	       value="com.jaspersoft.ji.adhoc.AdhocReportUnitImpl"/>
+      </map>
+    </property>
+  </bean>
+
+  <bean id="persistentMappings"  class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.ResourceFactoryImpl">
+    <property name="objectFactory" ref="objectFactory"/>
+    <property name="implementationClassMappings">
+      <map>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.FileResource"
+	       value="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoFileResource"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.ContentResource"
+	       value="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.ContentRepoFileResource"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.ReportDataSource"
+	       value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.impl.datasource.RepoReportDataSource"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JdbcReportDataSource"
+	       value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.impl.datasource.RepoJdbcDataSource"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.JndiJdbcReportDataSource"
+	       value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.impl.datasource.RepoJndiJdbcDataSource"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.BeanReportDataSource"
+	       value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.impl.datasource.RepoBeanDataSource"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.ReportUnit"
+	       value="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.impl.RepoReportUnit"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.Query"
+	       value="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoQuery"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.InputControl"
+	       value="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoInputControl"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.ListOfValues"
+	       value="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoListOfValues"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.ListOfValuesItem"
+	       value="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoListOfValuesItem"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.common.domain.DataType"
+	       value="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.persistent.RepoDataType"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.user.domain.ObjectPermission"
+	       value="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoObjectPermission"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.user.domain.ProfileAttribute"
+	       value="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoProfileAttribute"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.user.domain.User"
+	       value="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoUser"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.user.domain.Role"
+	       value="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoRole"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.user.domain.Tenant"
+		   value="com.jaspersoft.jasperserver.api.metadata.user.domain.impl.hibernate.RepoTenant"/>
+	<!-- these values override OS values -->
+	<entry key="com.jaspersoft.jasperserver.api.metadata.olap.domain.MondrianConnection"
+               value="com.jaspersoft.ji.ja.security.domain.RepoSecureMondrianConnection"/>
+	<entry key="com.jaspersoft.ji.ja.security.domain.SecureMondrianConnection"
+               value="com.jaspersoft.ji.ja.security.domain.RepoSecureMondrianConnection"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.olap.domain.MondrianXMLADefinition"
+	       value="com.jaspersoft.ji.ja.security.domain.RepoSecureMondrianXMLADefinition"/>
+
+	<entry key="com.jaspersoft.jasperserver.api.metadata.olap.domain.OlapUnit"
+	       value="com.jaspersoft.jasperserver.api.metadata.olap.domain.impl.hibernate.RepoOlapUnit"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.olap.domain.OlapClientConnection"
+	       value="com.jaspersoft.jasperserver.api.metadata.olap.domain.impl.hibernate.RepoOlapClientConnection"/>
+	<entry key="com.jaspersoft.jasperserver.api.metadata.olap.domain.XMLAConnection"
+	       value="com.jaspersoft.jasperserver.api.metadata.olap.domain.impl.hibernate.RepoXMLAConnection"/>
+	<entry key="com.jaspersoft.ji.adhoc.AdhocReportUnit"
+	       value="com.jaspersoft.ji.adhoc.hibernate.RepoAdhocReportUnit"/>
+	<entry key="com.jaspersoft.ji.adhoc.AdhocColumn"
+	       value="com.jaspersoft.ji.adhoc.hibernate.RepoAdhocColumn"/>
+	<entry key="com.jaspersoft.ji.adhoc.AdhocGroup"
+	       value="com.jaspersoft.ji.adhoc.hibernate.RepoAdhocGroup"/>
+	<entry key="com.jaspersoft.ji.adhoc.AdhocState"
+	       value="com.jaspersoft.ji.adhoc.hibernate.RepoAdhocTableState"/>
+	<entry key="com.jaspersoft.ji.adhoc.AdhocTableState"
+	       value="com.jaspersoft.ji.adhoc.hibernate.RepoAdhocTableState"/>
+      </map>
+    </property>
+  </bean>
+
+  <bean id="repoServiceTarget" class="com.jaspersoft.jasperserver.api.metadata.common.service.impl.hibernate.HibernateRepositoryServiceImpl">
+    <property name="auditContext">
+        <bean class="com.jaspersoft.jasperserver.api.logging.audit.context.impl.DummyAuditContext"/>
+    </property>
+    <property name="accessContext">
+        <bean class="com.jaspersoft.jasperserver.api.logging.access.context.impl.DummyAccessContext"/>
+    </property>      
+    <property name="sessionFactory" ref="sessionFactory"/>
+    <property name="resourceFactory" ref="mappingResourceFactory"/>
+    <property name="persistentClassMappings" ref="persistentMappings"/>
+  </bean>
+
+  <bean id="repoService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+    <property name="transactionManager" ref="repoTxManager"/>
+    <property name="target" ref="repoServiceTarget"/>
+    <property name="transactionAttributes">
+      <props>
+	<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+	<prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
+	<prop key="createFolder">PROPAGATION_REQUIRED</prop>
+	<prop key="save*">PROPAGATION_REQUIRED</prop>
+	<prop key="delete*">PROPAGATION_REQUIRED</prop>
+	<prop key="*">PROPAGATION_SUPPORTS</prop>
+      </props>
+    </property>
+  </bean>
+
+  <bean id="encodingProvider" class="com.jaspersoft.jasperserver.api.common.util.StaticCharacterEncodingProvider">
+    <constructor-arg value="UTF-8"/>
+  </bean>
+
+
+</beans>

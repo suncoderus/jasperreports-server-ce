@@ -1,0 +1,88 @@
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<project name="install">
+
+  <!-- ======================================================================= -->
+  <!--                                                                         -->
+  <!-- This file holds installation related macros and targets                 -->
+  <!--                                                                         -->
+  <!-- ======================================================================= -->
+
+  <!-- ======================================================================= -->
+  <!-- Import a build file containing targets for db operations                -->
+  <!-- If the db directory has a db.xml, use that, otherwise use default       -->
+  <!-- ======================================================================= -->
+
+  <!-- echo for debugging:
+       <echo> overrideDatabaseInstallTargets = ${overrideDatabaseInstallTargets}"/>
+  -->
+
+  <if>
+    <available file="${currentDbDir}/db.xml"/>
+    <then>
+      <import file="${currentDbDir}/db.xml"/>
+    </then>
+    <else>
+      <!-- use the default DB related targets -->
+      <import file="db-common.xml"/>
+    </else>
+  </if>
+
+  <!-- Import the import-export targets. -->
+  <import file="import-export.xml" />
+
+  <!-- Import application server management and deployment targets. -->
+  <import file="app-server.xml" />
+
+  <!-- ======================================================================= -->
+  <!--                                                                         -->
+  <!-- Installation targets                                                    -->
+  <!--                                                                         -->
+  <!-- ======================================================================= -->
+
+  <target name="install-normal-ce"
+          description="Performs normal install of JasperServer CE (with sample databases and sample data)"
+          depends="gen-config, pre-install-test-ce, prepare-all-ce-dbs-normal, deploy-webapp-ce-if-needed">
+    <echo>Installation successfully completed!</echo>
+  </target>
+
+  <target name="install-normal-pro"
+          description="Performs normal install of JasperServer Pro (with sample databases and sample data)"
+          depends="gen-config, pre-install-test-pro, prepare-all-pro-dbs-normal, deploy-webapp-pro-if-needed">
+    <echo>Installation successfully completed!</echo>
+  </target>
+
+  <target name="install-minimal-ce"
+          description="Performs minimal install of JasperServer CE (no sample databases and sample data)"
+          depends="set-minimal-mode, gen-config, pre-install-test-ce, prepare-js-ce-db-minimal, deploy-webapp-ce-if-needed">
+    <echo>Installation successfully completed!</echo>
+  </target>
+
+  <target name="install-minimal-pro"
+          description="Performs minimal install of JasperServer Pro (no sample databases and sample data)"
+          depends="set-minimal-mode, gen-config, pre-install-test-pro, prepare-js-pro-db-minimal, deploy-webapp-pro-if-needed">
+    <echo>Installation successfully completed!</echo>
+  </target>
+
+  <target name="set-minimal-mode"
+          description="Sets property that flags that process of installation or upgrade is 'minimal'">
+    <property name="js.minimal.mode" value="true" />
+  </target>
+
+</project>

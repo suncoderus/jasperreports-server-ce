@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2005 - 2018 TIBCO Software Inc.
+  ~ http://www.jaspersoft.com.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+    
+	<!-- Backing action for view report flow -->
+	<bean id="viewReportAction" class="com.jaspersoft.jasperserver.war.action.ViewReportAction">
+			<property name="repository">
+				<ref bean="${bean.repositoryService}"/>
+			</property>
+			<property name="engine">
+				<ref bean="engineService"/>
+			</property>
+			<property name="messages">
+				<ref bean="messageSource"/>
+			</property>
+			<property name="reportUnitAttrName" value="reportUnit"/>
+			<property name="controlsDisplayFormAttrName" value="controlsDisplayForm"/>
+			<property name="controlsDisplayViewAttrName" value="controlsDisplayView"/>
+			<property name="reportDisplayFormAttrName" value="reportDisplayForm"/>
+			<property name="calendarDatePatternAttrName" value="calendarDatePattern"/>
+			<property name="calendarDatetimePatternAttrName" value="calendarDatetimePattern"/>
+			<property name="flowAttributeInhibitRequestParsing" value="inhibitRequestParsing"/>
+			<property name="requestParameterPageIndex" value="pageIndex"/>
+			<property name="flowAttributePageIndex" value="pageIndex"/>
+			<property name="requestAttributeHtmlLinkHandlerFactory" value="hyperlinkHandlerFactory"/>
+			<property name="flowAttributeDepth" value="reportDepth"/>
+			<property name="flowAttributeJasperPrintName" value="jasperPrintName"/>
+			<property name="hyperlinkProducerFactory" ref="viewReportHyperlinkProducerFactory"/>
+			<property name="flowAttributeIsSubflow" value="isSubflow"/>
+			<property name="hasInputControlsAttrName" value="hasInputControls"/>
+			<property name="reportReadOnlyAttrName" value="isReportReadOnly"/>
+			<property name="reportFolderReadOnlyAttrName" value="isReportFolderReadOnly"/>
+			<property name="requestParameterReportOutput" value="output"/>
+			<property name="flowAttributeReportOutput" value="reportOutput"/>
+			<property name="flowAttributeUseClientTimezone" value="useClientTimezone"/>
+			<property name="staticDatePattern" value="yyyyMMddHHmmss"/>
+			<property name="reportUnitObjectAttrName" value="reportUnitObject"/>
+			<property name="calendarFormatProvider" ref="messagesCalendarFormatProvider"/>
+			<property name="attributeInputControlsInformation" value="inputControlsInformation"/>
+			<property name="inputControlsAttrName" value="inputControls"/>
+			<property name="jasperPrintAccessor" ref="jasperPrintAccessor"/>
+			<property name="reportContextAccessor" ref="reportContextWebAccessor"/>
+			<property name="virtualizerFactory" ref="fileVirtualizerFactory"/>	
+			<property name="configuredExporters" ref="exporterConfigMap"/>
+			<property name="exportersSupportedByiPad" ref="exportersSupportedByiPad"/>
+			<property name="attributeReportControlsLayout" value="reportControlsLayout"/>
+			<property name="attributeReportForceControls" value="reportForceControls"/>
+			<property name="attributeSavedInputsState" value="savedInputsState"/>
+			<property name="attributeControlsHidden" value="inputControlsHidden"/>
+			<property name="attributeDashboardParametersHasError" value="dashboardParametersHasError"/>
+			<property name="attributeReportLocale" value="reportExecutionLocale"/>
+			<property name="parameterReportLocale" value="reportLocale"/>
+            <property name="auditContext" ref="${bean.auditContext}"/>
+            <property name="messageSourceObjectAttrName" value="messageSource"/>
+            <property name="requestParameterAnchor" value="anchor"/>
+			<property name="flowAttributeInitialPageIndex" value="initialPageIndex"/>
+			<property name="flowAttributeInitialAnchor" value="initialAnchor"/>
+            <property name="securityContextProvider" ref="${bean.securityContextProvider}"/>
+            <property name="configuration" ref="configurationBean"/>
+            <property name="reportLoadingService" ref="${bean.reportLoadingService}"/>
+            <property name="objectPermissionService" ref="objectPermissionService"/>
+            <property name="defaultAsyncReport" value="true"/>
+            <property name="defaultRecordDataSnapshot" value="true"/>
+            <property name="jasperReportsContext" ref="${bean.jasperReportsContext}"/>
+            <property name="showDialogForMandatoryInputControlsWithoutDefaultValue" value="false"/>
+            <property name="waitForFinalReportTime" value="100"/>
+    </bean>
+
+	<bean id="viewReportActionBean" class="com.jaspersoft.jasperserver.war.action.ResourceTypeMappingAction">
+        <property name="repositoryService" ref="${bean.repositoryService}"/>
+        <property name="engineService" ref="engineService"/>
+		<property name="resourceUriAttributeName" value="reportUnit"/>
+		<property name="typeToActionBean">
+			<util:map map-class="java.util.LinkedHashMap">
+				<entry key="com.jaspersoft.jasperserver.api.metadata.jasperreports.domain.ReportUnit"
+					value-ref="viewReportAction"/>
+			</util:map>
+		</property>
+    </bean>
+	
+    <bean id="setViewReportActionMap" class="com.jaspersoft.jasperserver.api.common.util.spring.GenericBeanUpdaterDefinition">
+        <property name="order" value="10"/>
+        <property name="beanName" value="viewReportActionBean"/>
+        <property name="propertyName" value="typeToActionBean"/>
+        <property name="operation" value="set"/>
+    </bean>
+
+
+	<bean id="baseReportExporter" class="com.jaspersoft.jasperserver.war.action.AbstractReportExporter" abstract="true">
+		<property name="jasperPrintAccessor" ref="jasperPrintAccessor"/>
+		<property name="flowAttributeJasperPrintName" value="jasperPrintName"/>
+		<property name="flowAttributeReportUnitURI" value="reportUnit"/>
+		<property name="httpUtils" ref="httpUtils"/>
+		<property name="responseHeaderSetter"><ref local="exportHeaders"/></property>
+		<property name="jasperReportsContext" ref="${bean.jasperReportsContext}"/>
+		<property name="viewReportAction" ref="viewReportAction"/>
+	</bean>
+	
+	<bean id="exportHeaders" class="com.jaspersoft.jasperserver.war.util.MatcherObjectSelector">
+		<property name="entries">
+			<list>
+				<bean class="com.jaspersoft.jasperserver.war.util.MatcherObjectSelector$Entry">
+					<property name="matcher">
+						<!-- a GET IE request that has no referrer -->
+						<bean class="com.jaspersoft.jasperserver.war.util.StandardRequestMatcher">
+							<property name="method" value="get"/>
+							<property name="headers">
+								<map>
+									<entry key="Referer" value="^$"/>
+									<entry key="User-Agent" value=".*\bmsie\b.*"/>
+								</map>
+							</property>
+						</bean>
+					</property>
+					<property name="object">
+						<bean class="com.jaspersoft.jasperserver.war.util.SimpleResponseHeaderSetter">
+							<property name="headers">
+								<map>
+									<entry key="Pragma" value=""/>
+									<entry key="Cache-Control" value="private"/>
+								</map>
+							</property>
+						</bean>
+					</property>
+				</bean>
+				<bean class="com.jaspersoft.jasperserver.war.util.MatcherObjectSelector$Entry">
+					<property name="matcher">
+						<!-- universal matcher -->
+						<bean class="com.jaspersoft.jasperserver.war.util.UniversalMatcher"/>
+					</property>
+					<property name="object">
+						<bean class="com.jaspersoft.jasperserver.war.util.SimpleResponseHeaderSetter">
+							<property name="headers">
+								<map>
+									<!-- default headers, this is needed for IE under SSL -->
+									<entry key="Pragma" value=""/>
+									<entry key="Cache-Control" value="private"/>
+								</map>
+							</property>
+						</bean>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="reportPdfExporter" class="com.jaspersoft.jasperserver.war.action.ReportPdfExporter" parent="baseReportExporter">
+		<property name="engine" ref="engineService"/>
+		<property name="exportParameters" ref="pdfExportParameters"/>
+		<property name="setResponseContentLength" value="true"/>
+	</bean>
+
+	<bean id="reportExcelExporter" class="com.jaspersoft.jasperserver.war.action.ReportExcelExporter" parent="baseReportExporter">
+		<property name="exportParameters" ref="xlsExportParameters"/>
+		<property name="setResponseContentLength" value="true"/>
+	</bean>
+
+	<bean id="reportExcelNoPaginationExporter" class="com.jaspersoft.jasperserver.war.action.ReportExcelExporter" parent="baseReportExporter">
+		<property name="exportParameters" ref="xlsExportParameters"/>
+		<property name="setResponseContentLength" value="true"/>
+		<property name="paginated" value="false"/>
+	</bean>
+
+	<bean id="reportXlsxExporter" class="com.jaspersoft.jasperserver.war.action.ReportXlsxExporter" parent="baseReportExporter">
+		<property name="exportParameters" ref="xlsExportParameters"/>
+		<property name="setResponseContentLength" value="true"/>
+	</bean>
+
+	<bean id="reportXlsxNoPaginationExporter" class="com.jaspersoft.jasperserver.war.action.ReportXlsxExporter" parent="baseReportExporter">
+		<property name="exportParameters" ref="xlsExportParameters"/>
+		<property name="setResponseContentLength" value="true"/>
+		<property name="paginated" value="false"/>
+	</bean>
+
+	<bean id="reportCsvExporter" class="com.jaspersoft.jasperserver.war.action.ReportCsvExporter" parent="baseReportExporter">
+		<property name="exportParameters" ref="csvExportParameters"/>
+		<property name="setResponseContentLength" value="true"/>
+	</bean>
+
+	<bean id="reportRtfExporter" class="com.jaspersoft.jasperserver.war.action.ReportRtfExporter" parent="baseReportExporter">
+		<property name="setResponseContentLength" value="true"/>
+	</bean>
+
+	<bean id="reportOdtExporter" class="com.jaspersoft.jasperserver.war.action.ReportOdtExporter" parent="baseReportExporter">
+		<property name="setResponseContentLength" value="true"/>
+	</bean>
+
+	<bean id="reportOdsExporter" class="com.jaspersoft.jasperserver.war.action.ReportOdsExporter" parent="baseReportExporter">
+		<property name="exportParameters" ref="odsExportParameters"/>
+		<property name="setResponseContentLength" value="true"/>
+	</bean>
+
+	<bean id="reportTextExporter" class="com.jaspersoft.jasperserver.war.action.ReportTextExporter" parent="baseReportExporter">
+		<property name="setResponseContentLength" value="true"/>
+	</bean>
+
+	<bean id="reportDocxExporter" class="com.jaspersoft.jasperserver.war.action.ReportDocxExporter" parent="baseReportExporter">
+		<property name="setResponseContentLength" value="true"/>
+	</bean>
+
+	<bean id="reportPptxExporter" class="com.jaspersoft.jasperserver.war.action.ReportPptxExporter" parent="baseReportExporter">
+		<property name="exportParameters" ref="pptxExportParameters"/>
+		<property name="setResponseContentLength" value="true"/>
+	</bean>
+
+	<bean id="reportExporter" class="com.jaspersoft.jasperserver.war.action.ReportExporterAction">
+		<property name="configuredExporters" ref="exporterConfigMap"/>
+		<property name="exportParameters">
+			<null/>
+		</property>	
+		<property name="configurationBean" ref="configurationBean"/>
+		<property name="messageSource" ref="messageSource"/>
+		<property name="viewReportAction" ref="viewReportAction"/>
+	</bean>
+
+	<!-- specific exporter configurations -->
+	<bean id="pdfExporterConfiguration" class="com.jaspersoft.jasperserver.war.action.ExporterConfigurationBean">
+		<property name="descriptionKey" value="jasper.report.view.hint.export.pdf"/>
+		<property name="iconSrc" value="/images/pdf.gif"/>
+		<property name="parameterDialogName" value=""/>
+		<property name="exportParameters" ref="pdfExportParameters"/>
+		<property name="currentExporter" ref="reportPdfExporter"/>
+	</bean>
+
+	<bean id="xlsExporterConfiguration" class="com.jaspersoft.jasperserver.war.action.ExporterConfigurationBean" scope="prototype">
+		<property name="descriptionKey" value="jasper.report.view.hint.export.excel"/>
+		<property name="iconSrc" value="/images/xls.gif"/>
+		<property name="parameterDialogName" value="excelExportParams"/>
+		<property name="exportParameters" ref="xlsExportParameters"/>
+		<property name="currentExporter" ref="reportExcelExporter"/>
+	</bean>
+	
+	<bean id="xlsNoPaginationExporterConfiguration" class="com.jaspersoft.jasperserver.war.action.ExporterConfigurationBean" scope="prototype">
+		<property name="descriptionKey" value="jasper.report.view.hint.export.excel.nopag"/>
+		<property name="iconSrc" value="/images/xls.gif"/>
+		<property name="parameterDialogName" value="excelExportParams"/>
+		<property name="exportParameters" ref="xlsExportParameters"/>
+		<property name="currentExporter" ref="reportExcelNoPaginationExporter"/>
+	</bean>
+	
+	<bean id="xlsxExporterConfiguration" class="com.jaspersoft.jasperserver.war.action.ExporterConfigurationBean" scope="prototype">
+		<property name="descriptionKey" value="jasper.report.view.hint.export.xlsx"/>
+		<property name="iconSrc" value="/images/xlsx.png"/>
+		<property name="parameterDialogName" value="excelExportParams"/>
+		<property name="exportParameters" ref="xlsExportParameters"/>
+		<property name="currentExporter" ref="reportXlsxExporter"/>
+	</bean>
+	
+	<bean id="xlsxNoPaginationExporterConfiguration" class="com.jaspersoft.jasperserver.war.action.ExporterConfigurationBean" scope="prototype">
+		<property name="descriptionKey" value="jasper.report.view.hint.export.xlsx.nopag"/>
+		<property name="iconSrc" value="/images/xlsx.png"/>
+		<property name="parameterDialogName" value="excelExportParams"/>
+		<property name="exportParameters" ref="xlsExportParameters"/>
+		<property name="currentExporter" ref="reportXlsxNoPaginationExporter"/>
+	</bean>
+	
+	<bean id="rtfExporterConfiguration" class="com.jaspersoft.jasperserver.war.action.ExporterConfigurationBean">
+		<property name="descriptionKey" value="jasper.report.view.hint.export.rtf"/>
+		<property name="iconSrc" value="/images/rtf.gif"/>
+		<property name="parameterDialogName" value=""/>
+		<property name="exportParameters">
+			<null/>
+		</property>
+		<property name="currentExporter" ref="reportRtfExporter"/>
+	</bean>
+
+	<bean id="odtExporterConfiguration" class="com.jaspersoft.jasperserver.war.action.ExporterConfigurationBean">
+		<property name="descriptionKey" value="jasper.report.view.hint.export.odt"/>
+		<property name="iconSrc" value="/images/odt.png"/>
+		<property name="parameterDialogName" value=""/>
+		<property name="exportParameters">
+			<null/>
+		</property>
+		<property name="currentExporter" ref="reportOdtExporter"/>
+	</bean>
+
+	<bean id="csvExporterConfiguration" class="com.jaspersoft.jasperserver.war.action.ExporterConfigurationBean">
+		<property name="descriptionKey" value="jasper.report.view.hint.export.csv"/>
+		<property name="iconSrc" value="/images/csv.gif"/>
+		<property name="parameterDialogName" value="csvExportParams"/>
+		<property name="exportParameters" ref="csvExportParameters"/>
+		<property name="currentExporter" ref="reportCsvExporter"/>
+	</bean>
+
+	<bean id="txtExporterConfiguration" class="com.jaspersoft.jasperserver.war.action.ExporterConfigurationBean">
+		<property name="descriptionKey" value="jasper.report.view.hint.export.txt"/>
+		<property name="iconSrc" value="/images/text.png"/>
+		<property name="parameterDialogName" value="txtExportParams"/>
+		<property name="exportParameters" ref="txtExportParameters"/>
+		<property name="currentExporter" ref="reportTextExporter"/>
+	</bean>
+
+	<bean id="docxExporterConfiguration" class="com.jaspersoft.jasperserver.war.action.ExporterConfigurationBean">
+		<property name="descriptionKey" value="jasper.report.view.hint.export.docx"/>
+		<property name="iconSrc" value="/images/docx.png"/>
+		<property name="parameterDialogName" value=""/>
+		<property name="exportParameters">
+			<null/>
+		</property>
+		<property name="currentExporter" ref="reportDocxExporter"/>
+	</bean>
+
+	<bean id="odsExporterConfiguration" class="com.jaspersoft.jasperserver.war.action.ExporterConfigurationBean" scope="prototype">
+		<property name="descriptionKey" value="jasper.report.view.hint.export.ods"/>
+		<property name="iconSrc" value="/images/ods.png"/>
+		<property name="parameterDialogName" value="odsExportParams"/>
+		<property name="exportParameters" ref="odsExportParameters"/>
+		<property name="currentExporter" ref="reportOdsExporter"/>
+	</bean>
+	
+	<bean id="pptxExporterConfiguration" class="com.jaspersoft.jasperserver.war.action.ExporterConfigurationBean" scope="prototype">
+		<property name="descriptionKey" value="jasper.report.view.hint.export.pptx"/>
+		<property name="iconSrc" value="/images/pptx.png"/>
+		<property name="parameterDialogName" value=""/>
+		<property name="exportParameters" ref="pptxExportParameters"/>
+		<property name="currentExporter" ref="reportPptxExporter"/>
+	</bean>
+	
+	<!-- end specific exporter configurations -->
+	
+	
+    <util:map id="exporterConfigMap">
+        <!-- comment/uncomment any of the lines below if you want related exporters 
+        	 to be excluded/included in the viewer's exporters list
+        	 Note: separate configuration for iPad 'exportersSupportedByiPad'
+        	 -->
+        	 
+        <entry key="pdf" value-ref="pdfExporterConfiguration"/>
+        <entry key="xls" value-ref="xlsExporterConfiguration"/>
+        <entry key="xlsNoPag" value-ref="xlsNoPaginationExporterConfiguration"/>
+        <entry key="csv" value-ref="csvExporterConfiguration"/>
+        <entry key="docx" value-ref="docxExporterConfiguration"/>
+        <entry key="rtf" value-ref="rtfExporterConfiguration"/>
+        <entry key="odt" value-ref="odtExporterConfiguration"/>
+        <entry key="ods" value-ref="odsExporterConfiguration"/>
+        <entry key="xlsx" value-ref="xlsxExporterConfiguration"/>
+        <entry key="xlsxNoPag" value-ref="xlsxNoPaginationExporterConfiguration"/>
+        <entry key="pptx" value-ref="pptxExporterConfiguration"/>
+        <!-- 
+        <entry key="txt" value-ref="txtExporterConfiguration"/>
+        -->
+    </util:map>
+
+    <util:list id="exportersSupportedByiPad">
+        <!-- Only listed keys will be used from 'exporterConfigMap' -->
+        <value>pdf</value>
+        <value>xls</value>
+        <value>xlsNoPag</value>
+        <value>csv</value>
+    </util:list>
+</beans>
